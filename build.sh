@@ -6,8 +6,8 @@ __bash_dir__="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # SKIP_SDC_SOURCE_TEST="${SKIP_SDC_SOURCE_TEST:-false}"
 SKIP_BUILD_LIB="${SKIP_BUILD_LIB:-false}"
-SKIP_RUN_SDC=${SKIP_RUN_SDC:-false}
-DEV_MODE="${DEV_MODE:-true}"
+SKIP_RUN_SDC=${SKIP_RUN_SDC:-true}
+DEV_MODE="${DEV_MODE:-false}"
 
 TAP_DATA_VERSION=tapdata-1.2.1
 export TAP_DATA_VERSION
@@ -78,7 +78,7 @@ run_sdc() {
     export SDC_FILE_LIMIT=1024
     # dist/sdc/bin/streamsets dc
     # BUILD_ID=dontKillMe  nohup dist/sdc/bin/streamsets dc &
-    BUILD_ID=dontKillMe nohup ./bin/tapdata dc>nohup.out &
+    BUILD_ID=dontKillMe nohup ./bin/tapdata dc>nohup.out 2>&1 &
 }
 
 main () {
@@ -88,6 +88,23 @@ main () {
     # if [ "$SKIP_SDC_SOURCE_TEST" != "true" ]; then
     #     download_sdc
     # fi   
+
+    if [ "$PID" != "" ]; then
+	echo 'KILL TAPDATA'
+	  kill -9 $PID
+	else
+	  echo 'TAPDATA IS NOT RUNNING'
+    fi
+
+
+    if [ "$SKIP_RUN_SDC" = "false" ]; then
+        #kill $(lsof -t -i:18630)
+	echo 'starting sdc'
+        run_sdc
+    else
+	echo 'not starting sdc'
+    fi
+
 
     if [ "$SKIP_BUILD_LIB" != "true" ]; then
        install_ui_lib
@@ -100,20 +117,6 @@ main () {
         echo "Done: built dist html files in ./dist/target/${TAP_DATA_VERSION}"
     fi 
 
-    if [ "$SKIP_RUN_SDC" = "false" ]; then
-        #kill $(lsof -t -i:18630)
-	if [ "$PID" != "" ]; then
-	  echo 'KILL TAPDATA'
-	  kill -9 $PID
-	else
-	  echo 'TAPDATA IS NOT RUNNING'
-	fi
-        echo 'starting sdc'
-        run_sdc
-    else
-	echo 'not starting sdc'
-    fi
- 
-    
+     
 }
 main "$@"

@@ -39,14 +39,10 @@ and
 
 - Then execute
 ```
-  ./run.sh
+  ./build.sh
 ```
 
 - To start TapData,execute
 ```
-  ./dist/target/tapdata-1.2.1/bin/streamsets dc
-```
-or
-```
-  nohup ./dist/target/tapdata-1.2.1/bin/streamsets dc &
+  ./dist/target/tapdata-1.2.1/bin/tapdata dc
 ```

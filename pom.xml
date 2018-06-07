@@ -324,14 +324,14 @@
   </profiles>
 
   <repositories>
-    <repository>
-      <id>cdh.repo</id>
-      <url>https://repository.cloudera.com/content/groups/cloudera-repos</url>
-      <name>Cloudera Repositories</name>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
+    <!--<repository>-->
+      <!--<id>cdh.repo</id>-->
+      <!--<url>https://repository.cloudera.com/content/groups/cloudera-repos</url>-->
+      <!--<name>Cloudera Repositories</name>-->
+      <!--<snapshots>-->
+        <!--<enabled>false</enabled>-->
+      <!--</snapshots>-->
+    <!--</repository>-->
     <repository>
       <id>confluent</id>
       <url>http://packages.confluent.io/maven/</url>

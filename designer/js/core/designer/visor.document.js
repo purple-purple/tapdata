@@ -20,6 +20,7 @@
 		this.defaultentityconnectionType="referenceConnector-012101";
 		this.defaultmapconnectionType="mapConnector-0322";
 		this.tables=new Map();
+		this.sourcetype="";
 		var percent=2/3;
 		var _width=document.body.clientWidth;
 		if(self!=top)
@@ -1104,8 +1105,8 @@
 			r.publishId=this.publishId;
 			r.template=this.template;
 			r.showRelation=this.showRelation;
-			
-			r.clusterclone=this.clusterclone;
+			r.sourcetype=this.sourcetype;
+			r.mode=this.mode;
 			var _rootwidget=this.activePanel.instance.rootwidget;
 			var _width=Math.min(300,_rootwidget.width);
 			var _height=Math.min(300,_rootwidget.height);

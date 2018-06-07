@@ -129,9 +129,9 @@ ul.dropdown-menu>li>a{
 							</div> 
 						</a> 
 					</div>
-					<div class="component widget text-center" style="cursor:pointer"> 
+<!--			<div class="component widget text-center" style="cursor:pointer"> 
 						<label style="cursor:pointer"><input style="cursor:pointer" type="checkbox"  name="clusterclone" checked="{document.clusterclone?true:false}" onclick="{ClusterClone}"/> Cluster Clone</label>
-					</div>
+					</div>-->
 					<div class="btn-group text-center" style="cursor:pointer"> 
 						<label style="cursor:pointer"><input style="cursor:pointer" type="checkbox"  name="showRelation" checked="{document.showRelation?true:false}" onclick="{showRelationchange}"/> Show ER Relationship</label>
 					</div>

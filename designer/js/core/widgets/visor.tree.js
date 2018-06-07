@@ -964,6 +964,8 @@
 					}
 				});
 			}
+			if("mongodb"==ths.begin.widget.sourcetype)
+				mappingtype="MergedObject";
 			this.end.offsetx=newNode.x;
 			this.end.offsety=newNode.y;
 			this.targetpath=gettargetpath(newNode);

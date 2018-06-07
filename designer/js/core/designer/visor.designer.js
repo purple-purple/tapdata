@@ -577,9 +577,8 @@
 		
 		this.init=function(schema,opts){
 			 ths.reset();
-			 ths.setting=ths.setting||{};
-    		 $.extend(ths.setting,opts||{});
-    		 ths.setting.sourcetype=schema.database_type;
+    		 ths.document.sourcetype=schema.database_type;
+    		 ths.document.mode=opts.mode;
     		 ths.document.restoreSchema(schema||{});
     		 riot.mount("navigation",ths);
     		 ths.trigger("restoredocument");
@@ -598,6 +597,8 @@
 					height=document.body.clientHeight-offsetY;
 				for(var i=0;i<ths.document.activePanel.instance.widgets.length;i++){
 					var _widget=ths.document.activePanel.instance.widgets[i];
+					if(_widget.type=="table"&&ths.document.sourcetype)
+					  _widget.sourcetype=ths.document.sourcetype;
 					if(_widget.visible&&(_widget.y+_widget.height>height)&&_widget.type!='separator')
 					    height=(_widget.y+_widget.height)+20;
 					if(_widget.visible&&(_widget.x+_widget.width>width))

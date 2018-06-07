@@ -26,7 +26,7 @@ To build the TapData you will need the following software :
 ```
 and
 ```
-  cd datacollector-plugin-api
+  cd ../datacollector-plugin-api
   mvn package install -DskipTests
 ```
 

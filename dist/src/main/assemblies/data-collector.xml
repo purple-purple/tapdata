@@ -23,7 +23,7 @@
       <directory>${basedir}/src/main</directory>
       <outputDirectory>/</outputDirectory>
       <includes>
-        <include>bin/*</include>
+        <include>bin/tapdata</include>
       </includes>
       <fileMode>0755</fileMode>
     </fileSet>
@@ -477,10 +477,10 @@
     <!--</fileSet>-->
 
     <!-- Mongo libs -->
-    <fileSet>
-      <directory>${basedir}/../${mongodb_3-lib}/target/streamsets-libs/</directory>
-      <outputDirectory>/streamsets-libs/</outputDirectory>
-    </fileSet>
+    <!--<fileSet>-->
+      <!--<directory>${basedir}/../${mongodb_3-lib}/target/streamsets-libs/</directory>-->
+      <!--<outputDirectory>/streamsets-libs/</outputDirectory>-->
+    <!--</fileSet>-->
 
     <!-- redis-lib -->
     <!--<fileSet>-->

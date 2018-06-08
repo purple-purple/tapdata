@@ -292,7 +292,7 @@
       </activation>
       <modules>
         <module>dist</module>
-        <module>cloudera-integration</module>
+        <!--<module>cloudera-integration</module>-->
       </modules>
     </profile>
 

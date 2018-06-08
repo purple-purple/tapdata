@@ -12,7 +12,7 @@ DEV_MODE="${DEV_MODE:-false}"
 TAP_DATA_VERSION=tapdata-1.2.1
 export TAP_DATA_VERSION
 
-PID=$(ps -ef|grep tapdata|grep -v grep|awk '{print $2}')
+PID=$(ps -ef|grep $TAP_DATA_VERSION""|grep -v grep|awk '{print $2}')
 echo 'TAPDATA PID:'$PID
 
 make_dist_dir() {

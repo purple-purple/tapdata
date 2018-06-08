@@ -13,7 +13,6 @@ TAP_DATA_VERSION=tapdata-1.2.1
 export TAP_DATA_VERSION
 
 PID=$(ps -ef|grep $TAP_DATA_VERSION""|grep -v grep|awk '{print $2}')
-echo 'TAPDATA PID:'$PID
 
 make_dist_dir() {
     if [ ! -d "${__bash_dir__}/dist/" ]; then
@@ -87,18 +86,17 @@ main () {
     
     # if [ "$SKIP_SDC_SOURCE_TEST" != "true" ]; then
     #     download_sdc
-    # fi   
-
-    if [ "$PID" != "" ]; then
-	echo 'KILL TAPDATA'
-	  kill -9 $PID
-	else
-	  echo 'TAPDATA IS NOT RUNNING'
-    fi
-
+    # fi
 
     if [ "$SKIP_RUN_SDC" = "false" ]; then
         #kill $(lsof -t -i:18630)
+	if [ "$PID" != "" ]; then
+	  echo KILL "$TAP_DATA_VERSION":{$PID}
+	  kill -9 $PID
+	else
+	  echo 'TAPDATA IS NOT RUNNING'
+	fi
+
 	echo 'starting sdc'
         run_sdc
     else

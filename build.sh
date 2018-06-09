@@ -8,7 +8,7 @@ __bash_dir__="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKIP_BUILD_LIB="${SKIP_BUILD_LIB:-false}"
 SKIP_RUN_SDC=${SKIP_RUN_SDC:-true}
 DEV_MODE="${DEV_MODE:-false}"
-
+DOWNLOAD_SDC="${DOWNLOAD_SDC:-false}"
 TAP_DATA_VERSION=tapdata-1.2.1
 export TAP_DATA_VERSION
 
@@ -90,17 +90,20 @@ main () {
 
     if [ "$SKIP_RUN_SDC" = "false" ]; then
         #kill $(lsof -t -i:18630)
-	if [ "$PID" != "" ]; then
-	  echo KILL "$TAP_DATA_VERSION":{$PID}
-	  kill -9 $PID
-	else
-	  echo 'TAPDATA IS NOT RUNNING'
-	fi
+        if [ "$PID" != "" ]; then
+            echo KILL "$TAP_DATA_VERSION":{$PID}
+            kill -9 $PID
+        else
+            echo 'TAPDATA IS NOT RUNNING'
+        fi
 
-	echo 'starting sdc'
+        if [ "$DOWNLOAD_SDC" = "true" ]; then
+            download_sdc
+        fi
+        echo 'starting sdc'
         run_sdc
     else
-	echo 'not starting sdc'
+        echo 'not starting sdc'
     fi
 
 

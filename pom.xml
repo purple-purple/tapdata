@@ -280,7 +280,7 @@
     <!--<module>windows-lib</module>-->
 
     <module>mongodb_3-lib</module>
-    <module>samplestage</module>
+    <!--<module>samplestage</module>-->
   </modules>
 
   <build>

@@ -45,7 +45,7 @@ angular.module('splitterDirectives', [])
         var pane2 = scope.panes[1];
         var vertical = scope.orientation == 'vertical';
         var pane1Min = pane1.minSize || 0;
-        var pane2Min = pane2.minSize || 0;
+        var pane2Min = pane2 && pane2.minSize || 0;
         var drag = false;
         
         pane1.elem.after(handler);

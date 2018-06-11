@@ -162,7 +162,7 @@
 
     <!--<module>cassandra-protolib</module>-->
 
-    <!--<module>mongodb-protolib</module>-->
+    <module>mongodb-protolib</module>
 
     <!--<module>flume-protolib</module>-->
 
@@ -214,7 +214,7 @@
     <!--<module>vault-credentialstore-lib</module>-->
     <!--<module>windows-lib</module>-->
 
-    <!--<module>mongodb_3-lib</module>-->
+    <module>mongodb_3-lib</module>
   </modules>
 
   <build>

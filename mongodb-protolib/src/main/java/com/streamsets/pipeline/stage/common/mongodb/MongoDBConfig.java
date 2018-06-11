@@ -36,6 +36,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Optional;
 
 public class MongoDBConfig {
@@ -344,7 +345,7 @@ public class MongoDBConfig {
       displayPosition = 190
   )
   public boolean sslInvalidHostNameAllowed = false;
-
+  private HashMap<String, MongoCollection> collections = new HashMap<String, MongoCollection>();
   public void init(
       Stage.Context context,
       List<Stage.ConfigIssue> issues,
@@ -376,6 +377,15 @@ public class MongoDBConfig {
     return mongoCollection;
   }
 
+  public MongoCollection getMongoCollection(String collectionName){
+      
+    if(collections.get(collectionName) == null){
+        MongoCollection coll = createMongoCollection(null, null, null, null);
+        if(coll!=null)
+            collections.put(collectionName, coll);
+    }
+    return collections.get(collectionName);
+  }
   private MongoClient createClient(
       Stage.Context context,
       List<Stage.ConfigIssue> issues,
@@ -509,6 +519,7 @@ public class MongoDBConfig {
         mongoCollection = mongoDatabase.getCollection(collection).withWriteConcern(writeConcern);
       }
     } catch (MongoClientException e) {
+        if(issues!=null)
       issues.add(context.createConfigIssue(
           Groups.MONGODB.name(),
           MONGO_CONFIG_PREFIX + "collection",

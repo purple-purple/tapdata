@@ -65,6 +65,8 @@ public class MongoDBTarget extends BaseTarget {
   private ErrorRecordHandler errorRecordHandler;
   private DataGeneratorFactory generatorFactory;
 
+  private TapTransformer transformer;
+
   public MongoDBTarget(MongoTargetConfigBean mongoTargetConfigBean) {
     this.mongoTargetConfigBean = mongoTargetConfigBean;
   }
@@ -97,6 +99,8 @@ public class MongoDBTarget extends BaseTarget {
     builder.setCharset(StandardCharsets.UTF_8);
     builder.setMode(Mode.MULTIPLE_OBJECTS);
     generatorFactory = builder.build();
+    
+    transformer = new TapTransformer(mongoTargetConfigBean);
 
     return issues;
   }
@@ -112,8 +116,12 @@ public class MongoDBTarget extends BaseTarget {
     Iterator<Record> records = batch.getRecords();
     List<WriteModel<Document>> documentList = new ArrayList<>();
     List<Record> recordList = new ArrayList<>();
+    int count=0;
     while (records.hasNext()) {
-      Record record = records.next();
+      Record record = records.next();      
+      // for(String attr: record.getHeader().getAttributeNames()){
+      //   System.out.println(attr+" -- "+record.getHeader().getAttribute(attr));
+      // }
       try {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(DEFAULT_CAPACITY);
         DataGenerator generator = generatorFactory.getGenerator(baos);
@@ -122,62 +130,17 @@ public class MongoDBTarget extends BaseTarget {
         Document document = Document.parse(new String(baos.toByteArray()));
 
         // create a write model based on record header
-        if (isNullOrEmpty(record.getHeader().getAttribute(OperationType.SDC_OPERATION_TYPE))) {
-          LOG.error(Errors.MONGODB_15.getMessage(), record.getHeader().getSourceId());
-          throw new OnRecordErrorException(Errors.MONGODB_15, record.getHeader().getSourceId());
-        }
+        // if (isNullOrEmpty(record.getHeader().getAttribute(OperationType.SDC_OPERATION_TYPE))) {
+        //   LOG.error(Errors.MONGODB_15.getMessage(), record.getHeader().getSourceId());
+        //   throw new OnRecordErrorException(Errors.MONGODB_15, record.getHeader().getSourceId());
+        // }
 
-        String operationCode = record.getHeader().getAttribute(OperationType.SDC_OPERATION_TYPE);
-        String operation;
-        if (operationCode != null) {
-          operation = OperationType.getLabelFromStringCode(operationCode);
-        } else {
-          operation = record.getHeader().getAttribute(OperationType.SDC_OPERATION_TYPE);
-        }
-        if (operation == null) {
-          throw new StageException(Errors.MONGODB_15, record.getHeader().getSourceId());
-        }
-        switch (operation.toUpperCase()) {
-          case "INSERT":
-            documentList.add(new InsertOneModel<>(document));
-            recordList.add(record);
-            break;
-          case "REPLACE":
-            validateUniqueKey(operation, record);
-            recordList.add(record);
-            documentList.add(
-                new ReplaceOneModel<>(
-                    new Document(
-                        removeLeadingSlash(mongoTargetConfigBean.uniqueKeyField),
-                        record.get(mongoTargetConfigBean.uniqueKeyField).getValueAsString()
-                    ),
-                    document,
-                    new UpdateOptions().upsert(mongoTargetConfigBean.isUpsert)
-                )
-            );
-            break;
-          case "UPDATE":
-            validateUniqueKey(operation, record);
-            recordList.add(record);
-            documentList.add(
-                new UpdateOneModel<>(
-                    new Document(
-                        removeLeadingSlash(mongoTargetConfigBean.uniqueKeyField),
-                        record.get(mongoTargetConfigBean.uniqueKeyField).getValueAsString()
-                    ),
-                    new Document("$set", document),
-                    new UpdateOptions().upsert(mongoTargetConfigBean.isUpsert)
-                )
-            );
-            break;
-          case "DELETE":
-            recordList.add(record);
-            documentList.add(new DeleteOneModel<>(document));
-            break;
-          default:
-            LOG.error(Errors.MONGODB_14.getMessage(), operation, record.getHeader().getSourceId());
-            throw new StageException(Errors.MONGODB_14, operation, record.getHeader().getSourceId());
-        }
+        WriteModel model = transformer.processRecord(record, document);            
+        if(model != null){
+              recordList.add(record);
+              documentList.add(model);
+        }            
+       
       } catch (IOException | StageException | NumberFormatException e) {
         errorRecordHandler.onError(
             new OnRecordErrorException(
@@ -191,10 +154,12 @@ public class MongoDBTarget extends BaseTarget {
     }
 
     if (!documentList.isEmpty()) {
+      System.out.println("Writing "+ documentList.size()+" ops ");
       try {
         BulkWriteResult bulkWriteResult = mongoCollection.bulkWrite(documentList);
         if (bulkWriteResult.wasAcknowledged()) {
-          LOG.trace(
+          System.out.println(bulkWriteResult);
+          LOG.debug(
               "Wrote batch with {} inserts, {} updates and {} deletes",
               bulkWriteResult.getInsertedCount(),
               bulkWriteResult.getModifiedCount(),
@@ -214,6 +179,10 @@ public class MongoDBTarget extends BaseTarget {
         }
       }
     }
+  }
+
+  private void processOplog(){
+
   }
 
   private void validateUniqueKey(String operation, Record record) throws OnRecordErrorException {

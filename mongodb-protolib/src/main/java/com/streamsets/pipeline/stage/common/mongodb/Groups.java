@@ -22,6 +22,7 @@ import com.streamsets.pipeline.api.Label;
 public enum Groups implements Label {
   MONGODB("MongoDB"),
   CREDENTIALS("Credentials"),
+  OPERATIONS("Operations"),
   ADVANCED("Advanced"),
   ;
 

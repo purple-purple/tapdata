@@ -26,10 +26,10 @@ import com.streamsets.pipeline.stage.common.mongodb.Groups;
 
 @StageDef(
     version = 3,
-    label = "MongoDB",
-    description = "Writes data to MongoDB",
-    icon="mongodb.png",
-    onlineHelpRefUrl ="index.html#datacollector/UserGuide/Destinations/MongoDB.html#task_mrc_k5n_4v",
+    label = "Tap Mongo",
+    description = "Tapdata Transformation Output to MongoDB ",
+    icon="tapmongo.png",
+    onlineHelpRefUrl ="http://tapdata.io",
     upgrader = MongoDBTargetUpgrader.class
 )
 

@@ -23,7 +23,7 @@ import com.streamsets.pipeline.stage.common.mongodb.MongoDBConfig;
 
 public class MongoTargetConfigBean {
 
-  @ConfigDefBean(groups = {"MONGODB", "CREDENTIALS", "ADVANCED"})
+  @ConfigDefBean(groups = {"MONGODB", "CREDENTIALS", "OPERATIONS","ADVANCED"})
   public MongoDBConfig mongoConfig;
 
   @ConfigDef(
@@ -56,8 +56,44 @@ public class MongoTargetConfigBean {
       required = true,
       displayPosition = 1020,
       group = "MONGODB"
-  )
+  )  
   @ValueChooserModel(WriteConcernChooserValues.class)
   public WriteConcernLabel writeConcern = WriteConcernLabel.JOURNALED;
 
+  /**@ConfigDef(
+      type = ConfigDef.Type.STRING,
+      label = "Operation Type",
+      description = "Sets the operation type: INSERT | UPDATE | REPLACE | DELETE",
+      defaultValue = "INSERT",
+      required = false,
+      displayPosition = 1000,
+      group = "OPERATIONS"
+  )
+  public String operation;
+  */
+  
+  @ConfigDef(
+      type = ConfigDef.Type.TEXT,
+      label = "Mapping",
+      description = "Define the table mapping",
+      defaultValue = "",
+      required = true,
+      displayPosition = 1005,
+      group = "OPERATIONS"
+  )
+  public String mapping;
+
+  @ConfigDef(
+      type = ConfigDef.Type.BOOLEAN,
+      label = "Collection Cloning",
+      defaultValue = "false",
+      description = "Check this if replicating mongo collection",
+      required = false,
+      displayPosition = 1003,
+      group = "OPERATIONS"
+  )
+  public boolean isCloningMode;
+
+
+  
 }

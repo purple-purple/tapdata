@@ -67,6 +67,71 @@
     <vault-credentialstore-lib>vault-credentialstore-lib</vault-credentialstore-lib>
     <windows-lib>windows-lib</windows-lib>
     <rootProject>true</rootProject>
+
+    <apache-kafka_0_8_1-lib>apache-kafka_0_8_1-lib</apache-kafka_0_8_1-lib>
+    <apache-kafka_0_8_2-lib>apache-kafka_0_8_2-lib</apache-kafka_0_8_2-lib>
+    <apache-kafka_0_9-lib>apache-kafka_0_9-lib</apache-kafka_0_9-lib>
+    <apache-kafka_0_10-lib>apache-kafka_0_10-lib</apache-kafka_0_10-lib>
+    <apache-kafka_0_11-lib>apache-kafka_0_11-lib</apache-kafka_0_11-lib>
+    <apache-kafka_1_0-lib>apache-kafka_1_0-lib</apache-kafka_1_0-lib>
+    <apache-kudu_1_0-lib>apache-kudu_1_0-lib</apache-kudu_1_0-lib>
+    <apache-kudu_1_1-lib>apache-kudu_1_1-lib</apache-kudu_1_1-lib>
+    <apache-kudu_1_2-lib>apache-kudu_1_2-lib</apache-kudu_1_2-lib>
+    <apache-kudu_1_3-lib>apache-kudu_1_3-lib</apache-kudu_1_3-lib>
+    <apache-kudu_1_4-lib>apache-kudu_1_4-lib</apache-kudu_1_4-lib>
+    <apache-kudu_1_5-lib>apache-kudu_1_5-lib</apache-kudu_1_5-lib>
+    <apache-kudu_1_6-lib>apache-kudu_1_6-lib</apache-kudu_1_6-lib>
+    <apache-kudu_1_7-lib>apache-kudu_1_7-lib</apache-kudu_1_7-lib>
+    <apache-solr_6_1_0-lib>apache-solr_6_1_0-lib</apache-solr_6_1_0-lib>
+    <cassandra_3-lib>cassandra_3-lib</cassandra_3-lib>
+    <cdh_5_2-lib>cdh_5_2-lib</cdh_5_2-lib>
+    <cdh_5_3-lib>cdh_5_3-lib</cdh_5_3-lib>
+    <cdh_5_4-lib>cdh_5_4-lib</cdh_5_4-lib>
+    <cdh_5_5-lib>cdh_5_5-lib</cdh_5_5-lib>
+    <cdh_5_7-lib>cdh_5_7-lib</cdh_5_7-lib>
+    <cdh_5_8-lib>cdh_5_8-lib</cdh_5_8-lib>
+    <cdh_5_9-lib>cdh_5_9-lib</cdh_5_9-lib>
+    <cdh_5_10-lib>cdh_5_10-lib</cdh_5_10-lib>
+    <cdh_5_11-lib>cdh_5_11-lib</cdh_5_11-lib>
+    <cdh_5_12-lib>cdh_5_12-lib</cdh_5_12-lib>
+    <cdh_5_13-lib>cdh_5_13-lib</cdh_5_13-lib>
+    <cdh_5_14-lib>cdh_5_14-lib</cdh_5_14-lib>
+    <cdh-spark_2_1-lib>cdh-spark_2_1-lib</cdh-spark_2_1-lib>
+    <cdh-spark_2_2-lib>cdh-spark_2_2-lib</cdh-spark_2_2-lib>
+    <cdh-spark_2_3-lib>cdh-spark_2_3-lib</cdh-spark_2_3-lib>
+    <cdh_6_0-lib>cdh_6_0-lib</cdh_6_0-lib>
+    <cdh_kafka_1_2-lib>cdh_kafka_1_2-lib</cdh_kafka_1_2-lib>
+    <cdh_kafka_1_3-lib>cdh_kafka_1_3-lib</cdh_kafka_1_3-lib>
+    <cdh_kafka_2_0-lib>cdh_kafka_2_0-lib</cdh_kafka_2_0-lib>
+    <cdh_kafka_2_1-lib>cdh_kafka_2_1-lib</cdh_kafka_2_1-lib>
+    <cdh_kafka_3_0-lib>cdh_kafka_3_0-lib</cdh_kafka_3_0-lib>
+    <cdh_spark_2_1_r1-lib>cdh_spark_2_1_r1-lib</cdh_spark_2_1_r1-lib>
+    <elasticsearch_5-lib>elasticsearch_5-lib</elasticsearch_5-lib>
+    <emr_hadoop_2_7_3-lib>emr_hadoop_2_7_3-lib</emr_hadoop_2_7_3-lib>
+    <emr_hadoop_2_8_3-lib>emr_hadoop_2_8_3-lib</emr_hadoop_2_8_3-lib>
+    <groovy_2_4-lib>groovy_2_4-lib</groovy_2_4-lib>
+    <kinetica_6_0-lib>kinetica_6_0-lib</kinetica_6_0-lib>
+    <kinetica_6_1-lib>kinetica_6_1-lib</kinetica_6_1-lib>
+    <hdp_2_2-lib>hdp_2_2-lib</hdp_2_2-lib>
+    <hdp_2_3-lib>hdp_2_3-lib</hdp_2_3-lib>
+    <hdp_2_3-hive1-lib>hdp_2_3-hive1-lib</hdp_2_3-hive1-lib>
+    <hdp_2_4-lib>hdp_2_4-lib</hdp_2_4-lib>
+    <hdp_2_4-hive1-lib>hdp_2_4-hive1-lib</hdp_2_4-hive1-lib>
+    <hdp_2_5-lib>hdp_2_5-lib</hdp_2_5-lib>
+    <hdp_2_5-flume-lib>hdp_2_5-flume-lib</hdp_2_5-flume-lib>
+    <hdp_2_6-lib>hdp_2_6-lib</hdp_2_6-lib>
+    <hdp_2_6_1-hive1-lib>hdp_2_6_1-hive1-lib</hdp_2_6_1-hive1-lib>
+    <hdp_2_6_2-hive1-lib>hdp_2_6_2-hive1-lib</hdp_2_6_2-hive1-lib>
+    <hdp_2_6-hive2-lib>hdp_2_6-hive2-lib</hdp_2_6-hive2-lib>
+    <hdp_2_6-flume-lib>hdp_2_6-flume-lib</hdp_2_6-flume-lib>
+    <jython_2_7-lib>jython_2_7-lib</jython_2_7-lib>
+    <mapr_5_0-lib>mapr_5_0-lib</mapr_5_0-lib>
+    <mapr_5_1-lib>mapr_5_1-lib</mapr_5_1-lib>
+    <mapr_5_2-lib>mapr_5_2-lib</mapr_5_2-lib>
+    <mapr_6_0-lib>mapr_6_0-lib</mapr_6_0-lib>
+    <mapr_6_0-mep4-lib>mapr_6_0-mep4-lib</mapr_6_0-mep4-lib>
+    <mapr_spark_2_1_mep_3_0-lib>mapr_spark_2_1_mep_3_0-lib</mapr_spark_2_1_mep_3_0-lib>
+    <mongodb_3-lib>mongodb_3-lib</mongodb_3-lib>
   </properties>
 
   <!-- StreamSets Data Collector API being used -->
@@ -215,6 +280,7 @@
     <!--<module>windows-lib</module>-->
 
     <module>mongodb_3-lib</module>
+    <module>samplestage</module>
   </modules>
 
   <build>

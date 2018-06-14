@@ -1,4 +1,11 @@
 {
+	"tapdata": {
+		"Parameters":"参数",
+		"Notifications": "消息",
+		"Error Records": "错误记录",
+		"Cluster": "集群",
+		"Execution Mode": "运行模式"
+	},
 	"global": {
 		"title": "任务代理",
 		"login": "登录",
@@ -386,7 +393,7 @@
 				"enterKey": "输入名称",
 				"enterPredicate": "输入条件",
 				"enterValue": "输入值",
-				"general": "General",
+				"general": "概览",
 				"info": "信息",
 				"loading": "正在加载...",
 				"no记录": "无预览记录。",

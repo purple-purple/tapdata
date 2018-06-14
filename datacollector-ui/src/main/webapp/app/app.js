@@ -15,6 +15,11 @@
  */
 
 angular.module('dataCollectorApp')
+.factory('customTranslationHandler', function () {
+  return function (translationID, uses) {    
+    return (translationID.split('.'))[1];
+  };
+})
   .config(function($routeProvider, $locationProvider, $translateProvider, $provide,
                    tmhDynamicLocaleProvider, uiSelectConfig, $httpProvider, AnalyticsProvider) {
 
@@ -55,6 +60,7 @@ angular.module('dataCollectorApp')
     $translateProvider.useCookieStorage();
     $translateProvider.useSanitizeValueStrategy('sanitizeParameters');
     $translateProvider.preferredLanguage('ch');
+    $translateProvider.useMissingTranslationHandler('customTranslationHandler');
 
     tmhDynamicLocaleProvider.localeLocationPattern('bower_components/angular-i18n/angular-locale_{{locale}}.js');
     tmhDynamicLocaleProvider.useCookieStorage('NG_TRANSLATE_LANG_KEY');

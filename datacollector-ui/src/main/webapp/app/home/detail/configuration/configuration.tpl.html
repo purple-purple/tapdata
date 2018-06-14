@@ -20,7 +20,7 @@
       <tab-heading>
         <i class="fa fa-exclamation-triangle icon-danger"
            ng-show="showConfigurationWarning(detailPaneConfig, groupNameToLabelMap.name)"></i>
-        <span>{{groupNameToLabelMap.label}}</span>
+        <span>{{('tapdata.'+ groupNameToLabelMap.label | translate) }}</span>
       </tab-heading>
 
       <div class="tabs-content" ng-if="groupNameToLabelMap.active">

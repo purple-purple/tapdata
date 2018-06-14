@@ -17,6 +17,8 @@
 
 # resolve links - $0 may be a softlink
 PRG="${0}"
+export DEBUG="${DEBUG:-false}"
+export HTTP_PORT="${HTTP_PORT:-8000}"
 
 while [ -h "${PRG}" ]; do
 ls=`ls -ld "${PRG}"`
@@ -98,7 +100,7 @@ SDC_JAVA_OPTS="${SDC_JAVA_OPTS} -Dsdc.conf.dir=${SDC_CONF}"
 SDC_JAVA_OPTS="${SDC_JAVA_OPTS} -Dsdc.data.dir=${SDC_DATA}"
 SDC_JAVA_OPTS="${SDC_JAVA_OPTS} -Dsdc.log.dir=${SDC_LOG}"
 
-BOOTSTRAP_JAR="${SDC_DIST}/libexec/bootstrap-libs/main/streamsets-datacollector-bootstrap-${project.version}.jar"
+BOOTSTRAP_JAR="${SDC_DIST}/libexec/bootstrap-libs/main/streamsets-datacollector-bootstrap-3.2.1.0-SNAPSHOT.jar"
 
 SDC_JAVA_OPTS="${SDC_JAVA_OPTS} -javaagent:${BOOTSTRAP_JAR}"
 
@@ -188,6 +190,15 @@ then
   SDC_SECURITY_MANAGER="-Djava.security.manager -Djava.security.policy=${SDC_POLICY_FILE}"
   SDC_JAVA_OPTS="${SDC_SECURITY_MANAGER} ${SDC_JAVA_OPTS}"
 fi
+
+echo "DEBUG:${DEBUG}"
+if [ "${DEBUG}" = "true" ]
+then
+  echo "Open debug mode,port:$HTTP_PORT"
+  SDC_JAVA_OPTS="${SDC_JAVA_OPTS} -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=$HTTP_PORT"
+fi
+
+echo "SDC_JAVA_OPTS : ${SDC_JAVA_OPTS}"
 
 if [ $VERBOSE -eq 1 ];
 then

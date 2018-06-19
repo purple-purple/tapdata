@@ -1,13 +1,24 @@
 <script type="text/ng-template" id="labelConfigurationTemplate">
   <label class="col-lg-3 col-md-4 control-label">{{'tapdata.'+ configDefinition.label| translate }}
-    <i class="fa fa-info-circle help-icon"
+   
+    <i ng-if="configDefinition.description" class="fa fa-info-circle help-icon"
        ng-class="{
        'fa-info-circle': configDefinition.type !== 'CREDENTIAL' && configDefinition.type !== 'EL_CREDENTIAL',
        'fa-key': configDefinition.type === 'CREDENTIAL' || configDefinition.type === 'EL_CREDENTIAL'
        }"
        tooltip-placement="right"
        tooltip-append-to-body="false"
-       tooltip="{{configDefinition.description || configDefinition.label}}"
+       tooltip="{{ 'tapdata.' + configDefinition.description | translate}}"
+       tooltip-trigger="mouseenter"></i>
+
+       <i ng-if="!configDefinition.description" class="fa fa-info-circle help-icon"
+       ng-class="{
+       'fa-info-circle': configDefinition.type !== 'CREDENTIAL' && configDefinition.type !== 'EL_CREDENTIAL',
+       'fa-key': configDefinition.type === 'CREDENTIAL' || configDefinition.type === 'EL_CREDENTIAL'
+       }"
+       tooltip-placement="right"
+       tooltip-append-to-body="false"
+       tooltip="{{ 'tapdata.' + configDefinition.label | translate}}"
        tooltip-trigger="mouseenter"></i>
   </label>
 </script>
@@ -15,7 +26,7 @@
 <script type="text/ng-template" id="configurationIssuesTemplate">
   <div class="help-block">
     <div ng-repeat="issue in getConfigurationIssues(detailPaneConfig, configDefinition)">
-      <span>{{issue.message}}</span>
+      <span>{{ ('tapdata.' + issue.message | translate)}}</span>
       <span ng-show="issue.count > 1" class="badge">{{issue.count}}</span>
     </div>
   </div>

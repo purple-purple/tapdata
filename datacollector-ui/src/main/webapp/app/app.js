@@ -17,7 +17,7 @@
 angular.module('dataCollectorApp')
 .factory('customTranslationHandler', function () {
   return function (translationID, uses) {    
-    return (translationID.split('.'))[1];
+    return (translationID.split('.')).slice(1).join('.')
   };
 })
   .config(function($routeProvider, $locationProvider, $translateProvider, $provide,

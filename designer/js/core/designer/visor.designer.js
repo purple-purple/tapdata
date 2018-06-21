@@ -196,6 +196,7 @@
 							editable:true,
 							x:ths.document.separator,
 							y:0,
+							dblclick:function(){}
 						}).appendPresenter(ths.document.activePanel.instance);
 						$.widgets("label",{
 							name:"label_source",
@@ -238,6 +239,8 @@
 								    this.x=_widget.x-15;
 							}
 							ths.document.separator=this.x;
+							var label_target=ths.document.activePanel.instance.Widget("label_target");
+							label_target.x=this.x;
 						}
 	 				}
 	 				ths.resize(true);
@@ -734,16 +737,14 @@
 	    visordesigner.prototype.updatePropertyEditor=function(){
 			var ths=this;
 			var _widget=this.document.activePanel.instance.focuswidget;
-			var widget1=null;
-			if(_widget!=null)
-				widget1=_widget.persist();
+			if(_widget&&_widget.type=="separator")
+			     this.document.activePanel.instance.focuswidget=null;
 	    	if(this.document.activePanel&&this.document.activePanel.instance.focuswidget)
 	    	{
 	    		ths.trigger("openpropertypanel",0);
 	    		ShowConfirmClose(true);
 	    	}
-	    	if(_widget&&_widget.type!="separator")
-	    		riot.mount("propertyEditorWidget",ths);
+	    	riot.mount("propertyEditorWidget",ths);
 		};
 	    
 		visordesigner.createWidget=function(data){

@@ -92,6 +92,7 @@ ul.dropdown-menu>li>a{
 						</div>
 					</a>
 				</div>
+				<!--
 				<div class="component widget  text-center" >
 					<a href="#"  onclick="{fullscreen}">
 						<div data-type="textinput">
@@ -106,7 +107,8 @@ ul.dropdown-menu>li>a{
 						</div>
 					</a>
 				</div>
-			<!--	<div class="component widget  text-center" > 
+				-->
+				<div class="component widget  text-center" > 
 					<a href="#"  onclick="{savedocument}"> 
 						<div data-type="textinput"> 
 						<div class="title" style="margin-bottom:10px;"><img src="images/save.png"/>Save</div> 
@@ -120,7 +122,7 @@ ul.dropdown-menu>li>a{
 						</div> 
 					</a> 
 				</div>
-				-->
+				
 				<div class="pull-right">
 					<div class="component widget  text-right" > 
 						<a href="#"  onclick="{display}"> 
@@ -129,14 +131,11 @@ ul.dropdown-menu>li>a{
 							</div> 
 						</a> 
 					</div>
-<!--			<div class="component widget text-center" style="cursor:pointer"> 
-						<label style="cursor:pointer"><input style="cursor:pointer" type="checkbox"  name="clusterclone" checked="{document.clusterclone?true:false}" onclick="{ClusterClone}"/> Cluster Clone</label>
-					</div>-->
 					<div class="btn-group text-center" style="cursor:pointer"> 
 						<label style="cursor:pointer"><input style="cursor:pointer" type="checkbox"  name="showRelation" checked="{document.showRelation?true:false}" onclick="{showRelationchange}"/> Show ER Relationship</label>
 					</div>
 					<div class="component widget text-center" style="cursor:pointer"> 
-						<label style="cursor:pointer"><input style="cursor:pointer" type="checkbox"  name="showSimple" checked="{document.mode=='simple'?true:false}" onclick="{showSimplechange}"/> Simple Mode</label>
+						<label style="cursor:pointer"><input style="cursor:pointer" type="checkbox"  name="showmode" checked="{document.showmode=='simple'?true:false}" onclick="{showSimplechange}"/> Simple Mode</label>
 					</div>
 				</div>
 			</div>

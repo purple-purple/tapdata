@@ -247,6 +247,16 @@ public class HikariPoolConfigBean {
   @ValueChooserModel(TransactionIsolationLevelChooserValues.class)
   public TransactionIsolationLevel transactionIsolation = TransactionIsolationLevel.DEFAULT;
 
+  @ConfigDef(
+          required = true,
+          type = ConfigDef.Type.STRING,
+          label = "Database Owner",
+          description = "Owner of your database",
+          displayPosition = 12,
+          group = "JDBC"
+  )
+  public String databaseOwner = "";
+
 
   private static final String HIKARI_CONFIG_PREFIX = "hikariConfigBean.";
   private static final String DRIVER_CLASSNAME = HIKARI_CONFIG_PREFIX + "driverClassName";

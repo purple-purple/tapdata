@@ -2035,17 +2035,17 @@ angular
       // $rootScope.$broadcast('previewSchema',$scope.selectedStage )
       // $scope.$on('fieldPathsUpdated', function(a,b,c){
       //   console.log(a,b,c, 'fieldPathsUpdated!');
-      // })
-
+      // }) 
       previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
         10).then(function(data){
+          
           if(data.batchesOutput && data.batchesOutput[0] && data.batchesOutput[0][0]){
             const info = data.batchesOutput[0][0].output;
             for(var key in info){
               try{
                 const schemaString = info[key][0].header.values.schema;
                 const tableInfo = JSON.parse(schemaString);
-
+                console.log('got table schema:',tableInfo)
                 $scope.showMappingView = !$scope.showMappingView;
                 $scope.refreshGraph(); 
                 $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
@@ -2068,6 +2068,13 @@ angular
                     $rootScope.$broadcast('showMappingView');
                     $scope.pipelineConfig['metadata']['tapdata_mapping'] = result
                     $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
+                    $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
+
+                  })
+                  ifrm.mydesigner.on('cancel', r => {
+                    $rootScope.$broadcast('showMappingView'); 
+                    $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
+
                   })
                 }, 1000)
                 
@@ -2109,29 +2116,29 @@ angular
     
     var self = this;
     $scope.$on('onNodeSelection', function (event, options) {
-      console.log(event, options)
       updateDetailPane(options);
       if(options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
         $scope.selectedStage = options.selectedObject;
       }
-      
+      var existed = $(".nav.nav-tabs:last").find("#mapping-button").length;
+      $(".nav.nav-tabs:last").find("#mapping-button").remove();
+
       setTimeout(function(){
         console.log(options.selectedObject.library)
+        var existed = $(".nav.nav-tabs:last").find("#mapping-button").length;
+        $(".nav.nav-tabs:last").find("#mapping-button").remove();
         if(options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
           self.mongoNodeOption = options
-          var existed = $(".nav.nav-tabs:last").find("#mapping-button").length;
-          if(!existed) {
-            $(".nav.nav-tabs:last").append($(`<li id="mapping-button" 
-            ng-class="{active: active, disabled: disabled}" 
-            class="ng-isolate-scope">
-            <div  click='loadTest')}" style="margin-top: 10px;cursor: pointer;" 
-            tab-heading-transclude="" class="ng-binding">
-                <tab-heading class="ng-scope">
-                <span class="ng-binding" style="color: #337ab7;">Edit Mapping2</span>
-              </tab-heading>
-            </div>  
-            </li> `))
-          }
+          $(".nav.nav-tabs:last").append($(`<li id="mapping-button" 
+          ng-class="{active: active, disabled: disabled}" 
+          class="ng-isolate-scope">
+          <div  click='loadTest')}" style="margin-top: 10px;cursor: pointer;" 
+          tab-heading-transclude="" class="ng-binding">
+              <tab-heading class="ng-scope">
+              <span class="ng-binding" style="color: #337ab7;">Mapping</span>
+            </tab-heading>
+          </div>  
+          </li> `))
         }
         $("#mapping-button").off("click").on("click", function(){
           $rootScope.$broadcast('showMappingView');

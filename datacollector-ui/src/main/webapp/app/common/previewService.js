@@ -162,6 +162,7 @@ angular.module('dataCollectorApp.common')
      */
     this.getInputRecordsFromPreview = function(pipelineName, stageInstance, batchSize) {
       var deferred = $q.defer();
+
       api.pipelineAgent.createPreview(pipelineName, 0, batchSize, 0, true, true, [], stageInstance.instanceName)
         .then(
           function (res) {
@@ -175,8 +176,16 @@ angular.module('dataCollectorApp.common')
         )
         .then(
           function(previewData) {
-            var stagePreviewData = self.getPreviewDataForStage(previewData.batchesOutput[0], stageInstance);
-            deferred.resolve(stagePreviewData.input);
+            // var stagePreviewData = self.getPreviewDataForStage(previewData.batchesOutput[0], stageInstance);
+            // deferred.resolve(stagePreviewData.input);
+            //TAPDATA TODO:
+            if(previewData.batchesOutput && previewData.batchesOutput[0]){
+              var stagePreviewData = self.getPreviewDataForStage(previewData.batchesOutput[0], stageInstance);
+              deferred.resolve(stagePreviewData.input);
+            }
+            else{
+              deferred.resolve(previewData);
+            }
           },
           function(res) {
             deferred.reject(res);
@@ -427,12 +436,15 @@ angular.module('dataCollectorApp.common')
       api.pipelineAgent.getPreviewData(previewerId)
         .then(function(response) {
           var previewData = response.data;
-          if(previewData.status !== 'FINISHED') {
-            //Ignore
-            defer.reject();
-          } else {
-            defer.resolve(previewData);
-          }
+          // if(previewData.status !== 'FINISHED') {
+          //   //Ignore
+          //   defer.reject();
+          // } else {
+          //   defer.resolve(previewData);
+          // }
+          // TAPDATA TODO:
+          defer.resolve(previewData);
+
         })
         .catch(function(response) {
           defer.reject();

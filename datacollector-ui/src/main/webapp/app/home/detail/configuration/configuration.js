@@ -769,7 +769,9 @@ angular
           });
       }
     };
-
+    $scope.$on('previewSchema', function(event, stageInstance){
+      updateFieldDataForStage(stageInstance)
+    })
     var initializeGroupInformation = function(options) {
       var groupDefn = $scope.detailPaneConfigDefn ? $scope.detailPaneConfigDefn.configGroupDefinition : undefined;
 

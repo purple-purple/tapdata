@@ -145,6 +145,11 @@ public final class CTJdbcRunnable extends JdbcBaseRunnable {
   }
 
   @Override
+  public void createAndAddRecord(ResultSet rs, TableRuntimeContext tableRuntimeContext, BatchContext batchContext, String tableSchemasJson) throws SQLException, StageException {
+    this.createAndAddRecord(rs,tableRuntimeContext,batchContext);
+  }
+
+  @Override
   public void generateSchemaChanges(BatchContext batchContext) throws SQLException {
     // no-op
   }

@@ -376,11 +376,10 @@ public class JdbcSource extends BaseSource {
                         try {
                             tableSchemasJson = jdbcLoadSchema.getTableSchemasJson(connection, statement);
                         } catch (IOException e) {
-                            LOG.error(e.toString());
-                            throw new StageException(JdbcErrors.JDBC_400);
+                            LOG.error("Load oracle schema error: {}", e.toString());
                         }
 
-                        LOG.info("load oracle schema:" + tableSchemasJson);
+                        LOG.debug("Load oracle schema: {}", tableSchemasJson);
                     }
 
                     int fetchSize = batchSize;

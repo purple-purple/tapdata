@@ -89,17 +89,17 @@ public class OracleSchemaValidator implements ISchemaValidator {
             tables = adaptToSchema(tableColumnsMap, pkTableMap, fkTableMap);
         } catch (SQLException e) {
             throw e;
-        } /*finally {
+        } finally {
             if (resultSet != null) {
                 resultSet.close();
             }
-            if (statement != null) {
+            /*if (statement != null) {
                 statement.close();
             }
             if (conn != null) {
                 conn.close();
-            }
-        }*/
+            }*/
+        }
 
         return tables;
     }

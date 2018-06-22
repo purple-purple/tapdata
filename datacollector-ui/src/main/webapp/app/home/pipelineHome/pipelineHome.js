@@ -2038,12 +2038,10 @@ angular
       // }) 
       previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
         10).then(function(data){
-          
-          if(data.batchesOutput && data.batchesOutput[0] && data.batchesOutput[0][0]){
-            const info = data.batchesOutput[0][0].output;
-            for(var key in info){
-              try{
-                const schemaString = info[key][0].header.values.schema;
+          if(data && data.length > 0){
+            for( var i = 0; i < data.length; i++){
+              if(data[i].header.values.schema){
+                const schemaString = data[i].header.values.schema
                 const tableInfo = JSON.parse(schemaString);
                 console.log('got table schema:',tableInfo)
                 $scope.showMappingView = !$scope.showMappingView;
@@ -2077,12 +2075,53 @@ angular
 
                   })
                 }, 1000)
-                
-              }catch(e){
-                console.log('not exisited schema info in preview data')
               }
             }
           }
+          // if(data.batchesOutput && data.batchesOutput[0] && data.batchesOutput[0][0]){
+          //   const info = data.batchesOutput[0][0].output;
+          //   for(var key in info){
+          //     try{
+          //       const schemaString = info[key][0].header.values.schema;
+          //       const tableInfo = JSON.parse(schemaString);
+          //       console.log('got table schema:',tableInfo)
+          //       $scope.showMappingView = !$scope.showMappingView;
+          //       $scope.refreshGraph(); 
+          //       $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
+          //       $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
+                
+          //       setTimeout(function(){ 
+          //         $("#editorIframe").height((window.innerHeight - 240) + 'px')
+          //         let ifrmNode = document.getElementById('editorIframe')
+          //         let ifrm = ifrmNode ? ifrmNode.contentWindow || ifrmNode.contentDocument.document || ifrmNode.contentDocument : null;
+          //         var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
+          //         var current_mapping = $scope.pipelineConfig['metadata']['tapdata_mapping']
+          //         if(current_mapping) {
+          //           ifrm.mydesigner.restore(current_mapping, {mode: 'cluster-clone'}) 
+          //         }else{
+          //           ifrm.mydesigner.init(current_schema, {mode: 'cluster-clone'}) 
+
+          //         }
+          //         ifrm.mydesigner.on('savedocument', r => {
+          //           var result = ifrm.mydesigner.getDesignResult()
+          //           $rootScope.$broadcast('showMappingView');
+          //           $scope.pipelineConfig['metadata']['tapdata_mapping'] = result
+          //           $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
+          //           $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
+
+          //         })
+          //         ifrm.mydesigner.on('cancel', r => {
+          //           $rootScope.$broadcast('showMappingView'); 
+          //           $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
+
+          //         })
+          //       }, 1000)
+                
+          //     }catch(e){
+          //       console.log('not exisited schema info in preview data')
+          //     }
+          //   }
+          // }
         }).catch(function(e,b){
           console.log(e,b)
         })

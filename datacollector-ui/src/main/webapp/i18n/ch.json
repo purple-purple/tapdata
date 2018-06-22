@@ -155,7 +155,7 @@
 	"Writes data to Http destination": "将数据写入Http目标",
 	"Http Destination": "Http目的地",
 	"Writes data to MongoDB": "将数据写入MongoDB",
-	"MongoDB": "MongoDB的",
+	"MongoDB": "MongoDB",
 	"Reads OpLog records from MongoDB": "从MongoDB读取OpLog记录",
 	"MongoDB Oplog": "MongoDB Oplog",
 	"Reads records from a MongoDB collection": "从MongoDB集合中读取记录",

@@ -72,7 +72,7 @@ public class MongoTargetConfigBean {
   public String operation;
   */
   
-/*  @ConfigDef(
+  @ConfigDef(
       type = ConfigDef.Type.TEXT,
       label = "Mapping",
       description = "Define the table mapping",
@@ -81,7 +81,7 @@ public class MongoTargetConfigBean {
       displayPosition = 1005,
       group = "OPERATIONS"
   )
-  public String mapping;*/
+  public String mapping;
 
   @ConfigDef(
       type = ConfigDef.Type.BOOLEAN,

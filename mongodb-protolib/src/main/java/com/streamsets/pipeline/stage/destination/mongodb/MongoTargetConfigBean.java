@@ -23,7 +23,7 @@ import com.streamsets.pipeline.stage.common.mongodb.MongoDBConfig;
 
 public class MongoTargetConfigBean {
 
-  @ConfigDefBean(groups = {"MONGODB", "CREDENTIALS", "OPERATIONS","ADVANCED","MAPPING"})
+  @ConfigDefBean(groups = {"MONGODB", "CREDENTIALS", "OPERATIONS","ADVANCED"})
   public MongoDBConfig mongoConfig;
 
   @ConfigDef(

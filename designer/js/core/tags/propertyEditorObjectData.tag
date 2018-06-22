@@ -83,7 +83,7 @@
 						
 						<input type="checkbox" style="margin-top:8px;" onclick="{change}" id="{key}" checked="{widget['objectdata'][key]}" if={editor[key].format=='boolean' }>
 						
-						<select id="{key}" onchange={change} style="width:100%" if={editor[key].format=="single" } >
+						<select id="{key}" onchange={change} style="width:100%"  disabled={widget.sourcetype=='mongodb'?true:false} if={editor[key].format=="single" } >
 							<option each={option, i in editor[key].options}  value={option.id||option} selected={getValue(option,key)}>{option.text||option}</option>
 						</select>
 						
@@ -124,6 +124,9 @@
 	this.designer=parent.opts;
 	this.activepanel=this.designer.document.activePanel.instance;
 	this.widget=this.activepanel.focuswidget;
+	if(this.widget&&this.widget.begin&&this.widget.begin.widget.sourcetype=="mongodb"){
+		this.widget.sourcetype=this.widget.begin.widget.sourcetype;
+	}
 	this.setting="objectdata";
 	var ths=this;
 	var updateEditor=function(){

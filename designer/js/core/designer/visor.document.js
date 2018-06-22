@@ -14,6 +14,7 @@
 		this.dpi=8;
 		this.category=null;	
 		this.showthumbnail=false;
+		this.showmode="simple";
 		this.clusterclone=false;
 		this.defaultconnectionType="brokenLineConnector-0322";
 		this.defaulttableconnectionType="relationConnector-02120";
@@ -316,7 +317,8 @@
 				name:"separator1",
 				editable:true,
 				x:ths.separator,
-				y:0				
+				y:0,
+				dblclick:function(){}
 			}).appendPresenter(ths.activePanel.instance);
 			data.schema.tables=listSort(data.schema.tables,"table_name","ASC");
 			for(var i=0;i<=data.schema.tables.length-1;i++){
@@ -817,7 +819,8 @@
 			else if(shapevalue==="2")
 				endShape="arrow";	
 			var endType=parseInt(value.substring(3,4));
-        	
+        	if(this.focuswidget.type!="table"||this.targetwidget.type!="collection")
+        		return;
 			currentconnector=$.connector(type,{
 				name:myname,
 				text:myname,
@@ -1106,6 +1109,7 @@
 			r.template=this.template;
 			r.showRelation=this.showRelation;
 			r.sourcetype=this.sourcetype;
+			r.showmode=this.showmode;
 			r.mode=this.mode;
 			var _rootwidget=this.activePanel.instance.rootwidget;
 			var _width=Math.min(300,_rootwidget.width);

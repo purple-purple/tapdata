@@ -29,7 +29,7 @@
 	   margin-bottom:0px;
 	}
 </style>
-<div class="common"  style="margin-bottom:0px;border-width:0px"  if={widget}>
+<div class="common"  style="margin-bottom:0px;border-width:0px"  if={widget&&show()}>
 	<table class="table table-propertyEditor" style="width:100%;">
    		<tr class="common property-panel"  if={enableEdit("common")}>
 	   		<td style="border-top:none">  
@@ -299,7 +299,7 @@
 		</tr> -->
 	</table>
 </div>
-<div class="panel" style="margin-bottom:0px;border-width:0px;" if={widget}>
+<div class="panel" style="margin-bottom:0px;border-width:0px;" if={widget&&show()}>
 	    <table class="table table-propertyEditor" style="width:100%">
 		    <tr class="font property-panel" if={enableEdit("font")}>
 		    	<td>
@@ -517,6 +517,20 @@
 	
 	var ths=this;
 		
+		
+	this.show=function(){
+		var ret=true;
+		if(this.widget){
+			switch(this.widget.type){
+				case "label":
+				  ret= false;
+				  break;
+				default:
+					ret=true;
+			}
+		}
+		return ret;
+	}
 	this.enableEdit=function(prop){
 		if(ths.widget&&ths.widget.propertyEditors.indexOf(prop)>=0)
 			return true;

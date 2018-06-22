@@ -29,56 +29,61 @@ import java.util.Set;
  * Connection Manager to fetch connections as needed.
  */
 public final class ConnectionManager {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionManager.class);
 
-  private final HikariDataSource hikariDataSource;
-  private final ThreadLocal<Connection> threadLocalConnection;
-  private final Set<Connection> connectionsToCloseDuringDestroy;
+    private final HikariDataSource hikariDataSource;
+    private final ThreadLocal<Connection> threadLocalConnection;
+    private final Set<Connection> connectionsToCloseDuringDestroy;
 
-  public ConnectionManager(HikariDataSource hikariDataSource) {
-    this.hikariDataSource = hikariDataSource;
-    this.connectionsToCloseDuringDestroy = new HashSet<>();
-    this.threadLocalConnection = new ThreadLocal<>();
-  }
-
-  private synchronized Connection getNewConnection() throws SQLException{
-    Connection newConnection = hikariDataSource.getConnection();
-    connectionsToCloseDuringDestroy.add(newConnection);
-    return newConnection;
-  }
-
-  /**
-   * Get {@link Connection} if cached connection is null fetch a connection from {@link HikariDataSource}
-   * @return {@link Connection}
-   * @throws SQLException
-   */
-  public Connection getConnection() throws SQLException {
-    if (threadLocalConnection.get() == null) {
-      threadLocalConnection.set(getNewConnection());
+    public ConnectionManager(HikariDataSource hikariDataSource) {
+        this.hikariDataSource = hikariDataSource;
+        this.connectionsToCloseDuringDestroy = new HashSet<>();
+        this.threadLocalConnection = new ThreadLocal<>();
     }
-    return threadLocalConnection.get();
-  }
 
-  /**
-   * Close the current thread's connection
-   */
-  public void closeConnection() {
-    LOGGER.debug("Closing connection");
-    Connection connectionToRemove = threadLocalConnection.get();
-    JdbcUtil.closeQuietly(connectionToRemove);
-    if (connectionToRemove != null) {
-      synchronized (this) {
-        connectionsToCloseDuringDestroy.remove(connectionToRemove);
-      }
+    private synchronized Connection getNewConnection() throws SQLException {
+        Connection newConnection = hikariDataSource.getConnection();
+        connectionsToCloseDuringDestroy.add(newConnection);
+        return newConnection;
     }
-    threadLocalConnection.set(null);
-  }
 
-  /**
-   * Closes all connections
-   */
-  public synchronized void closeAll() {
-    LOGGER.debug("Closing all connections");
-    connectionsToCloseDuringDestroy.forEach(JdbcUtil::closeQuietly);
-  }
+    /**
+     * Get {@link Connection} if cached connection is null fetch a connection from {@link HikariDataSource}
+     *
+     * @return {@link Connection}
+     * @throws SQLException
+     */
+    public Connection getConnection() throws SQLException {
+        if (threadLocalConnection.get() == null) {
+            threadLocalConnection.set(getNewConnection());
+        }
+        return threadLocalConnection.get();
+    }
+
+    /**
+     * Close the current thread's connection
+     */
+    public void closeConnection() {
+        LOGGER.debug("Closing connection");
+        Connection connectionToRemove = threadLocalConnection.get();
+        JdbcUtil.closeQuietly(connectionToRemove);
+        if (connectionToRemove != null) {
+            synchronized (this) {
+                connectionsToCloseDuringDestroy.remove(connectionToRemove);
+            }
+        }
+        threadLocalConnection.set(null);
+    }
+
+    /**
+     * Closes all connections
+     */
+    public synchronized void closeAll() {
+        LOGGER.debug("Closing all connections");
+        connectionsToCloseDuringDestroy.forEach(JdbcUtil::closeQuietly);
+    }
+
+    public HikariDataSource getHikariDataSource() {
+        return this.hikariDataSource;
+    }
 }

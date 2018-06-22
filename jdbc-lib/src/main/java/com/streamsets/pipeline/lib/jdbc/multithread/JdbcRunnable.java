@@ -27,9 +27,19 @@ public interface JdbcRunnable {
    * Create record and add it to {@link com.streamsets.pipeline.api.BatchMaker}
    */
   void createAndAddRecord(
+          ResultSet rs,
+          TableRuntimeContext tableRuntimeContext,
+          BatchContext batchContext
+  ) throws SQLException, StageException;
+
+  /**
+   * Create record and add it to {@link com.streamsets.pipeline.api.BatchMaker}
+   */
+  void createAndAddRecord(
       ResultSet rs,
       TableRuntimeContext tableRuntimeContext,
-      BatchContext batchContext
+      BatchContext batchContext,
+      String tableSchemasJson
   ) throws SQLException, StageException;
 
   /**

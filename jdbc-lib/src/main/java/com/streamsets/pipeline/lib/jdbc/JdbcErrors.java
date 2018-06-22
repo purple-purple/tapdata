@@ -132,9 +132,7 @@ public enum JdbcErrors implements ErrorCode {
   JDBC_306("Invalid value {} for scale in field {}, should be less than or equal to precision's value: {}"),
   JDBC_307("Invalid decimal value {} in field {}: {} {} is more then expected {} "),
   JDBC_308("Information {} missing or invalid in the metadata record: {}"),
-  JDBC_309("No schema writer for connection string '{}'"),
-
-  JDBC_400("Load oracle schema error,list to jsonString error")
+  JDBC_309("No schema writer for connection string '{}'")
   ;
 
   private final String msg;

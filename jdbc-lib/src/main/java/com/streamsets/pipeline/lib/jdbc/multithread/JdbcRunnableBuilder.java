@@ -25,113 +25,120 @@ import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
 import java.util.Map;
 
 public class JdbcRunnableBuilder {
-  private PushSource.Context context;
-  private int threadNumber;
-  private int batchSize;
-  private TableJdbcConfigBean tableJdbcConfigBean;
-  private CommonSourceConfigBean commonSourceConfigBean;
-  private Map<String, String> offsets;
-  private ConnectionManager connectionManager;
-  private MultithreadedTableProvider tableProvider;
-  private CacheLoader<TableRuntimeContext, TableReadContext> tableReadContextCache;
-  private RateLimiter queryRateLimiter;
+    private PushSource.Context context;
+    private int threadNumber;
+    private int batchSize;
+    private TableJdbcConfigBean tableJdbcConfigBean;
+    private CommonSourceConfigBean commonSourceConfigBean;
+    private Map<String, String> offsets;
+    private ConnectionManager connectionManager;
+    private MultithreadedTableProvider tableProvider;
+    private CacheLoader<TableRuntimeContext, TableReadContext> tableReadContextCache;
+    private RateLimiter queryRateLimiter;
+    private String databaseOwner;
 
-  public JdbcRunnableBuilder() {
-  }
-
-  public JdbcRunnableBuilder context(PushSource.Context context) {
-    this.context = context;
-    return this;
-  }
-
-  public JdbcRunnableBuilder threadNumber(int threadNumber) {
-    this.threadNumber = threadNumber;
-    return this;
-  }
-
-  public JdbcRunnableBuilder batchSize(int batchSize) {
-    this.batchSize = batchSize;
-    return this;
-  }
-
-  public JdbcRunnableBuilder offsets(Map<String, String> offsets) {
-    this.offsets = offsets;
-    return this;
-  }
-
-  public JdbcRunnableBuilder tableProvider(MultithreadedTableProvider tableProvider) {
-    this.tableProvider = tableProvider;
-    return this;
-  }
-
-  public JdbcRunnableBuilder connectionManager(ConnectionManager connectionManager) {
-    this.connectionManager = connectionManager;
-    return this;
-  }
-
-  public JdbcRunnableBuilder tableJdbcConfigBean(TableJdbcConfigBean tableJdbcConfigBean) {
-    this.tableJdbcConfigBean = tableJdbcConfigBean;
-    return this;
-  }
-
-  public JdbcRunnableBuilder commonSourceConfigBean(CommonSourceConfigBean commonSourceConfigBean) {
-    this.commonSourceConfigBean = commonSourceConfigBean;
-    return this;
-  }
-
-  public JdbcRunnableBuilder tableReadContextCache(CacheLoader<TableRuntimeContext, TableReadContext> tableReadContextCache) {
-    this.tableReadContextCache = tableReadContextCache;
-    return this;
-  }
-
-  public JdbcRunnableBuilder queryRateLimiter(RateLimiter queryRateLimiter) {
-    this.queryRateLimiter = queryRateLimiter;
-    return this;
-  }
-
-  public JdbcBaseRunnable build() {
-    final String SQLServerCT = "SQLServerChangeTrackingClient";
-    final String SQLServerCDC = "SQLServerCDCClient";
-
-    if (context.getStageInfo().getInstanceName().startsWith(SQLServerCT)) {
-      return new CTJdbcRunnable(
-          context,
-          threadNumber,
-          batchSize,
-          offsets,
-          tableProvider,
-          connectionManager,
-          tableJdbcConfigBean,
-          commonSourceConfigBean,
-          tableReadContextCache,
-          queryRateLimiter
-      );
-    } else if (context.getStageInfo().getInstanceName().startsWith(SQLServerCDC)) {
-      return new CDCJdbcRunnable(
-          context,
-          threadNumber,
-          batchSize,
-          offsets,
-          tableProvider,
-          connectionManager,
-          tableJdbcConfigBean,
-          commonSourceConfigBean,
-          tableReadContextCache,
-          queryRateLimiter
-      );
-    } else {
-      return new TableJdbcRunnable(
-          context,
-          threadNumber,
-          batchSize,
-          offsets,
-          tableProvider,
-          connectionManager,
-          tableJdbcConfigBean,
-          commonSourceConfigBean,
-          tableReadContextCache,
-          queryRateLimiter
-      );
+    public JdbcRunnableBuilder() {
     }
-  }
+
+    public JdbcRunnableBuilder context(PushSource.Context context) {
+        this.context = context;
+        return this;
+    }
+
+    public JdbcRunnableBuilder threadNumber(int threadNumber) {
+        this.threadNumber = threadNumber;
+        return this;
+    }
+
+    public JdbcRunnableBuilder batchSize(int batchSize) {
+        this.batchSize = batchSize;
+        return this;
+    }
+
+    public JdbcRunnableBuilder offsets(Map<String, String> offsets) {
+        this.offsets = offsets;
+        return this;
+    }
+
+    public JdbcRunnableBuilder tableProvider(MultithreadedTableProvider tableProvider) {
+        this.tableProvider = tableProvider;
+        return this;
+    }
+
+    public JdbcRunnableBuilder connectionManager(ConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+        return this;
+    }
+
+    public JdbcRunnableBuilder tableJdbcConfigBean(TableJdbcConfigBean tableJdbcConfigBean) {
+        this.tableJdbcConfigBean = tableJdbcConfigBean;
+        return this;
+    }
+
+    public JdbcRunnableBuilder commonSourceConfigBean(CommonSourceConfigBean commonSourceConfigBean) {
+        this.commonSourceConfigBean = commonSourceConfigBean;
+        return this;
+    }
+
+    public JdbcRunnableBuilder tableReadContextCache(CacheLoader<TableRuntimeContext, TableReadContext> tableReadContextCache) {
+        this.tableReadContextCache = tableReadContextCache;
+        return this;
+    }
+
+    public JdbcRunnableBuilder queryRateLimiter(RateLimiter queryRateLimiter) {
+        this.queryRateLimiter = queryRateLimiter;
+        return this;
+    }
+
+    public JdbcBaseRunnable build() {
+        final String SQLServerCT = "SQLServerChangeTrackingClient";
+        final String SQLServerCDC = "SQLServerCDCClient";
+
+        if (context.getStageInfo().getInstanceName().startsWith(SQLServerCT)) {
+            return new CTJdbcRunnable(
+                    context,
+                    threadNumber,
+                    batchSize,
+                    offsets,
+                    tableProvider,
+                    connectionManager,
+                    tableJdbcConfigBean,
+                    commonSourceConfigBean,
+                    tableReadContextCache,
+                    queryRateLimiter
+            );
+        } else if (context.getStageInfo().getInstanceName().startsWith(SQLServerCDC)) {
+            return new CDCJdbcRunnable(
+                    context,
+                    threadNumber,
+                    batchSize,
+                    offsets,
+                    tableProvider,
+                    connectionManager,
+                    tableJdbcConfigBean,
+                    commonSourceConfigBean,
+                    tableReadContextCache,
+                    queryRateLimiter
+            );
+        } else {
+            return new TableJdbcRunnable(
+                    context,
+                    threadNumber,
+                    batchSize,
+                    offsets,
+                    tableProvider,
+                    connectionManager,
+                    tableJdbcConfigBean,
+                    commonSourceConfigBean,
+                    tableReadContextCache,
+                    queryRateLimiter,
+                    databaseOwner
+            );
+        }
+    }
+
+    public JdbcRunnableBuilder databaseOwner(String databaseOwner) {
+        this.databaseOwner = databaseOwner;
+        return this;
+    }
 }

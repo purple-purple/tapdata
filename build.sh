@@ -120,6 +120,6 @@ main () {
 
      
 }
-
-git submodule update --init --remote
+rm -rf designer
+git submodule update
 main "$@"

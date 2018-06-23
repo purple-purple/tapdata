@@ -68,6 +68,8 @@ import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
 
+import javax.print.Doc;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class TapTransformer {
@@ -100,7 +102,7 @@ public class TapTransformer {
         }
 
     }
-    public WriteModel<Document> processRecord(Record record, Document doc){
+    public List<WriteModel<Document>> processRecord(Record record, Document doc){
         //return new InsertOneModel<>(document);
 
         //String tableName = messageEntity.getTableName();
@@ -113,6 +115,8 @@ public class TapTransformer {
         // for(String attr: record.getHeader().getAttributeNames()){
         //     System.out.println(attr+" -- "+record.getHeader().getAttribute(attr));
         // }
+
+        List<WriteModel<Document>> models = new ArrayList<>();
         String operationCode = record.getHeader().getAttribute(OperationType.SDC_OPERATION_TYPE);
         String operation;
         if (operationCode != null) {
@@ -124,28 +128,35 @@ public class TapTransformer {
             operation = "";
         operation = operation.toUpperCase();
 
-        WriteModel<Document> result = null;
-        String relationship = mapConfig.getString("relationship");
-        if(relationship == null) 
-            relationship = "OneOne";
-        switch (relationship) {
-            case "OplogClone":
-                result = applyOplog(record, doc);
-                break;
-            case "ManyOne":
-                result = embedMany(record, doc,operation);   
-                break;
+        List<Document> mappings = (List<Document>) mapConfig.get("mappings");
+        for (Document mapping : mappings) {
 
-            case "OneMany":
-                //logger.warn("Unsupport this relationship {}", relationship);
-                System.out.println("One Many not supported yet");
-                break;
-            case "OneOne":                
-            default: 
-                result = upsert(record, doc, operation);
-                break;
-        }        
-        return result;
+            WriteModel<Document> result = null;
+            String relationship = mapping.getString("relationship");
+            if(relationship == null)
+                relationship = "OneOne";
+            switch (relationship) {
+                case "OplogClone":
+                    result = applyOplog(record, doc);
+                    break;
+                case "ManyOne":
+                    result = embedMany(record, doc,operation, mapping);
+                    break;
+
+                case "OneMany":
+                    //logger.warn("Unsupport this relationship {}", relationship);
+                    System.out.println("One Many not supported yet");
+                    break;
+                case "OneOne":
+                default:
+                    result = upsert(record, doc, operation, mapping);
+                    break;
+            }
+            if (result != null) {
+                models.add(result);
+            }
+        }
+        return models;
 
         /**
         new UpdateOneModel<>(
@@ -205,7 +216,7 @@ public class TapTransformer {
         return null;
     } // end meothd
 
-    private WriteModel<Document> upsert( Record record, Document doc, String operation) {
+    private WriteModel<Document> upsert(Record record, Document doc, String operation, Document mapping) {
         if (StringUtils.isBlank(operation)) {
             operation = "INSERT";
         }
@@ -213,7 +224,7 @@ public class TapTransformer {
         Document criteria = new Document();
         Document updateSpec = new Document();
 
-        List<Document> joinCondition = (List<Document>) mapConfig.get("join_condition");
+        List<Document> joinCondition = (List<Document>) mapping.get("join_condition");
 
         for (Document condition : joinCondition) {            
             String source = condition.getString("source");
@@ -228,7 +239,7 @@ public class TapTransformer {
 //        System.out.println("================\n\n");
         LOG.debug("upsert criteria " +  criteria);
         
-        String targetPath = mapConfig.getString("target_path");
+        String targetPath = mapping.getString("target_path");
         
         for (Map.Entry<String, Object> entry : doc.entrySet()) {
             String key = entry.getKey();
@@ -259,18 +270,18 @@ public class TapTransformer {
     } // end meothd
 
 
-    private WriteModel<Document> embedMany(Record record, Document doc, String operation) {
+    private WriteModel<Document> embedMany(Record record, Document doc, String operation, Document mapping) {
 //        System.out.println(doc);
         if (StringUtils.isBlank(operation)) {
             operation = "INSERT";
         }
-        String targetPath = mapConfig.getString("target_path");
+        String targetPath = mapping.getString("target_path");
                 
         Document criteria = new Document();
         Document matchCriteria = new Document();
         Document updateSpec = new Document();
 
-        List<Document> joinCondition = (List<Document>) mapConfig.get("join_condition");
+        List<Document> joinCondition = (List<Document>) mapping.get("join_condition");
         for (Document condition : joinCondition) {            
             String source = condition.getString("source");
             String target = condition.getString("target");
@@ -279,7 +290,7 @@ public class TapTransformer {
             }
         }                
 
-         List<Document> matchCondition = (List<Document>) mapConfig.get("match_condition");
+         List<Document> matchCondition = (List<Document>) mapping.get("match_condition");
          for (Document condition : matchCondition) {
              String source = condition.getString("source");
              String target = condition.getString("target");

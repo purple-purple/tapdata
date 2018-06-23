@@ -19,11 +19,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.DeleteOneModel;
-import com.mongodb.client.model.InsertOneModel;
-import com.mongodb.client.model.ReplaceOneModel;
-import com.mongodb.client.model.UpdateOneModel;
-import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.WriteModel;
 import com.streamsets.pipeline.api.Batch;
 import com.streamsets.pipeline.api.Record;
@@ -36,10 +31,10 @@ import com.streamsets.pipeline.config.DataFormat;
 import com.streamsets.pipeline.lib.generator.DataGenerator;
 import com.streamsets.pipeline.lib.generator.DataGeneratorFactory;
 import com.streamsets.pipeline.lib.generator.DataGeneratorFactoryBuilder;
-import com.streamsets.pipeline.lib.operation.OperationType;
 import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.ErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.mongodb.Errors;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -51,8 +46,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class MongoDBTarget extends BaseTarget {
   private static final Logger LOG = LoggerFactory.getLogger(MongoDBTarget.class);
@@ -69,6 +62,7 @@ public class MongoDBTarget extends BaseTarget {
 
   public MongoDBTarget(MongoTargetConfigBean mongoTargetConfigBean) {
     this.mongoTargetConfigBean = mongoTargetConfigBean;
+
   }
 
   @SuppressWarnings("unchecked")
@@ -99,9 +93,8 @@ public class MongoDBTarget extends BaseTarget {
     builder.setCharset(StandardCharsets.UTF_8);
     builder.setMode(Mode.MULTIPLE_OBJECTS);
     generatorFactory = builder.build();
-    
+//    getContext().getPipelineConstants()
     transformer = new TapTransformer(mongoTargetConfigBean);
-
     return issues;
   }
 
@@ -135,10 +128,10 @@ public class MongoDBTarget extends BaseTarget {
         //   throw new OnRecordErrorException(Errors.MONGODB_15, record.getHeader().getSourceId());
         // }
 
-        WriteModel model = transformer.processRecord(record, document);            
-        if(model != null){
+        List<WriteModel<Document>> models = transformer.processRecord(record, document);
+        if(CollectionUtils.isNotEmpty(models)){
               recordList.add(record);
-              documentList.add(model);
+              documentList.addAll(models);
         }            
        
       } catch (IOException | StageException | NumberFormatException e) {

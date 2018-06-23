@@ -15,62 +15,20 @@
  */
 package com.streamsets.pipeline.stage.destination.mongodb;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
-import com.mongodb.bulk.BulkWriteResult;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.DeleteOneModel;
-import com.mongodb.client.model.InsertOneModel;
-import com.mongodb.client.model.ReplaceOneModel;
-import com.mongodb.client.model.UpdateOneModel;
-import com.mongodb.client.model.UpdateOptions;
-import com.mongodb.client.model.WriteModel;
-import com.streamsets.pipeline.api.Batch;
+import com.mongodb.client.model.*;
 import com.streamsets.pipeline.api.Record;
-import com.streamsets.pipeline.api.StageException;
-import com.streamsets.pipeline.api.base.BaseTarget;
-import com.streamsets.pipeline.api.base.OnRecordErrorException;
-import com.streamsets.pipeline.api.ext.json.Mode;
-import com.streamsets.pipeline.api.impl.Utils;
-import com.streamsets.pipeline.config.DataFormat;
-import com.streamsets.pipeline.lib.generator.DataGenerator;
-import com.streamsets.pipeline.lib.generator.DataGeneratorFactory;
-import com.streamsets.pipeline.lib.generator.DataGeneratorFactoryBuilder;
 import com.streamsets.pipeline.lib.operation.OperationType;
-import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
-import com.streamsets.pipeline.stage.common.ErrorRecordHandler;
-import com.streamsets.pipeline.stage.common.mongodb.Errors;
-import org.apache.commons.io.IOUtils;
+import jdk.nashorn.internal.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.BSONObject;
 import org.bson.Document;
+import org.mortbay.util.ajax.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-
-
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.bulk.BulkWriteResult;
-import com.mongodb.bulk.BulkWriteUpsert;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.IndexModel;
-import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.Sorts;
-
-import javax.print.Doc;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class TapTransformer {
     private static final Logger LOG = LoggerFactory.getLogger(TapTransformer.class);
@@ -108,7 +66,7 @@ public class TapTransformer {
         //String tableName = messageEntity.getTableName();
         //List<Mapping> mappings = tableMappings.get(tableName);
         //List<ProcessResult> processResults = new ArrayList<>();
-        
+
         //for (Mapping mapping : mappings) {
         //LOG.debug("Processing record " + record);
         // System.out.println(record);
@@ -128,11 +86,12 @@ public class TapTransformer {
             operation = "";
         operation = operation.toUpperCase();
 
-        List<Document> mappings = (List<Document>) mapConfig.get("mappings");
-        for (Document mapping : mappings) {
+        String mappingsStr = mapConfig.getString("mappings");
+        List<BSONObject> objs = (List<BSONObject>) JSON.parse(mappingsStr);
+        for (BSONObject mapping : objs) {
 
             WriteModel<Document> result = null;
-            String relationship = mapping.getString("relationship");
+            String relationship = (String) mapping.get("relationship");
             if(relationship == null)
                 relationship = "OneOne";
             switch (relationship) {
@@ -173,9 +132,9 @@ public class TapTransformer {
     private WriteModel<Document> applyOplog( Record record, Document doc) {
         Document o = (Document)doc.get("o");
         Document o2 = (Document)doc.get("o2");
-        String op = doc.getString("op");    
+        String op = doc.getString("op");
         UpdateOptions updateOptions = new UpdateOptions();
-        
+
 //        System.out.println("=====" +op+" o:"+ o +" ,,, o2:"+ o2 +"");
 //        System.out.println(""+ doc);
 //        System.out.println(o.get("_id"));
@@ -185,38 +144,38 @@ public class TapTransformer {
             case "d":
                 // Update delete = new Update().pull(targetPath, value);
                 // processResult.setUpdate(delete);
-                return new DeleteOneModel<>(o);  //@todo check existence of O                 
+                return new DeleteOneModel<>(o);  //@todo check existence of O
             case "i":
-                // use upsert instead of insert                                
+                // use upsert instead of insert
                 if(o.get("_id")!=null){
                     updateOptions.upsert(true);
-                    o2 = new Document("_id", o.get("_id"));    
+                    o2 = new Document("_id", o.get("_id"));
                 }
                 else{
-                    // index creation op                    
-                }                
+                    // index creation op
+                }
                 // fall through
             case "u":
-                if(o!=null && o2!=null){                    
-                    if(o.get("_id")!=null){//@todo better way to determine ReplaceOne                        
-                        return new ReplaceOneModel<>(o2, o, updateOptions);                
-                    } 
+                if(o!=null && o2!=null){
+                    if(o.get("_id")!=null){//@todo better way to determine ReplaceOne
+                        return new ReplaceOneModel<>(o2, o, updateOptions);
+                    }
                     return new UpdateOneModel( o2, o);
                 }
                 else{
                     LOG.warn("Missing o and o2 in update: {}", doc);
-                }                 
+                }
                 break;
-            
+
             case "c":
-                
+
             default:
                 LOG.info("Unsupported oplog entry {}", doc);
-        }        
+        }
         return null;
     } // end meothd
 
-    private WriteModel<Document> upsert(Record record, Document doc, String operation, Document mapping) {
+    private WriteModel<Document> upsert(Record record, Document doc, String operation, BSONObject mapping) {
         if (StringUtils.isBlank(operation)) {
             operation = "INSERT";
         }
@@ -226,11 +185,11 @@ public class TapTransformer {
 
         List<Document> joinCondition = (List<Document>) mapping.get("join_condition");
 
-        for (Document condition : joinCondition) {            
+        for (Document condition : joinCondition) {
             String source = condition.getString("source");
             String target = condition.getString("target");
             if(source!=null && target!=null){
-                criteria.append(target, doc.get(source));                    
+                criteria.append(target, doc.get(source));
             }
         }
 //        System.out.println("Upsert document"+ doc.toJson());
@@ -238,14 +197,14 @@ public class TapTransformer {
 //        System.out.println("operation:" +  operation);
 //        System.out.println("================\n\n");
         LOG.debug("upsert criteria " +  criteria);
-        
-        String targetPath = mapping.getString("target_path");
-        
+
+        String targetPath = (String) mapping.get("target_path");
+
         for (Map.Entry<String, Object> entry : doc.entrySet()) {
             String key = entry.getKey();
             Object val = entry.getValue();
-            if(targetPath!=null && targetPath.length()>0) 
-                key = targetPath +"."+key;            
+            if(targetPath!=null && targetPath.length()>0)
+                key = targetPath +"."+key;
             updateSpec.append(key, val);
         }
 
@@ -266,29 +225,29 @@ public class TapTransformer {
         }
 
      return writeModel;
-        
+
     } // end meothd
 
 
-    private WriteModel<Document> embedMany(Record record, Document doc, String operation, Document mapping) {
+    private WriteModel<Document> embedMany(Record record, Document doc, String operation, BSONObject mapping) {
 //        System.out.println(doc);
         if (StringUtils.isBlank(operation)) {
             operation = "INSERT";
         }
-        String targetPath = mapping.getString("target_path");
-                
+        String targetPath = (String) mapping.get("target_path");
+
         Document criteria = new Document();
         Document matchCriteria = new Document();
         Document updateSpec = new Document();
 
         List<Document> joinCondition = (List<Document>) mapping.get("join_condition");
-        for (Document condition : joinCondition) {            
+        for (Document condition : joinCondition) {
             String source = condition.getString("source");
             String target = condition.getString("target");
             if(StringUtils.isNotBlank(source) && StringUtils.isNotBlank(target)){
-                criteria.append(target, doc.get(source));                    
+                criteria.append(target, doc.get(source));
             }
-        }                
+        }
 
          List<Document> matchCondition = (List<Document>) mapping.get("match_condition");
          for (Document condition : matchCondition) {
@@ -331,6 +290,7 @@ public class TapTransformer {
             criteria, updateSpec, new UpdateOptions().upsert(true)
         );
     }
+
 
 }
       /** 

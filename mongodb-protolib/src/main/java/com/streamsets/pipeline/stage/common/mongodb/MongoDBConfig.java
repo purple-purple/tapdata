@@ -81,6 +81,13 @@ public class MongoDBConfig {
   )
   public String database;
 
+  @ConfigDef(
+      type = ConfigDef.Type.STRING,
+      label = "Collection",
+      required = true,
+      group = "MONGODB",
+      displayPosition = 30
+  )
   public String collection;
 
   @ConfigDef(
@@ -355,7 +362,7 @@ public class MongoDBConfig {
       return;
     }
 
-//    mongoCollection = createMongoCollection(context, issues, readPreference, writeConcern);
+    mongoCollection = createMongoCollection(context, issues, readPreference, writeConcern);
   }
 
   public MongoClient getMongoClient() {

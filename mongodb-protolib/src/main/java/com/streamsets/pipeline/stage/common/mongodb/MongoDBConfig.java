@@ -81,13 +81,13 @@ public class MongoDBConfig {
   )
   public String database;
 
-  @ConfigDef(
-      type = ConfigDef.Type.STRING,
-      label = "Collection",
-      required = true,
-      group = "MONGODB",
-      displayPosition = 30
-  )
+//  @ConfigDef(
+//      type = ConfigDef.Type.STRING,
+//      label = "Collection",
+//      required = false,
+//      group = "MONGODB",
+//      displayPosition = 30
+//  )
   public String collection;
 
   @ConfigDef(
@@ -378,7 +378,7 @@ public class MongoDBConfig {
   }
 
   public MongoCollection getMongoCollection(String collectionName){
-      
+
     if(collections.get(collectionName) == null){
         MongoCollection coll = createMongoCollection(null, null, null, null);
         if(coll!=null)

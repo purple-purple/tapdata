@@ -99,14 +99,8 @@ public class TapTransformer {
                 }
             }
             if (recordTableEnum == RecordTableEnum.JDBC_TABLES) {
-                String jdbcTable = record.getHeader().getAttribute(recordTableEnum.getFieldName());
-                if (StringUtils.isNotBlank(jdbcTable)) {
-                    int length = jdbcTable.split("\\.").length;
-                    if (length > 1) {
-                        tableName = jdbcTable.split("\\.")[1];
-                    }
-                    break;
-                }
+                tableName = record.getHeader().getAttribute(recordTableEnum.getFieldName());
+                break;
             }
         }
 

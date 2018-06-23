@@ -36,6 +36,19 @@ public class TapTransformer {
     private static final Logger LOG = LoggerFactory.getLogger(TapTransformer.class);
 
     Document mapConfig = new Document();
+
+    private enum RecordTableEnum {
+        ORALCE_CDC_TALBE("oracle.cdc.table"),;
+
+        String fieldName;
+        RecordTableEnum(String fieldName) {
+            this.fieldName = fieldName;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
+    }
     
     public TapTransformer(MongoTargetConfigBean config){
         System.out.println("TapMongo initializing v3.2.0.18");
@@ -78,6 +91,17 @@ public class TapTransformer {
         Map<String, List<WriteModel<Document>>> map = new HashMap<>();
 //        List<WriteModel<Document>> models = new ArrayList<>();
         String operationCode = record.getHeader().getAttribute(OperationType.SDC_OPERATION_TYPE);
+        String tableName = null;
+
+        for (RecordTableEnum  recordTableEnum: RecordTableEnum.values()) {
+            tableName = record.getHeader().getAttribute(recordTableEnum.getFieldName());
+        }
+
+        if (StringUtils.isBlank(tableName)) {
+            LOG.warn("Not support this record {}", record.getHeader());
+            return null;
+        }
+
         String operation;
         if (operationCode != null) {
           operation = OperationType.getLabelFromStringCode(operationCode);
@@ -93,35 +117,38 @@ public class TapTransformer {
 
         for (Object obj : objs) {
             Map mapping = (Map) obj;
+            String fromTable = (String) mapping.get("from_table");
             String toTable = (String) mapping.get("to_table");
 
-            WriteModel<Document> result = null;
-            String relationship = (String) mapping.get("relationship");
-            if(relationship == null)
-                relationship = "OneOne";
-            switch (relationship) {
-                case "OplogClone":
-                    result = applyOplog(record, doc);
-                    break;
-                case "ManyOne":
-                    result = embedMany(record, doc,operation, mapping);
-                    break;
+            if (StringUtils.isNotBlank(fromTable) && fromTable.equals(tableName)) {
+                WriteModel<Document> result = null;
+                String relationship = (String) mapping.get("relationship");
+                if(relationship == null)
+                    relationship = "OneOne";
+                switch (relationship) {
+                    case "OplogClone":
+                        result = applyOplog(record, doc);
+                        break;
+                    case "ManyOne":
+                        result = embedMany(record, doc,operation, mapping);
+                        break;
 
-                case "OneMany":
-                    //logger.warn("Unsupport this relationship {}", relationship);
-                    System.out.println("One Many not supported yet");
-                    break;
-                case "OneOne":
-                default:
-                    result = upsert(record, doc, operation, mapping);
-                    break;
-            }
-            if (!map.containsKey(toTable)) {
-                map.put(toTable, new ArrayList<>());
-            }
-            if (result != null) {
-                map.get(toTable).add(result);
+                    case "OneMany":
+                        //logger.warn("Unsupport this relationship {}", relationship);
+                        System.out.println("One Many not supported yet");
+                        break;
+                    case "OneOne":
+                    default:
+                        result = upsert(record, doc, operation, mapping);
+                        break;
+                }
+                if (!map.containsKey(toTable)) {
+                    map.put(toTable, new ArrayList<>());
+                }
+                if (result != null) {
+                    map.get(toTable).add(result);
 //                models.add(result);
+                }
             }
         }
 //        Iterator<Object> iterator = objs.iterator();

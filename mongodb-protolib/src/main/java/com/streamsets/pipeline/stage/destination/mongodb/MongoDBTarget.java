@@ -35,6 +35,7 @@ import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.ErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.mongodb.Errors;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -43,9 +44,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class MongoDBTarget extends BaseTarget {
   private static final Logger LOG = LoggerFactory.getLogger(MongoDBTarget.class);
@@ -107,7 +106,7 @@ public class MongoDBTarget extends BaseTarget {
   @Override
   public void write(Batch batch) throws StageException {
     Iterator<Record> records = batch.getRecords();
-    List<WriteModel<Document>> documentList = new ArrayList<>();
+    Map<String, List<WriteModel<Document>>> collectionBulkMap = new HashMap<>();
     List<Record> recordList = new ArrayList<>();
     int count=0;
     while (records.hasNext()) {
@@ -128,11 +127,23 @@ public class MongoDBTarget extends BaseTarget {
         //   throw new OnRecordErrorException(Errors.MONGODB_15, record.getHeader().getSourceId());
         // }
 
-        List<WriteModel<Document>> models = transformer.processRecord(record, document);
-        if(CollectionUtils.isNotEmpty(models)){
-              recordList.add(record);
-              documentList.addAll(models);
-        }            
+        Map<String, List<WriteModel<Document>>> map = transformer.processRecord(record, document);
+        if (MapUtils.isNotEmpty(map)) {
+
+          for (Map.Entry<String, List<WriteModel<Document>>> entry : map.entrySet()) {
+            String collectionName = entry.getKey();
+            List<WriteModel<Document>> models = entry.getValue();
+            if (!collectionBulkMap.containsKey(collectionName)) {
+              collectionBulkMap.put(collectionName, new ArrayList<>());
+            }
+            collectionBulkMap.get(collectionName).addAll(models);
+          }
+
+        }
+//        if(CollectionUtils.isNotEmpty(models)){
+//              recordList.add(record);
+//              collectionBulkMap.addAll(models);
+//        }
        
       } catch (IOException | StageException | NumberFormatException e) {
         errorRecordHandler.onError(
@@ -146,18 +157,25 @@ public class MongoDBTarget extends BaseTarget {
       }
     }
 
-    if (!documentList.isEmpty()) {
-      System.out.println("Writing "+ documentList.size()+" ops ");
+    if (!collectionBulkMap.isEmpty()) {
+      System.out.println("Writing "+ collectionBulkMap.size()+" ops ");
       try {
-        BulkWriteResult bulkWriteResult = mongoCollection.bulkWrite(documentList);
-        if (bulkWriteResult.wasAcknowledged()) {
-          System.out.println(bulkWriteResult);
-          LOG.debug(
-              "Wrote batch with {} inserts, {} updates and {} deletes",
-              bulkWriteResult.getInsertedCount(),
-              bulkWriteResult.getModifiedCount(),
-              bulkWriteResult.getDeletedCount()
-          );
+        for (Map.Entry<String, List<WriteModel<Document>>> entry : collectionBulkMap.entrySet()) {
+          String collectionName = entry.getKey();
+          List<WriteModel<Document>> models = entry.getValue();
+          MongoCollection<Document> collection = mongoTargetConfigBean.mongoConfig.getMongoDatabase().getCollection(collectionName);
+
+          BulkWriteResult bulkWriteResult = collection.bulkWrite(models);
+          if (bulkWriteResult.wasAcknowledged()) {
+            System.out.println(bulkWriteResult);
+            LOG.debug(
+                    "Wrote batch with {} inserts, {} updates and {} deletes to {}",
+                    bulkWriteResult.getInsertedCount(),
+                    bulkWriteResult.getModifiedCount(),
+                    bulkWriteResult.getDeletedCount(),
+                    collectionName
+            );
+          }
         }
       } catch (MongoException e) {
         for (Record record : recordList) {

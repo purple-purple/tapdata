@@ -24,14 +24,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.BSONObject;
 import org.bson.Document;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.type.TypeFactory;
 import org.mortbay.util.ajax.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 public class TapTransformer {
     private static final Logger LOG = LoggerFactory.getLogger(TapTransformer.class);
@@ -63,7 +62,7 @@ public class TapTransformer {
         }
 
     }
-    public List<WriteModel<Document>> processRecord(Record record, Document doc){
+    public Map<String, List<WriteModel<Document>>> processRecord(Record record, Document doc){
         //return new InsertOneModel<>(document);
 
         //String tableName = messageEntity.getTableName();
@@ -76,8 +75,8 @@ public class TapTransformer {
         // for(String attr: record.getHeader().getAttributeNames()){
         //     System.out.println(attr+" -- "+record.getHeader().getAttribute(attr));
         // }
-
-        List<WriteModel<Document>> models = new ArrayList<>();
+        Map<String, List<WriteModel<Document>>> map = new HashMap<>();
+//        List<WriteModel<Document>> models = new ArrayList<>();
         String operationCode = record.getHeader().getAttribute(OperationType.SDC_OPERATION_TYPE);
         String operation;
         if (operationCode != null) {
@@ -94,6 +93,7 @@ public class TapTransformer {
         Iterator<Object> iterator = objs.iterator();
         while (iterator.hasNext()) {
             BSONObject mapping = (BSONObject) iterator.next();
+            String toTable = (String) mapping.get("to_table");
 
             WriteModel<Document> result = null;
             String relationship = (String) mapping.get("relationship");
@@ -116,8 +116,12 @@ public class TapTransformer {
                     result = upsert(record, doc, operation, mapping);
                     break;
             }
+            if (!map.containsKey(toTable)) {
+                map.put(toTable, new ArrayList<>());
+            }
             if (result != null) {
-                models.add(result);
+                map.get(toTable).add(result);
+//                models.add(result);
             }
         }
 //        for (BSONObject mapping : objs) {
@@ -147,7 +151,7 @@ public class TapTransformer {
 //                models.add(result);
 //            }
 //        }
-        return models;
+        return map;
 
         /**
         new UpdateOneModel<>(
@@ -323,7 +327,12 @@ public class TapTransformer {
         );
     }
 
-
+    public static void main(String[] args) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
+        List<Map> someClassList = objectMapper.readValue("{}", typeFactory.constructCollectionType(List.class, HashMap.class));
+        System.out.println(someClassList);
+    }
 }
       /** 
     

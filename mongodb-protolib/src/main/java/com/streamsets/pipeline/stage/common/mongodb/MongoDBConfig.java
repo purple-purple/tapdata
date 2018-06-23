@@ -362,7 +362,7 @@ public class MongoDBConfig {
       return;
     }
 
-    mongoCollection = createMongoCollection(context, issues, readPreference, writeConcern);
+//    mongoCollection = createMongoCollection(context, issues, readPreference, writeConcern);
   }
 
   public MongoClient getMongoClient() {

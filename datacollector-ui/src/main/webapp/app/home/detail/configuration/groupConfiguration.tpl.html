@@ -175,12 +175,19 @@
                    ng-class="{'has-error': getConfigurationIssues(detailPaneConfig, customFieldConfigDefinition).length > 0}"
                    ng-if="(verifyCustomFieldDependsOn(detailPaneConfig, customFieldValue, customFieldConfigDefinition))">
 
-                <label class="col-lg-3 control-label">{{customFieldConfigDefinition.label}}
-                  <i class="fa fa-info-circle help-icon"
+                <label class="col-lg-3 control-label">{{"tapdata." + customFieldConfigDefinition.label | translate}}
+               
+                  <i ng-if="customFieldConfigDefinition.description" class="fa fa-info-circle help-icon"
                      tooltip-placement="right"
                      tooltip-append-to-body="false"
-                     tooltip="{{customFieldConfigDefinition.description || customFieldConfigDefinition.label}}"
+                     tooltip="{{'tapdata.'+ customFieldConfigDefinition.description | translate}}"
                      tooltip-trigger="mouseenter"></i>
+                  <i ng-if="!customFieldConfigDefinition.description" class="fa fa-info-circle help-icon"
+                     tooltip-placement="right"
+                     tooltip-append-to-body="false"
+                     tooltip="{{'tapdata.'+ customFieldConfigDefinition.label | translate}}"
+                     tooltip-trigger="mouseenter"></i>
+                     
                 </label>
 
                 <div class="controls col-lg-9">

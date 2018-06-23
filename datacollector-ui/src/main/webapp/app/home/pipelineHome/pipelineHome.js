@@ -2029,6 +2029,10 @@ angular
     
 
     var pipelineHome = this;
+    $scope.$on('hideMappingView', function( event, option){
+      $scope.showMappingView = false;
+    })
+
     $scope.$on('showMappingView', function (event, options) {
       // console.log( $scope, options,"@@")
       // updateFieldDataForStage
@@ -2036,18 +2040,18 @@ angular
       // $scope.$on('fieldPathsUpdated', function(a,b,c){
       //   console.log(a,b,c, 'fieldPathsUpdated!');
       // }) 
+      
       previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
         10).then(function(data){
-          
-          if(data.batchesOutput && data.batchesOutput[0] && data.batchesOutput[0][0]){
-            const info = data.batchesOutput[0][0].output;
-            for(var key in info){
-              try{
-                const schemaString = info[key][0].header.values.schema;
+          if(data && data.length > 0){
+            for( var i = 0; i < data.length; i++){
+              if(data[i].header.values.schema){
+                const schemaString = data[i].header.values.schema
                 const tableInfo = JSON.parse(schemaString);
                 console.log('got table schema:',tableInfo)
-                $scope.showMappingView = !$scope.showMappingView;
+                $scope.showMappingView = true;
                 $scope.refreshGraph(); 
+
                 $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
                 $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
                 
@@ -2056,33 +2060,105 @@ angular
                   let ifrmNode = document.getElementById('editorIframe')
                   let ifrm = ifrmNode ? ifrmNode.contentWindow || ifrmNode.contentDocument.document || ifrmNode.contentDocument : null;
                   var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
-                  var current_mapping = $scope.pipelineConfig['metadata']['tapdata_mapping']
+                  var current_mapping = $scope.pipelineConfig['metadata']['tapdata_mapping'];
+                  try{
+                    if (typeof current_mapping === "string"){
+                      current_mapping = JSON.parse(current_mapping)
+                    }
+                  }catch(e){
+                    console.log(e)
+                  }
+                  // for(var i = 0; i < $scope.pipelineConfig.stages.length; i++) {
+                  //   if($scope.pipelineConfig.stages[i].library === 'streamsets-datacollector-mongodb_3-lib'){
+                  //     for(var j = 0; j < $scope.pipelineConfig.stages[i].configuration.length; j++){
+                  //         if( $scope.pipelineConfig.stages[i].configuration[j].name === "configBean.mapping" ){
+                  //           console.log('got current configBean.mapping:', $scope.pipelineConfig.stages[i].configuration[j].value)
+                  //           current_mapping = $scope.pipelineConfig.stages[i].configuration[j].value
+                  //           try{
+                  //             if (typeof current_mapping === "string"){
+                  //               current_mapping = JSON.parse(current_mapping)
+                  //             }
+                  //           }catch(e){
+                  //             console.log(e)
+                  //           }
+                  //         }
+                  //     }
+                  //   }
+                  // }
                   if(current_mapping) {
-                    ifrm.mydesigner.restore(current_mapping, {mode: 'cluster-clone'}) 
+                    ifrm.mydesigner && ifrm.mydesigner.restore(current_mapping, {mode: 'cluster-clone'}) 
                   }else{
-                    ifrm.mydesigner.init(current_schema, {mode: 'cluster-clone'}) 
-
+                    ifrm.mydesigner && ifrm.mydesigner.init(current_schema, {mode: 'cluster-clone'}) 
                   }
                   ifrm.mydesigner.on('savedocument', r => {
                     var result = ifrm.mydesigner.getDesignResult()
-                    $rootScope.$broadcast('showMappingView');
                     $scope.pipelineConfig['metadata']['tapdata_mapping'] = result
+                    
+                    for(var i = 0; i < $scope.pipelineConfig.stages.length; i++) {
+                      if($scope.pipelineConfig.stages[i].library === 'streamsets-datacollector-mongodb_3-lib'){
+                        for(var j = 0; j < $scope.pipelineConfig.stages[i].configuration.length; j++){
+                            if( $scope.pipelineConfig.stages[i].configuration[j].name === "configBean.mapping" ){
+                              $scope.pipelineConfig.stages[i].configuration[j].value = JSON.stringify({mappings: result.data})
+                            }
+                        }
+                      }
+                    }
+                    $rootScope.$broadcast('hideMappingView');
                     $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
                     $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
-
                   })
                   ifrm.mydesigner.on('cancel', r => {
-                    $rootScope.$broadcast('showMappingView'); 
+                    $rootScope.$broadcast('hideMappingView'); 
                     $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
-
                   })
                 }, 1000)
-                
-              }catch(e){
-                console.log('not exisited schema info in preview data')
               }
             }
           }
+          // if(data.batchesOutput && data.batchesOutput[0] && data.batchesOutput[0][0]){
+          //   const info = data.batchesOutput[0][0].output;
+          //   for(var key in info){
+          //     try{
+          //       const schemaString = info[key][0].header.values.schema;
+          //       const tableInfo = JSON.parse(schemaString);
+          //       console.log('got table schema:',tableInfo)
+          //       $scope.showMappingView = !$scope.showMappingView;
+          //       $scope.refreshGraph(); 
+          //       $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
+          //       $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
+                
+          //       setTimeout(function(){ 
+          //         $("#editorIframe").height((window.innerHeight - 240) + 'px')
+          //         let ifrmNode = document.getElementById('editorIframe')
+          //         let ifrm = ifrmNode ? ifrmNode.contentWindow || ifrmNode.contentDocument.document || ifrmNode.contentDocument : null;
+          //         var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
+          //         var current_mapping = $scope.pipelineConfig['metadata']['tapdata_mapping']
+          //         if(current_mapping) {
+          //           ifrm.mydesigner.restore(current_mapping, {mode: 'cluster-clone'}) 
+          //         }else{
+          //           ifrm.mydesigner.init(current_schema, {mode: 'cluster-clone'}) 
+
+          //         }
+          //         ifrm.mydesigner.on('savedocument', r => {
+          //           var result = ifrm.mydesigner.getDesignResult()
+          //           $rootScope.$broadcast('showMappingView');
+          //           $scope.pipelineConfig['metadata']['tapdata_mapping'] = result
+          //           $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
+          //           $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
+
+          //         })
+          //         ifrm.mydesigner.on('cancel', r => {
+          //           $rootScope.$broadcast('showMappingView'); 
+          //           $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
+
+          //         })
+          //       }, 1000)
+                
+          //     }catch(e){
+          //       console.log('not exisited schema info in preview data')
+          //     }
+          //   }
+          // }
         }).catch(function(e,b){
           console.log(e,b)
         })

@@ -378,7 +378,7 @@ public class MongoDBConfig {
   }
 
   public MongoCollection getMongoCollection(String collectionName){
-      
+
     if(collections.get(collectionName) == null){
         MongoCollection coll = createMongoCollection(null, null, null, null);
         if(coll!=null)

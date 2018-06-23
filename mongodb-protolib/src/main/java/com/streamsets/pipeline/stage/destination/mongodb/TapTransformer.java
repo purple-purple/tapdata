@@ -333,8 +333,9 @@ public class TapTransformer {
         Document matchCriteria = new Document();
         Document updateSpec = new Document();
 
-        List<Map> joinCondition = (List<Map>) mapping.get("join_condition");
-        for (Map condition : joinCondition) {
+        Object[] joinCondition = (Object[]) mapping.get("join_condition");
+        for (Object obj : joinCondition) {
+            Map condition = (Map) obj;
             String source = (String) condition.get("source");
             String target = (String) condition.get("target");
             if(StringUtils.isNotBlank(source) && StringUtils.isNotBlank(target)){

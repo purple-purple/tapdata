@@ -89,10 +89,10 @@ public class TapTransformer {
         operation = operation.toUpperCase();
 
         String mappingsStr = mapConfig.getString("mappings");
-        BasicDBList objs = (BasicDBList) JSON.parse(mappingsStr);
-        Iterator<Object> iterator = objs.iterator();
-        while (iterator.hasNext()) {
-            BSONObject mapping = (BSONObject) iterator.next();
+        Object[] objs = (Object[]) JSON.parse(mappingsStr);
+
+        for (Object obj : objs) {
+            Map mapping = (Map) obj;
             String toTable = (String) mapping.get("to_table");
 
             WriteModel<Document> result = null;
@@ -124,6 +124,35 @@ public class TapTransformer {
 //                models.add(result);
             }
         }
+//        Iterator<Object> iterator = objs.iterator();
+//        while (iterator.hasNext()) {
+//            BSONObject mapping = (BSONObject) iterator.next();
+//
+//            WriteModel<Document> result = null;
+//            String relationship = (String) mapping.get("relationship");
+//            if(relationship == null)
+//                relationship = "OneOne";
+//            switch (relationship) {
+//                case "OplogClone":
+//                    result = applyOplog(record, doc);
+//                    break;
+//                case "ManyOne":
+//                    result = embedMany(record, doc,operation, mapping);
+//                    break;
+//
+//                case "OneMany":
+//                    //logger.warn("Unsupport this relationship {}", relationship);
+//                    System.out.println("One Many not supported yet");
+//                    break;
+//                case "OneOne":
+//                default:
+//                    result = upsert(record, doc, operation, mapping);
+//                    break;
+//            }
+//            if (result != null) {
+//                models.add(result);
+//            }
+//        }
 //        for (BSONObject mapping : objs) {
 //
 //            WriteModel<Document> result = null;
@@ -211,7 +240,7 @@ public class TapTransformer {
         return null;
     } // end meothd
 
-    private WriteModel<Document> upsert(Record record, Document doc, String operation, BSONObject mapping) {
+    private WriteModel<Document> upsert(Record record, Document doc, String operation, Map mapping) {
         if (StringUtils.isBlank(operation)) {
             operation = "INSERT";
         }
@@ -219,11 +248,12 @@ public class TapTransformer {
         Document criteria = new Document();
         Document updateSpec = new Document();
 
-        List<Document> joinCondition = (List<Document>) mapping.get("join_condition");
+        Object[] joinCondition = (Object[]) mapping.get("join_condition");
 
-        for (Document condition : joinCondition) {
-            String source = condition.getString("source");
-            String target = condition.getString("target");
+        for (Object obj : joinCondition) {
+            Map condition = (Map) obj;
+            String source = (String) condition.get("source");
+            String target = (String) condition.get("target");
             if(source!=null && target!=null){
                 criteria.append(target, doc.get(source));
             }
@@ -265,7 +295,7 @@ public class TapTransformer {
     } // end meothd
 
 
-    private WriteModel<Document> embedMany(Record record, Document doc, String operation, BSONObject mapping) {
+    private WriteModel<Document> embedMany(Record record, Document doc, String operation, Map mapping) {
 //        System.out.println(doc);
         if (StringUtils.isBlank(operation)) {
             operation = "INSERT";
@@ -276,19 +306,20 @@ public class TapTransformer {
         Document matchCriteria = new Document();
         Document updateSpec = new Document();
 
-        List<Document> joinCondition = (List<Document>) mapping.get("join_condition");
-        for (Document condition : joinCondition) {
-            String source = condition.getString("source");
-            String target = condition.getString("target");
+        List<Map> joinCondition = (List<Map>) mapping.get("join_condition");
+        for (Map condition : joinCondition) {
+            String source = (String) condition.get("source");
+            String target = (String) condition.get("target");
             if(StringUtils.isNotBlank(source) && StringUtils.isNotBlank(target)){
                 criteria.append(target, doc.get(source));
             }
         }
 
-         List<Document> matchCondition = (List<Document>) mapping.get("match_condition");
-         for (Document condition : matchCondition) {
-             String source = condition.getString("source");
-             String target = condition.getString("target");
+         Object[] matchCondition = (Object[]) mapping.get("match_condition");
+         for (Object obj : matchCondition) {
+             Map condition = (Map) obj;
+             String source = (String) condition.get("source");
+             String target = (String) condition.get("target");
              if(StringUtils.isNotBlank(source) && StringUtils.isNotBlank(target) && StringUtils.isNotBlank(targetPath)){
                  // criteria.append(target, doc.get(source));
 //                 StringBuilder sb = new StringBuilder(targetPath).append(".$.").append(target.split("\\.", 1)[1]);
@@ -327,12 +358,7 @@ public class TapTransformer {
         );
     }
 
-    public static void main(String[] args) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        TypeFactory typeFactory = objectMapper.getTypeFactory();
-        List<Map> someClassList = objectMapper.readValue("{}", typeFactory.constructCollectionType(List.class, HashMap.class));
-        System.out.println(someClassList);
-    }
+
 }
       /** 
     

@@ -15,6 +15,7 @@
  */
 package com.streamsets.pipeline.stage.destination.mongodb;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.client.model.*;
 import com.streamsets.pipeline.api.Record;
 import com.streamsets.pipeline.lib.operation.OperationType;
@@ -22,11 +23,13 @@ import jdk.nashorn.internal.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.BSONObject;
 import org.bson.Document;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.mortbay.util.ajax.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -87,8 +90,10 @@ public class TapTransformer {
         operation = operation.toUpperCase();
 
         String mappingsStr = mapConfig.getString("mappings");
-        List<BSONObject> objs = (List<BSONObject>) JSON.parse(mappingsStr);
-        for (BSONObject mapping : objs) {
+        Object[] objs = (Object[]) JSON.parse(mappingsStr);
+
+        for (Object obj : objs) {
+            Map mapping = (Map) obj;
 
             WriteModel<Document> result = null;
             String relationship = (String) mapping.get("relationship");
@@ -115,6 +120,62 @@ public class TapTransformer {
                 models.add(result);
             }
         }
+//        Iterator<Object> iterator = objs.iterator();
+//        while (iterator.hasNext()) {
+//            BSONObject mapping = (BSONObject) iterator.next();
+//
+//            WriteModel<Document> result = null;
+//            String relationship = (String) mapping.get("relationship");
+//            if(relationship == null)
+//                relationship = "OneOne";
+//            switch (relationship) {
+//                case "OplogClone":
+//                    result = applyOplog(record, doc);
+//                    break;
+//                case "ManyOne":
+//                    result = embedMany(record, doc,operation, mapping);
+//                    break;
+//
+//                case "OneMany":
+//                    //logger.warn("Unsupport this relationship {}", relationship);
+//                    System.out.println("One Many not supported yet");
+//                    break;
+//                case "OneOne":
+//                default:
+//                    result = upsert(record, doc, operation, mapping);
+//                    break;
+//            }
+//            if (result != null) {
+//                models.add(result);
+//            }
+//        }
+//        for (BSONObject mapping : objs) {
+//
+//            WriteModel<Document> result = null;
+//            String relationship = (String) mapping.get("relationship");
+//            if(relationship == null)
+//                relationship = "OneOne";
+//            switch (relationship) {
+//                case "OplogClone":
+//                    result = applyOplog(record, doc);
+//                    break;
+//                case "ManyOne":
+//                    result = embedMany(record, doc,operation, mapping);
+//                    break;
+//
+//                case "OneMany":
+//                    //logger.warn("Unsupport this relationship {}", relationship);
+//                    System.out.println("One Many not supported yet");
+//                    break;
+//                case "OneOne":
+//                default:
+//                    result = upsert(record, doc, operation, mapping);
+//                    break;
+//            }
+//            if (result != null) {
+//                models.add(result);
+//            }
+//        }
         return models;
 
         /**
@@ -175,7 +236,7 @@ public class TapTransformer {
         return null;
     } // end meothd
 
-    private WriteModel<Document> upsert(Record record, Document doc, String operation, BSONObject mapping) {
+    private WriteModel<Document> upsert(Record record, Document doc, String operation, Map mapping) {
         if (StringUtils.isBlank(operation)) {
             operation = "INSERT";
         }
@@ -183,11 +244,12 @@ public class TapTransformer {
         Document criteria = new Document();
         Document updateSpec = new Document();
 
-        List<Document> joinCondition = (List<Document>) mapping.get("join_condition");
+        Object[] joinCondition = (Object[]) mapping.get("join_condition");
 
-        for (Document condition : joinCondition) {
-            String source = condition.getString("source");
-            String target = condition.getString("target");
+        for (Object obj : joinCondition) {
+            Map condition = (Map) obj;
+            String source = (String) condition.get("source");
+            String target = (String) condition.get("target");
             if(source!=null && target!=null){
                 criteria.append(target, doc.get(source));
             }
@@ -229,7 +291,7 @@ public class TapTransformer {
     } // end meothd
 
 
-    private WriteModel<Document> embedMany(Record record, Document doc, String operation, BSONObject mapping) {
+    private WriteModel<Document> embedMany(Record record, Document doc, String operation, Map mapping) {
 //        System.out.println(doc);
         if (StringUtils.isBlank(operation)) {
             operation = "INSERT";
@@ -240,19 +302,20 @@ public class TapTransformer {
         Document matchCriteria = new Document();
         Document updateSpec = new Document();
 
-        List<Document> joinCondition = (List<Document>) mapping.get("join_condition");
-        for (Document condition : joinCondition) {
-            String source = condition.getString("source");
-            String target = condition.getString("target");
+        List<Map> joinCondition = (List<Map>) mapping.get("join_condition");
+        for (Map condition : joinCondition) {
+            String source = (String) condition.get("source");
+            String target = (String) condition.get("target");
             if(StringUtils.isNotBlank(source) && StringUtils.isNotBlank(target)){
                 criteria.append(target, doc.get(source));
             }
         }
 
-         List<Document> matchCondition = (List<Document>) mapping.get("match_condition");
-         for (Document condition : matchCondition) {
-             String source = condition.getString("source");
-             String target = condition.getString("target");
+         Object[] matchCondition = (Object[]) mapping.get("match_condition");
+         for (Object obj : matchCondition) {
+             Map condition = (Map) obj;
+             String source = (String) condition.get("source");
+             String target = (String) condition.get("target");
              if(StringUtils.isNotBlank(source) && StringUtils.isNotBlank(target) && StringUtils.isNotBlank(targetPath)){
                  // criteria.append(target, doc.get(source));
 //                 StringBuilder sb = new StringBuilder(targetPath).append(".$.").append(target.split("\\.", 1)[1]);

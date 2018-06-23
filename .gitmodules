@@ -1,0 +1,4 @@
+[submodule "designer"]
+	path = designer
+	url = git@github.com:tjworks/visualdesigner.git
+	branch = v1.2

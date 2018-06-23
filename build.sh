@@ -120,4 +120,6 @@ main () {
 
      
 }
+
+git submodule update --init --remote
 main "$@"

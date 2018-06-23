@@ -7,8 +7,6 @@
 		"Execution Mode": "运行模式",
 		"JDBC Connection String": "JDBC 连接字符串",
 		"The number of retries upon a SQL Error.  To allow for the possibility of handling transient errors (ex: connection issues, deadlock, etc.), provide a positive value here.  After the specified number of retries is reached, the stage will fail upon the next error and pipeline error handling behavior will take over.":"SQL错误时重试的次数。 为了能够处理瞬时错误（例如：连接问题，死锁等），请在此处提供一个正值。 达到指定的重试次数后，阶段将在下一个错误发生时失败，并且管道错误处理行为将接管。",
-		
-
 		"Produce new records for each element of a list or map field": "为列表或地图字段的每个元素生成新记录",
 	"Field Pivoter": "现场枢轴",
 	"Listens for requests on an HTTP endpoint": "在HTTP端点上侦听请求",
@@ -1428,7 +1426,7 @@
 	"JDBC": "JDBC",
 	"Legacy Drivers": "传统驱动程序",
 	"Change Tracking": "更改跟踪",
-	"Legacy": "遗产",
+	"Legacy": "Legacy",
 	"Change Data Capture": "更改数据捕获",
 	"CDC": "CDC",
 	"Oracle CDC": "Oracle CDC",

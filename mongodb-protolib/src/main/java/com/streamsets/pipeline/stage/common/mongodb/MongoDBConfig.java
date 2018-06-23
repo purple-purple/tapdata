@@ -81,13 +81,6 @@ public class MongoDBConfig {
   )
   public String database;
 
-//  @ConfigDef(
-//      type = ConfigDef.Type.STRING,
-//      label = "Collection",
-//      required = false,
-//      group = "MONGODB",
-//      displayPosition = 30
-//  )
   public String collection;
 
   @ConfigDef(

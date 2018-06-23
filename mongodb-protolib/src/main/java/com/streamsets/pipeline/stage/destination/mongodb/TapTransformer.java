@@ -15,22 +15,19 @@
  */
 package com.streamsets.pipeline.stage.destination.mongodb;
 
-import com.mongodb.BasicDBList;
 import com.mongodb.client.model.*;
 import com.streamsets.pipeline.api.Record;
 import com.streamsets.pipeline.lib.operation.OperationType;
-import jdk.nashorn.internal.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.BSONObject;
 import org.bson.Document;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.type.TypeFactory;
 import org.mortbay.util.ajax.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TapTransformer {
     private static final Logger LOG = LoggerFactory.getLogger(TapTransformer.class);
@@ -38,7 +35,8 @@ public class TapTransformer {
     Document mapConfig = new Document();
 
     private enum RecordTableEnum {
-        ORALCE_CDC_TALBE("oracle.cdc.table"),;
+        ORALCE_CDC_TALBE("oracle.cdc.table"),
+        JDBC_TABLES("jdbc.tables");
 
         String fieldName;
         RecordTableEnum(String fieldName) {
@@ -94,7 +92,16 @@ public class TapTransformer {
         String tableName = null;
 
         for (RecordTableEnum  recordTableEnum: RecordTableEnum.values()) {
-            tableName = record.getHeader().getAttribute(recordTableEnum.getFieldName());
+            if (recordTableEnum == RecordTableEnum.ORALCE_CDC_TALBE) {
+                tableName = record.getHeader().getAttribute(recordTableEnum.getFieldName());
+                if (StringUtils.isNotBlank(tableName)) {
+                    break;
+                }
+            }
+            if (recordTableEnum == RecordTableEnum.JDBC_TABLES) {
+                tableName = record.getHeader().getAttribute(recordTableEnum.getFieldName());
+                break;
+            }
         }
 
         if (StringUtils.isBlank(tableName)) {

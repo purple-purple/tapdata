@@ -104,6 +104,7 @@ angular
       canWrite: false,
       canExecute: false,
       isDPMPipelineDirty: false,
+      tapdataMessage:'',
 
       /**
        * Add New Pipeline Configuration
@@ -2034,16 +2035,17 @@ angular
     })
 
     $scope.$on('showMappingView', function (event, options) {
-      // console.log( $scope, options,"@@")
-      // updateFieldDataForStage
-      // $rootScope.$broadcast('previewSchema',$scope.selectedStage )
-      // $scope.$on('fieldPathsUpdated', function(a,b,c){
-      //   console.log(a,b,c, 'fieldPathsUpdated!');
-      // }) 
+      if($scope.showLoading){
+        return;
+      }
+      $scope.tapdataMessage= "Loading DB schema Info ...";
+      $scope.showLoading = true;
       
       previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
         10).then(function(data){
           if(data && data.length > 0){
+            $scope.tapdataMessage= "";
+            $scope.showLoading = false;
             for( var i = 0; i < data.length; i++){
               if(data[i].header.values.schema){
                 const schemaString = data[i].header.values.schema
@@ -2114,6 +2116,11 @@ angular
                 }, 1000)
               }
             }
+          }else{
+            $scope.tapdataMessage= "Can not get schema info";
+            setTimeout(function(){
+              $scope.showLoading = false;
+            },2000)
           }
         }).catch(function(e,b){
           console.log(e,b)
@@ -2122,6 +2129,7 @@ angular
     
     var self = this;
     $scope.$on('onNodeSelection', function (event, options) {
+      // $scope.showLoading = true;
       updateDetailPane(options);
       if(options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
         $scope.selectedStage = options.selectedObject;

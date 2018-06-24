@@ -1,6 +1,6 @@
 <ng-include src="'app/home/alerts/error/errorModal.tpl.html'"></ng-include>
 
-<div class="pipeline-home-loading" show-loading="showLoading"></div>
+<div class="pipeline-home-loading" show-loading="showLoading" message="tapdataMessage"></div>
 
 <ng-include src="'app/home/header/header.tpl.html'"></ng-include>
 <div ng-if=" viewJobConfigWhileRunning || showMappingView || (!showJobConfig && !isPipelineRunning)">

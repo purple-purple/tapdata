@@ -140,11 +140,10 @@ if [ -d "$SDC_HOME/jdk/$JDK_DIR" ];then
 fi
 
 if [ -z "$JAVA_HOME" ]
-  then
-    JAVA=`which java 2> /dev/null`
-  else
-    JAVA="$JAVA_HOME/bin/java"
-  fi
+then
+  JAVA=`which java 2> /dev/null`
+else
+  JAVA="$JAVA_HOME/bin/java"
 fi
 
 if [ -z "$JAVA" ]

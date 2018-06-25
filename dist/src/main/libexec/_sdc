@@ -19,7 +19,7 @@
 export DEBUG="${DEBUG:-false}"
 export HTTP_PORT="${HTTP_PORT:-8000}"
 
-JDK_TAR="jdk-8u171-linux-x64.tar.gz"
+JDK_TAR="jdk1.8.0_171.tar.gz"
 JDK_DIR="jdk1.8.0_171"
 
 # resolve links - $0 may be a softlink

@@ -196,6 +196,15 @@
       <outputDirectory>/streamsets-libs/</outputDirectory>
     </fileSet>
 
+    <!-- oracle jdbc6 -->
+    <fileSet>
+      <directory>${basedir}/../driver/</directory>
+      <includes>
+        <include>ojdbc6.jar</include>
+      </includes>
+      <outputDirectory>/streamsets-libs/streamsets-datacollector-jdbc-lib/lib/</outputDirectory>
+    </fileSet>
+
     <!-- jms-lib -->
     <!--<fileSet>
       <directory>${basedir}/../jms-lib/target/streamsets-libs/</directory>

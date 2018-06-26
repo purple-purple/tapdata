@@ -271,6 +271,9 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
                 while (recordCount < batchSize) {
                     if (rs.isClosed() || !rs.next()) {
                         resultSetEndReached = true;
+                        if (StringUtils.isNotEmpty(tableSchemasJson) && recordCount == 0) {
+                            createAndAddRecord(rs, tableRuntimeContext, batchContext, tableSchemasJson);
+                        }
                         break;
                     }
 

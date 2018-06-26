@@ -9,7 +9,7 @@ SKIP_BUILD_LIB="${SKIP_BUILD_LIB:-false}"
 SKIP_RUN_SDC=${SKIP_RUN_SDC:-true}
 DEV_MODE="${DEV_MODE:-false}"
 DOWNLOAD_SDC="${DOWNLOAD_SDC:-false}"
-TAP_DATA_VERSION=tapdata-1.0.0
+TAP_DATA_VERSION=tapdata
 export TAP_DATA_VERSION
 
 PID=$(ps -ef|grep $TAP_DATA_VERSION""|grep -v grep|awk '{print $2}')

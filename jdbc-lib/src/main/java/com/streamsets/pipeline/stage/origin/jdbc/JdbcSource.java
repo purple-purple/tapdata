@@ -282,7 +282,7 @@ public class JdbcSource extends BaseSource {
             List<ConfigIssue> issues, Source.Context context, DatabaseMetaData dbMetadata
     ) throws SQLException {
         if (!txnColumnName.isEmpty() && !dbMetadata.supportsResultSetType(ResultSet.TYPE_SCROLL_INSENSITIVE)) {
-            issues.add(context.createConfigIssue(Groups.CDC.name(), TXN_ID_COLUMN_NAME, JdbcErrors.JDBC_30));
+            //issues.add(context.createConfigIssue(Groups.CDC.name(), TXN_ID_COLUMN_NAME, JdbcErrors.JDBC_30));
         }
     }
 

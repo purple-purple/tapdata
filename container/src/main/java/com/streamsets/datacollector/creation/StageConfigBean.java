@@ -62,7 +62,7 @@ public class StageConfigBean {
   public List<String> stageRequiredFields;
 
   public static final String STAGE_PRECONDITIONS_CONFIG = "stageRecordPreconditions";
-  @ConfigDef(
+  /*@ConfigDef(
       required = false,
       type = ConfigDef.Type.LIST,
       defaultValue="",
@@ -72,7 +72,7 @@ public class StageConfigBean {
       group = "",
       evaluation = ConfigDef.Evaluation.EXPLICIT,
       elDefs = { RecordEL.class, RuntimeEL.class }
-  )
+  )*/
   public List<String> stageRecordPreconditions;
 
   public static final Set<String> CONFIGS = ImmutableSet.of(STAGE_ON_RECORD_ERROR_CONFIG, STAGE_PRECONDITIONS_CONFIG,

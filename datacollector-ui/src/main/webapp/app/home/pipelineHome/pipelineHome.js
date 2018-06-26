@@ -2053,9 +2053,6 @@ angular
           console.log(e)
         } 
         if(current_mapping) {
-          current_mapping.content = JSON.parse(current_mapping.content);
-          current_mapping.content.schema = current_schema.schema;
-          current_mapping.content = JSON.stringify( current_mapping.content);
           current_mapping.schema = current_schema.schema
           console.log(current_mapping);
           ifrm.mydesigner && ifrm.mydesigner.restore(current_mapping) 
@@ -2084,27 +2081,38 @@ angular
           $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
         })
       }
-
+      function getSchema(ob){
+        var dict = [ob]
+        let next = dict.shift();
+        while(next){
+          for (var key in next) {
+            if(key === 'schema'){
+              return next[key]
+            }
+            if(typeof next[key] === 'object'){
+              dict.push(Object.assign({}, next[key]))
+            }      
+          }
+          next = dict.shift();
+        }
+        return null
+      }
+       
 
       previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
         10).then(function(data){
-          if(data && data.length > 0){
+          const schemaString = getSchema(data)
+          if(schemaString){ 
             $scope.tapdataMessage= "";
             $scope.showLoading = false;
-            for( var i = 0; i < data.length; i++){
-              if(data[i].header.values.schema){
-                const schemaString = data[i].header.values.schema
-                const tableInfo = JSON.parse(schemaString);
-                console.log('got table schema:',tableInfo)
-                $scope.showMappingView = true;
-                $scope.refreshGraph(); 
+            const tableInfo = JSON.parse(schemaString);
+            console.log('got table schema:',tableInfo)
+            $scope.showMappingView = true;
+            $scope.refreshGraph(); 
 
-                $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
-                $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
-                
-                setTimeout(mappingLoad.bind(this, $scope, $rootScope), 3000)
-              }
-            }
+            $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
+            $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
+            setTimeout(mappingLoad.bind(this, $scope, $rootScope), 3000)
           }else{
             $scope.tapdataMessage= "Can not get schema info";
             setTimeout(function(){

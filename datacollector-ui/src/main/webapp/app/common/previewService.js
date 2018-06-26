@@ -181,7 +181,9 @@ angular.module('dataCollectorApp.common')
             //TAPDATA TODO:
             if(previewData.batchesOutput && previewData.batchesOutput[0]){
               var stagePreviewData = self.getPreviewDataForStage(previewData.batchesOutput[0], stageInstance);
-              deferred.resolve(stagePreviewData.input);
+               //TAPDATA TODO:
+              // deferred.resolve(stagePreviewData.input);
+              deferred.resolve(previewData.batchesOutput);
             }
             else{
               deferred.resolve(previewData);

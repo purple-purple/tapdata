@@ -317,7 +317,8 @@ public abstract class AbstractTableJdbcSource extends BasePushSource {
 
     @Override
     public void produce(Map<String, String> lastOffsets, int maxBatchSize) throws StageException {
-        int batchSize = Math.min(maxBatchSize, commonSourceConfigBean.maxBatchSize);
+//        int batchSize = Math.min(maxBatchSize, commonSourceConfigBean.maxBatchSize);
+        int batchSize = commonSourceConfigBean.maxBatchSize;
         handleLastOffset(new HashMap<>(lastOffsets));
         try {
             executorService = new SafeScheduledExecutorService(numberOfThreads, TableJdbcRunnable.TABLE_JDBC_THREAD_PREFIX);

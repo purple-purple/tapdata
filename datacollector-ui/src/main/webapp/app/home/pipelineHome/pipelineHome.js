@@ -2026,7 +2026,7 @@ angular
     setInterval(function(){
       $scope.refreshGraph();
     }, 2000);
-    
+   
 
     var pipelineHome = this;
     $scope.$on('hideMappingView', function( event, option){
@@ -2126,6 +2126,7 @@ angular
     
     var self = this;
     $scope.$on('onNodeSelection', function (event, options) {
+      
       // $scope.showLoading = true;
       updateDetailPane(options);
       if(options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
@@ -2154,11 +2155,34 @@ angular
         $("#mapping-button").off("click").on("click", function(){
           $rootScope.$broadcast('showMappingView');
         })
+
+     
       },1000)
      
     });
 
+    setInterval(function(){
+      $("li").has("span:contains(更改数据捕获)").remove()
+      $("li").has("span:contains(传统驱动程序)").remove()
+      $("li").has("span:contains(高级)").remove()
+      $("li").has("span:contains(参数)").remove()
 
+      $("div.form-group").has("label:contains(生成事件)").remove()
+      $("div.form-group").has("label:contains(前提条件)").remove()
+      $("div.form-group").has("label:contains(唯一主键)").remove()
+      $("div.form-group").has("label:contains(UPSERT)").remove()
+
+      $("div.form-group").has("label:contains(数据送达保证)").remove()
+      $("div.form-group").has("label:contains(开始活动)").remove()
+      $("div.form-group").has("label:contains(停止事件)").remove()
+      $("div.form-group").has("label:contains(错误时重试管道)").remove()
+      $("div.form-group").has("label:contains(重试尝试)").remove()
+      $("div.form-group").has("label:contains(最大流水线内存（MB）)").remove()
+      $("div.form-group").has("label:contains(超过内存)").remove()
+      $("div.form-group").has("label:contains(费率限制（记录/秒）)").remove()
+      $("div.form-group").has("label:contains(最大跑步者)").remove()
+      $("div.form-group").has("label:contains(创建失败快照)").remove()
+    },300)
 
     $scope.$on('onPasteNode', function (event, stageInstance) {
       var stageLibraries = $scope.stageLibraries;

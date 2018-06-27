@@ -90,6 +90,16 @@ while test $# -gt 0; do
       echo ""
       exit 0
       ;;
+    rs)
+      PID=`ps -ef|grep ${BASEDIR}|grep -v grep|awk '{print $2}'`
+      if [ ! -z "${PID}" ];then
+        kill -9 $PID 2>/dev/null
+        echo "Detected tapdata pid:${PID},stoped success"
+      fi
+      nohup ${PRG} dc &
+      echo "start tapdata success"
+      exit 0
+      ;;
     *)
       echo ""
       echo "Invalid sub-command"

@@ -23,7 +23,7 @@ public enum Groups implements Label {
   JDBC("JDBC"),
   TABLE("Tables"),
   CREDENTIALS("Credentials"),
-  LEGACY("Legacy Drivers"),
+//  LEGACY("Legacy Drivers"),
   ADVANCED("Advanced"),
   ;
 

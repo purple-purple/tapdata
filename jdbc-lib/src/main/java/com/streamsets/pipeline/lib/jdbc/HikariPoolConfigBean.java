@@ -113,17 +113,17 @@ public class HikariPoolConfigBean {
   @ListBeanModel
   public List<ConnectionPropertyBean> driverProperties = new ArrayList<>();
 
-  @ConfigDef(
+  /*@ConfigDef(
       required = false,
       type = ConfigDef.Type.STRING,
       label = "JDBC Driver Class Name",
       description = "Class name for pre-JDBC 4 compliant drivers.",
       displayPosition = 10,
       group = "LEGACY"
-  )
+  )*/
   public String driverClassName = "";
 
-  @ConfigDef(
+  /*@ConfigDef(
       required = false,
       type = ConfigDef.Type.TEXT,
       mode = ConfigDef.Mode.SQL,
@@ -131,7 +131,7 @@ public class HikariPoolConfigBean {
       description = "Not recommended for JDBC 4 compliant drivers. Runs when a new database connection is established.",
       displayPosition = 20,
       group = "LEGACY"
-  )
+  )*/
   public String connectionTestQuery = "";
 
   @ConfigDef(
@@ -340,7 +340,7 @@ public class HikariPoolConfigBean {
       try {
         Class.forName(driverClassName);
       } catch (ClassNotFoundException e) {
-        issues.add(context.createConfigIssue(com.streamsets.pipeline.stage.origin.jdbc.Groups.LEGACY.name(), DRIVER_CLASSNAME, JdbcErrors.JDBC_28, e.toString()));
+//        issues.add(context.createConfigIssue(com.streamsets.pipeline.stage.origin.jdbc.Groups.LEGACY.name(), DRIVER_CLASSNAME, JdbcErrors.JDBC_28, e.toString()));
       }
     }
 

@@ -41,6 +41,7 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.api.ValueChooserModel;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -88,17 +89,17 @@ public class PipelineConfigBean implements Stage {
   )
   public String edgeHttpUrl = EDGE_HTTP_URL_DEFAULT;
 
-  @ConfigDef(
+/*  @ConfigDef(
       required = true,
       type = ConfigDef.Type.MODEL,
       defaultValue="AT_LEAST_ONCE",
       label = "Delivery Guarantee",
-      displayPosition = 20
+      displayPosition = 20startEvent
   )
-  @ValueChooserModel(DeliveryGuaranteeChooserValues.class)
+  @ValueChooserModel(DeliveryGuaranteeChooserValues.class)*/
   public DeliveryGuarantee deliveryGuarantee;
 
-  @ConfigDef(
+/*  @ConfigDef(
       required = false,
       type = ConfigDef.Type.MODEL,
       label = "Start Event",
@@ -106,10 +107,10 @@ public class PipelineConfigBean implements Stage {
       defaultValue = "streamsets-datacollector-basic-lib::com_streamsets_pipeline_stage_destination_devnull_ToErrorNullDTarget::1",
       displayPosition = 23
   )
-  @ValueChooserModel(PipelineLifecycleStageChooserValues.class)
+  @ValueChooserModel(PipelineLifecycleStageChooserValues.class)*/
   public String startEventStage;
 
-  @ConfigDef(
+/*  @ConfigDef(
       required = false,
       type = ConfigDef.Type.MODEL,
       label = "Stop Event",
@@ -117,18 +118,18 @@ public class PipelineConfigBean implements Stage {
       defaultValue = "streamsets-datacollector-basic-lib::com_streamsets_pipeline_stage_destination_devnull_ToErrorNullDTarget::1",
       displayPosition = 26
   )
-  @ValueChooserModel(PipelineLifecycleStageChooserValues.class)
+  @ValueChooserModel(PipelineLifecycleStageChooserValues.class)*/
   public String stopEventStage;
 
-  @ConfigDef(
+/*  @ConfigDef(
     required = true,
     type = ConfigDef.Type.BOOLEAN,
     defaultValue = "true",
     label = "Retry Pipeline on Error",
-    displayPosition = 30)
-  public boolean shouldRetry;
+    displayPosition = 30)*/
+  public boolean shouldRetry = true;
 
-  @ConfigDef(
+/*  @ConfigDef(
     required = false,
     type = ConfigDef.Type.NUMBER,
     defaultValue = "-1",
@@ -137,10 +138,10 @@ public class PipelineConfigBean implements Stage {
     triggeredByValue = "true",
     description = "Max no of retries. To retry indefinitely, use -1. The wait time between retries starts at 15 seconds"
       + " and doubles until reaching 5 minutes.",
-    displayPosition = 30)
-  public int retryAttempts;
+    displayPosition = 30)*/
+  public int retryAttempts = -1;
 
-  @ConfigDef(
+/*  @ConfigDef(
     required = true,
     type = ConfigDef.Type.NUMBER,
     label = "Max Pipeline Memory (MB)",
@@ -150,11 +151,11 @@ public class PipelineConfigBean implements Stage {
     displayPosition = 60,
     min = 0,
     group = ""
-  )
+  )*/
   public long memoryLimit;
 
 
-  @ConfigDef(
+/*  @ConfigDef(
       required = true,
       type = ConfigDef.Type.MODEL,
       defaultValue="LOG",
@@ -164,7 +165,7 @@ public class PipelineConfigBean implements Stage {
       displayPosition = 70,
       group = ""
   )
-  @ValueChooserModel(MemoryLimitExceededChooserValues.class)
+  @ValueChooserModel(MemoryLimitExceededChooserValues.class)*/
   public MemoryLimitExceeded memoryLimitExceeded;
 
   @ConfigDef(
@@ -310,7 +311,7 @@ public class PipelineConfigBean implements Stage {
   )
   public String hdfsS3ConfDir;
 
-  @ConfigDef(
+/*  @ConfigDef(
       required = false,
       type = ConfigDef.Type.NUMBER,
       defaultValue = "0",
@@ -318,10 +319,10 @@ public class PipelineConfigBean implements Stage {
       description = "Maximum number of records per second that should be accepted into the pipeline. " +
           "Rate is not limited if this is not set, or is set to 0",
       displayPosition = 180
-  )
+  )*/
   public long rateLimit;
 
-  @ConfigDef(
+/*  @ConfigDef(
       required = false,
       type = ConfigDef.Type.NUMBER,
       defaultValue = "0",
@@ -329,10 +330,10 @@ public class PipelineConfigBean implements Stage {
       description = "Maximum number of runners that should be created for this pipeline. Use 0 to not impose limit.",
       min = 0,
       displayPosition = 190
-  )
+  )*/
   public int maxRunners = 0;
 
-  @ConfigDef(
+/*  @ConfigDef(
     required = true,
     type = ConfigDef.Type.BOOLEAN,
     defaultValue = "true",
@@ -343,10 +344,10 @@ public class PipelineConfigBean implements Stage {
       configName = "executionMode", triggeredByValues = "STANDALONE"
     ),
     displayPosition = 200
-  )
+  )*/
   public boolean shouldCreateFailureSnapshot;
 
-  @ConfigDef(
+/*  @ConfigDef(
     required = true,
     type = ConfigDef.Type.NUMBER,
     defaultValue = "60",
@@ -357,7 +358,7 @@ public class PipelineConfigBean implements Stage {
       configName = "executionMode", triggeredByValues = "STANDALONE"
     ),
     displayPosition = 210
-  )
+  )*/
   public long runnerIdleTIme = 60;
 
   @ConfigDef(required = true,

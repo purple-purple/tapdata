@@ -12,7 +12,9 @@ DOWNLOAD_SDC="${DOWNLOAD_SDC:-false}"
 TAP_DATA_VERSION=tapdata-1.0.0
 export TAP_DATA_VERSION
 
-PID=$(ps -ef|grep ${__bash_dir__}/tapdata|grep -v grep|awk '{print $2}')
+TAPDATA_FINAL_NAME=tapdata
+
+PID=$(ps -ef|grep "${__bash_dir__}"/"${TAPDATA_FINAL_NAME}"|grep -v grep|awk '{print $2}')
 
 make_dist_dir() {
     if [ ! -d "${__bash_dir__}/dist/" ]; then
@@ -21,8 +23,8 @@ make_dist_dir() {
     if [ ! -d "${__bash_dir__}/dist/target" ]; then
         mkdir "${__bash_dir__}/dist/target"
     fi
-    if [ ! -d "${__bash_dir__}/dist/target/${TAP_DATA_VERSION}" ]; then
-        mkdir "${__bash_dir__}/dist/target/${TAP_DATA_VERSION}"
+    if [ ! -d "${__bash_dir__}/dist/target/${TAPDATA_FINAL_NAME}" ]; then
+        mkdir "${__bash_dir__}/dist/target/${TAPDATA_FINAL_NAME}"
     fi
 }
 
@@ -33,10 +35,10 @@ download_sdc() {
     if [ ! -f "${__bash_dir__}/dist/streamsets-datacollector-core-${SDC_VERSION}.tgz" ]; then
         curl -O http://nightly.streamsets.com.s3-us-west-2.amazonaws.com/datacollector/latest/tarball/streamsets-datacollector-core-${SDC_VERSION}.tgz
     fi
-    rm -rf "${__bash_dir__}/dist/target/${TAP_DATA_VERSION}"
+    rm -rf "${__bash_dir__}/dist/target/${TAPDATA_FINAL_NAME}"
     tar -xvf streamsets-datacollector-core-${SDC_VERSION}.tgz  &> /dev/null
-    mv streamsets-datacollector-${SDC_VERSION} "${__bash_dir__}/dist/target/${TAP_DATA_VERSION}"
-    rm  -rf "target/${TAP_DATA_VERSION}/sdc-static-web"
+    mv streamsets-datacollector-${SDC_VERSION} "${__bash_dir__}/dist/target/${TAPDATA_FINAL_NAME}"
+    rm  -rf "target/${TAPDATA_FINAL_NAME}/sdc-static-web"
     cd "${__bash_dir__}"
 }
 
@@ -72,7 +74,7 @@ run_sdc() {
     #download_sdc
     
     echo "start to run sdc"
-    cd "${__bash_dir__}"/dist/target/"$TAP_DATA_VERSION"
+    cd "${__bash_dir__}"/dist/target/"${TAPDATA_FINAL_NAME}"
     
     export SDC_FILE_LIMIT=1024
     # dist/sdc/bin/streamsets dc
@@ -91,10 +93,10 @@ main () {
     if [ "$SKIP_RUN_SDC" = "false" ]; then
         #kill $(lsof -t -i:18630)
         if [ "$PID" != "" ]; then
-            echo KILL "TAPDATA":{$PID}
+            echo KILL "${TAPDATA_FINAL_NAME}":{$PID}
             kill -9 $PID
         else
-            echo 'TAPDATA IS NOT RUNNING'
+            echo "${TAPDATA_FINAL_NAME}" IS NOT RUNNING
         fi
 
         if [ "$DOWNLOAD_SDC" = "true" ]; then
@@ -115,8 +117,8 @@ main () {
         watch_ui
     else 
         build_ui
-        echo "Done: built dist html files in dist/target/${TAP_DATA_VERSION}"
-        sed -i.bak "s#TAPDATA_VERSION_INFO#$TAP_DATA_VERSION#" "${__bash_dir__}/dist/target/${TAP_DATA_VERSION}/sdc-static-web/templates-app.js"
+        echo "Done: built dist html files in dist/target/${TAPDATA_FINAL_NAME}"
+        sed -i.bak "s#TAPDATA_VERSION_INFO#$TAP_DATA_VERSION#" "${__bash_dir__}/dist/target/${TAPDATA_FINAL_NAME}/sdc-static-web/templates-app.js"
     fi
 }
 rm -rf designer

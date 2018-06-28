@@ -114,19 +114,23 @@ angular.module('dataCollectorApp.common')
                 deleteConfigDefinition(self.stageDefinitions[pi], filter)
               }
               if(self.stageDefinitions[pi].label === 'JDBC Multitable Consumer' ){
-                filter=['Preconditions', 'Unique Key Field','Upsert']
+                filter=['Preconditions', 'Unique Key Field','Upsert','Produce Events']
                 deleteConfigDefinition(self.stageDefinitions[pi], filter)
                 deleteGroupConfig(self.stageDefinitions[pi], ['Legacy Drivers'])
+                delete self.stageDefinitions[pi].producingEvents
               }
               if(self.stageDefinitions[pi].label === 'Oracle CDC Client' ){
-                filter=['Preconditions', 'Unique Key Field','Upsert']
+                filter=['Preconditions', 'Unique Key Field','Upsert','Produce Events']
                 deleteConfigDefinition(self.stageDefinitions[pi], filter)
                 deleteGroupConfig(self.stageDefinitions[pi], ['Legacy'])
+                delete self.stageDefinitions[pi].producingEvents
+
               }
               if(self.stageDefinitions[pi].label === 'JDBC Query Consumer' ){
-                filter=['Preconditions', 'Unique Key Field','Upsert']
+                filter=['Preconditions', 'Unique Key Field','Upsert','Produce Events']
                 deleteConfigDefinition(self.stageDefinitions[pi], filter)
                 deleteGroupConfig(self.stageDefinitions[pi], ['Change Data Capture','Legacy Drivers'])
+                delete self.stageDefinitions[pi].producingEvents
               }
             }
 

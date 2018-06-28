@@ -72,7 +72,7 @@ watch_ui() {
 run_sdc() {
     #echo "start to check sdc download"
     #download_sdc
-    
+
     echo "start to run sdc"
     cd "${__bash_dir__}"/dist/target/"${TAPDATA_FINAL_NAME}"
     

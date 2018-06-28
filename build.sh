@@ -14,7 +14,7 @@ export TAP_DATA_VERSION
 
 TAPDATA_FINAL_NAME=tapdata
 
-PID=$(ps -ef|grep "${__bash_dir__}"/"${TAPDATA_FINAL_NAME}"|grep -v grep|awk '{print $2}')
+PID=$(ps -ef|grep ./dist/target/"${TAPDATA_FINAL_NAME}"|grep -v grep|awk '{print $2}')
 
 make_dist_dir() {
     if [ ! -d "${__bash_dir__}/dist/" ]; then

@@ -9,7 +9,7 @@ SKIP_BUILD_LIB="${SKIP_BUILD_LIB:-false}"
 SKIP_RUN_SDC=${SKIP_RUN_SDC:-true}
 DEV_MODE="${DEV_MODE:-false}"
 DOWNLOAD_SDC="${DOWNLOAD_SDC:-false}"
-TAP_DATA_VERSION=tapdata
+TAP_DATA_VERSION=tapdata-1.2.1
 export TAP_DATA_VERSION
 
 PID=$(ps -ef|grep $TAP_DATA_VERSION""|grep -v grep|awk '{print $2}')
@@ -115,11 +115,11 @@ main () {
         watch_ui
     else 
         build_ui
-        echo "Done: built dist html files in ./dist/target/${TAP_DATA_VERSION}"
-    fi 
-
-     
+        echo "Done: built dist html files in dist/target/${TAP_DATA_VERSION}"
+        sed -i.bak "s#TAPDATA_VERSION_INFO#$TAP_DATA_VERSION#" "${__bash_dir__}/dist/target/${TAP_DATA_VERSION}/sdc-static-web/templates-app.js"
+    fi
 }
 rm -rf designer
 git submodule update
 main "$@"
+

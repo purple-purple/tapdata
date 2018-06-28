@@ -9,10 +9,10 @@ SKIP_BUILD_LIB="${SKIP_BUILD_LIB:-false}"
 SKIP_RUN_SDC=${SKIP_RUN_SDC:-true}
 DEV_MODE="${DEV_MODE:-false}"
 DOWNLOAD_SDC="${DOWNLOAD_SDC:-false}"
-TAP_DATA_VERSION=tapdata-1.2.1
+TAP_DATA_VERSION=tapdata-1.0.0
 export TAP_DATA_VERSION
 
-PID=$(ps -ef|grep $TAP_DATA_VERSION""|grep -v grep|awk '{print $2}')
+PID=$(ps -ef|grep ${__bash_dir__}/tapdata|grep -v grep|awk '{print $2}')
 
 make_dist_dir() {
     if [ ! -d "${__bash_dir__}/dist/" ]; then
@@ -91,7 +91,7 @@ main () {
     if [ "$SKIP_RUN_SDC" = "false" ]; then
         #kill $(lsof -t -i:18630)
         if [ "$PID" != "" ]; then
-            echo KILL "$TAP_DATA_VERSION":{$PID}
+            echo KILL "TAPDATA":{$PID}
             kill -9 $PID
         else
             echo 'TAPDATA IS NOT RUNNING'

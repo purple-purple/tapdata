@@ -2110,9 +2110,9 @@ angular
             $scope.showMappingView = true;
             $scope.refreshGraph(); 
             var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
-            var equalLastTime =  _.isEqual(current_schema, tableInfo);
-            console.log(current_schema,compareLastTime,"compareLastTime!")
-            if( current_schema && !equalLastTime){
+            var equalLastTime =  _.isEqual(current_schema.tables, tableInfo);
+            console.log(current_schema,equalLastTime,"compareLastTime!")
+            if( current_schema && current_schema.tables && !equalLastTime){
               $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
               $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''
             }

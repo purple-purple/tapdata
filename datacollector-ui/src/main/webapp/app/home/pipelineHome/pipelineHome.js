@@ -2100,7 +2100,7 @@ angular
        
 
       previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
-        10).then(function(data){
+        -1,true).then(function(data){
           const schemaString = getSchema(data)
           if(schemaString){ 
             $scope.tapdataMessage= "";
@@ -2109,8 +2109,13 @@ angular
             console.log('got table schema:',tableInfo)
             $scope.showMappingView = true;
             $scope.refreshGraph(); 
-
-            $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
+            var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
+            var equalLastTime =  _.isEqual(current_schema, tableInfo);
+            console.log(current_schema,compareLastTime,"compareLastTime!")
+            if( current_schema && !equalLastTime){
+              $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
+              $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''
+            }
             $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
             setTimeout(mappingLoad.bind(this, $scope, $rootScope), 3000)
           }else{
@@ -2132,27 +2137,28 @@ angular
       if(options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
         $scope.selectedStage = options.selectedObject;
       }
-      var existed = $(".nav.nav-tabs:last").find("#mapping-button").length;
-      $(".nav.nav-tabs:last").find("#mapping-button").remove();
+      // var existed = $(".nav.nav-tabs:last").find("#mapping-button").length;
+      // $(".nav.nav-tabs:last").find("#mapping-button").remove();
 
       setTimeout(function(){
-        console.log(options.selectedObject.library)
-        var existed = $(".nav.nav-tabs:last").find("#mapping-button").length;
-        $(".nav.nav-tabs:last").find("#mapping-button").remove();
-        if(options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
-          self.mongoNodeOption = options
-          $(".nav.nav-tabs:last").append($(`<li id="mapping-button" 
-          ng-class="{active: active, disabled: disabled}" 
-          class="ng-isolate-scope">
-          <div  click='loadTest')}" style="margin-top: 10px;cursor: pointer;" 
-          tab-heading-transclude="" class="ng-binding">
-              <tab-heading class="ng-scope">
-              <span class="ng-binding" style="color: #337ab7;">Mapping</span>
-            </tab-heading>
-          </div>  
-          </li> `))
-        }
-        $("#mapping-button").off("click").on("click", function(){
+        // console.log(options.selectedObject.library)
+        // var existed = $(".nav.nav-tabs:last").find("#mapping-button").length;
+        // $(".nav.nav-tabs:last").find("#mapping-button").remove();
+        // if(options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
+        //   self.mongoNodeOption = options
+        //   $(".nav.nav-tabs:last").append($(`<li id="mapping-button" 
+        //   ng-class="{active: active, disabled: disabled}" 
+        //   class="ng-isolate-scope">
+        //   <div  click='loadTest')}" style="margin-top: 10px;cursor: pointer;" 
+        //   tab-heading-transclude="" class="ng-binding">
+        //       <tab-heading class="ng-scope">
+        //       <span class="ng-binding" style="color: #337ab7;">Mapping</span>
+        //     </tab-heading>
+        //   </div>  
+        //   </li> `))
+        // }
+        console.log('new mapping')
+        $("tab-heading span:contains(Mapping)").off("click").on("click", function(){
           $rootScope.$broadcast('showMappingView');
         })
 
@@ -2160,30 +2166,7 @@ angular
       },1000)
      
     });
-
-    // setInterval(function(){
-    //   $("li").has("span:contains(更改数据捕获)").remove()
-    //   $("li").has("span:contains(传统驱动程序)").remove()
-    //   $("li").has("span:contains(高级)").remove()
-    //   $("li").has("span:contains(参数)").remove()
-
-    //   $("div.form-group").has("label:contains(生成事件)").remove()
-    //   $("div.form-group").has("label:contains(前提条件)").remove()
-    //   $("div.form-group").has("label:contains(唯一主键)").remove()
-    //   $("div.form-group").has("label:contains(UPSERT)").remove()
-
-    //   $("div.form-group").has("label:contains(数据送达保证)").remove()
-    //   $("div.form-group").has("label:contains(开始活动)").remove()
-    //   $("div.form-group").has("label:contains(停止事件)").remove()
-    //   $("div.form-group").has("label:contains(错误时重试管道)").remove()
-    //   $("div.form-group").has("label:contains(重试尝试)").remove()
-    //   $("div.form-group").has("label:contains(最大流水线内存（MB）)").remove()
-    //   $("div.form-group").has("label:contains(超过内存)").remove()
-    //   $("div.form-group").has("label:contains(费率限制（记录/秒）)").remove()
-    //   $("div.form-group").has("label:contains(最大跑步者)").remove()
-    //   $("div.form-group").has("label:contains(创建失败快照)").remove()
-    // },300)
-
+ 
     $scope.$on('onPasteNode', function (event, stageInstance) {
       var stageLibraries = $scope.stageLibraries;
       var newStage = _.find(stageLibraries, function (stage) {

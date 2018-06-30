@@ -9,6 +9,8 @@
 		"The number of retries upon a SQL Error.  To allow for the possibility of handling transient errors (ex: connection issues, deadlock, etc.), provide a positive value here.  After the specified number of retries is reached, the stage will fail upon the next error and pipeline error handling behavior will take over.":"SQL错误时重试的次数。 为了能够处理瞬时错误（例如：连接问题，死锁等），请在此处提供一个正值。 达到指定的重试次数后，阶段将在下一个错误发生时失败，并且管道错误处理行为将接管。",
 		"Produce new records for each element of a list or map field": "为列表或地图字段的每个元素生成新记录",
 	"Field Pivoter": "现场枢轴",
+	"Collection Cloning":"Collection复制",
+	"Check this if replicating mongo collection": "如果复制mongo collection,请勾选该选项",
 	"Listens for requests on an HTTP endpoint": "在HTTP端点上侦听请求",
 	"HTTP Server": "HTTP服务器",
 	"Flattens nested structures.": "压扁嵌套结构。",
@@ -366,7 +368,7 @@
 	"Field Does Not Exist": "字段不存在",
 	"Action to take with records sent to error": "采取记录发送给错误的操作",
 	"On Record Error": "记录错误",
-	"Records without any of these fields are sent to error": "没有任何这些字段的记录被发送到错误",
+	"Records without any of these fields are sent to error": "没有包含这些必需字段的记录将被发送到错误记录",
 	"Required Fields": "必填字段",
 	"Records that don't satisfy all the preconditions are sent to error": "不满足所有先决条件的记录将被发送至错误",
 	"Preconditions": "前提条件",
@@ -1576,7 +1578,7 @@
 	"Pattern of the table names to read. Use a SQL like syntax.": "要读取的表格名称的模式。使用SQL语法。",
 	"Table Name Pattern": "表名称模式",
 	"Pattern of the table names to exclude from being read. Use a Java regex syntax. Leave empty if no exclusion needed.": "要从中读取的表格名称的模式。使用Java正则表达式语法。如果不需要排除，请留空。",
-	"Table Exclusion Pattern": "表格排除模式",
+	"Table Exclusion Pattern": "要排除的Table名称pattern",
 	"Use -1 to opt out of this option": "使用-1选择退出此选项",
 	"A parameterized value to use in the JDBC insert statement. Must include a ?.": "在JDBC插入语句中使用的参数化值。必须包括一个？",
 	"Parameterized Value": "参数化值",
@@ -1598,7 +1600,7 @@
 	"The maximum number of partitions that can be processed at once. Includes active partitions with rows left to read and completed partitions before they are pruned.": "一次可以处理的最大分区数量。包含活动分区，剩余的行用于读取和完成分区，然后进行修剪。",
 	"Max Partitions": "最大分区",
 	"Additional conditions to apply for the offset column when a query is issued. These conditions will be a logical AND with last offset value filter already applied by default.": "查询发布时应用于偏移列的附加条件。这些条件将是一个逻辑与，并且上一个偏移值过滤器已被默认应用。",
-	"Offset Column Conditions": "偏移字段条件"
+	"Offset Column Conditions": "Offset字段条件"
 	},
 	"global": {
 		"title": "任务代理",

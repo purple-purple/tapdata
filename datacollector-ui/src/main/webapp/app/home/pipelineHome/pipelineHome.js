@@ -765,6 +765,11 @@ angular
       }
     });
 
+    setInterval(function(){
+      $("li:contains(Mapping)").off("click").on("click", function(){
+        $rootScope.$broadcast('showMappingView');
+      })
+    }, 1000);
     /**
      * Fetch definitions for Pipeline and Stages, fetch all pipeline configuration info, status and metric.
      */
@@ -2111,10 +2116,31 @@ angular
             $scope.refreshGraph(); 
             var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
             if(current_schema && current_schema.schema){
-              current_schema.schema.tables.sort((a,b)=> a.table_name > b.table_name)
-              tableInfo.sort((a,b)=> a.table_name > b.table_name)
+              current_schema.schema.tables.sort((a,b)=> {
+                delete a.visible
+                delete b.visible
+                a.fields && a.fields.sort((i,j)=>{
+                  return i.field_name.localeCompare(j.field_name)
+                })
+                b.fields && b.fields.sort((i,j)=>{
+                  return i.field_name.localeCompare(j.field_name)
+                })
+                return a.table_name.localeCompare(b.table_name)
+              })
+              
+              tableInfo.sort((a,b)=> {
+                delete a.visible
+                delete b.visible
+                a.fields && a.fields.sort((i,j)=>{
+                  return i.field_name.localeCompare(j.field_name)
+                })
+                b.fields && b.fields.sort((i,j)=>{
+                  return i.field_name.localeCompare(j.field_name)
+                })
+                return  a.table_name.localeCompare(b.table_name)
+              })
               var equalLastTime =  _.isEqual(current_schema.schema.tables, tableInfo);
-
+ 
               console.log(current_schema,equalLastTime,"compareLastTime!")
               if( !equalLastTime){
                 $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
@@ -2139,42 +2165,23 @@ angular
     
     var self = this;
     $scope.$on('onNodeSelection', function (event, options) {
-      
-      // $scope.showLoading = true;
-      updateDetailPane(options);
-      if(options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
-        $scope.selectedStage = options.selectedObject;
+      if(options){
+        updateDetailPane(options);
       }
-      // var existed = $(".nav.nav-tabs:last").find("#mapping-button").length;
-      // $(".nav.nav-tabs:last").find("#mapping-button").remove();
-
-      setTimeout(function(){
-        // console.log(options.selectedObject.library)
-        // var existed = $(".nav.nav-tabs:last").find("#mapping-button").length;
-        // $(".nav.nav-tabs:last").find("#mapping-button").remove();
-        // if(options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
-        //   self.mongoNodeOption = options
-        //   $(".nav.nav-tabs:last").append($(`<li id="mapping-button" 
-        //   ng-class="{active: active, disabled: disabled}" 
-        //   class="ng-isolate-scope">
-        //   <div  click='loadTest')}" style="margin-top: 10px;cursor: pointer;" 
-        //   tab-heading-transclude="" class="ng-binding">
-        //       <tab-heading class="ng-scope">
-        //       <span class="ng-binding" style="color: #337ab7;">Mapping</span>
-        //     </tab-heading>
-        //   </div>  
-        //   </li> `))
-        // }
-        console.log('new mapping')
-        $("li a tab-heading span:contains(Mapping)").off("click").on("click", function(){
-          $rootScope.$broadcast('showMappingView');
-        })
-
-     
-      },2000)
+      
+      if(options && options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
+        $scope.selectedStage = options.selectedObject;
+        setTimeout(function(){
+          console.log('new mapping')
+          $("li:contains(Mapping)").off("click").on("click", function(){
+            $rootScope.$broadcast('showMappingView');
+          })
+        },2000)
+      } 
+      
      
     });
- 
+    
     $scope.$on('onPasteNode', function (event, stageInstance) {
       var stageLibraries = $scope.stageLibraries;
       var newStage = _.find(stageLibraries, function (stage) {

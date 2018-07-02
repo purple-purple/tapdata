@@ -2037,7 +2037,7 @@ angular
       if($scope.showLoading){
         return;
       }
-      $scope.tapdataMessage= "Loading DB schema Info ...";
+      $scope.tapdataMessage= "Loading DB Schema Info ...";
       $scope.showLoading = true;
       const mappingLoad = function($scope, $rootScope){
         $("#editorIframe").height((window.innerHeight - 240) + 'px')
@@ -2121,7 +2121,7 @@ angular
             $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
             setTimeout(mappingLoad.bind(this, $scope, $rootScope), 3000)
           }else{
-            $scope.tapdataMessage= "Can not get schema info";
+            $scope.tapdataMessage= "Can Not Get Schema Info";
             setTimeout(function(){
               $scope.showLoading = false;
             },2000)
@@ -2160,12 +2160,12 @@ angular
         //   </li> `))
         // }
         console.log('new mapping')
-        $("tab-heading span:contains(Mapping)").off("click").on("click", function(){
+        $("li a tab-heading span:contains(Mapping)").off("click").on("click", function(){
           $rootScope.$broadcast('showMappingView');
         })
 
      
-      },1000)
+      },2000)
      
     });
  

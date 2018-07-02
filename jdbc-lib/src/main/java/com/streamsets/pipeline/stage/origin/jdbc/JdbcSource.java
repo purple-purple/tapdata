@@ -369,7 +369,7 @@ public class JdbcSource extends BaseSource {
                         statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
                     }
 
-                    // if connectionString start with jdbc:oracle,then load oracle schema
+                    // if connectionString start with jdbc:oracle,isPreview,batchSize=-1,then load oracle schema
                     if (getContext().isPreview() && hikariConfigBean.connectionString.startsWith("jdbc:oracle") && batchSize == -1) {
                         jdbcLoadSchema = new JdbcOracleLoadSchemaImpl(hikariConfigBean.databaseOwner);
 

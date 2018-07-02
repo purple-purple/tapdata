@@ -1186,6 +1186,8 @@
 	"Upsert": "UPSERT",
 	"Sets the write concern": "设置写入关注点",
 	"Write Concern": "写关注",
+	"No-more-data Event Generation Delay (seconds)":"触发 'No-more-data'事件的延时(秒)",
+	"Number of seconds to delay when all rows have been processed, before generating the no-more-data event.  Used if you want other events to show up in the event stream first.": "在生成no-more-data事件之前，处理所有行时延迟的秒数。 如果您希望其他事件首先显示在事件流中，请使用它。",
 	"Specify the initial timestamp in seconds. Leave -1 to opt out.": "指定以秒为单位的初始时间戳。让-1退出。",
 	"Initial Timestamp (secs)": "初始时间戳（秒）",
 	"Specify the initial ordinal after timestamp. Leave -1 to Opt out.": "指定时间戳后的初始序号。让-1退出。",

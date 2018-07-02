@@ -2117,6 +2117,9 @@ angular
                 $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
                 $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''
               }
+            }else{
+              $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
+              $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''
             }
             $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
             setTimeout(mappingLoad.bind(this, $scope, $rootScope), 3000)

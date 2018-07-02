@@ -2111,7 +2111,10 @@ angular
             $scope.refreshGraph(); 
             var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
             if(current_schema && current_schema.schema){
+              current_schema.schema.tables.sort((a,b)=> a.table_name > b.table_name)
+              tableInfo.sort((a,b)=> a.table_name > b.table_name)
               var equalLastTime =  _.isEqual(current_schema.schema.tables, tableInfo);
+
               console.log(current_schema,equalLastTime,"compareLastTime!")
               if( !equalLastTime){
                 $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}

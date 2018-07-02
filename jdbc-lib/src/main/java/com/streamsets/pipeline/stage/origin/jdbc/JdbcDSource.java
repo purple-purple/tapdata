@@ -132,7 +132,7 @@ public class JdbcDSource extends DSource {
             displayPosition = 180,
             group = "CDC"
     )*/
-    public String txnIdColumnName;
+    public String txnIdColumnName = "";
 
     /*@ConfigDef(
         required = true,

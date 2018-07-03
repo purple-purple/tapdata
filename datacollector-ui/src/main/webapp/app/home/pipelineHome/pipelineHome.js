@@ -766,6 +766,10 @@ angular
     });
 
     setInterval(function(){
+      $("label:contains(Cluster Clone)").parent().siblings().children().off("click").on("click",function(){
+        $rootScope.$broadcast('clusterClone');
+      })
+
       if($("#edit-mapping-button").length < 1 ){
         $("label:contains(Mapping)").parent().siblings().children().append("<button id='edit-mapping-button' style='margin-top:10px;'>Edit Mapping</button>")
       }
@@ -2040,6 +2044,45 @@ angular
     var pipelineHome = this;
     $scope.$on('hideMappingView', function( event, option){
       $scope.showMappingView = false;
+    })
+
+    $scope.$on("clusterClone", function (event, options) {
+      function getSchema(ob){
+        var dict = [ob]
+        let next = dict.shift();
+        while(next){
+          for (var key in next) {
+            if(key === 'schema'){
+              return next[key]
+            }
+            if(typeof next[key] === 'object'){
+              dict.push(Object.assign({}, next[key]))
+            }      
+          }
+          next = dict.shift();
+        }
+        return null
+      }
+      previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
+        -2,true).then(function(data){
+          const schemaString = getSchema(data)
+          if(schemaString){ 
+            const tableInfo = JSON.parse(schemaString);
+            console.log('got table schema:',tableInfo)
+            for(var i = 0; i < $scope.pipelineConfig.stages.length; i++) {
+              if($scope.pipelineConfig.stages[i].library === 'streamsets-datacollector-mongodb_3-lib'){
+                for(var j = 0; j < $scope.pipelineConfig.stages[i].configuration.length; j++){
+                    if( $scope.pipelineConfig.stages[i].configuration[j].name === "configBean.schema" ){
+                      $scope.pipelineConfig.stages[i].configuration[j].value = JSON.stringify({schema: {tables:tableInfo}})
+                    }
+                }
+              }
+            }
+          }
+             
+        }).catch(function(e,b){
+          console.log(e,b)
+        })
     })
 
     $scope.$on('showMappingView', function (event, options) {

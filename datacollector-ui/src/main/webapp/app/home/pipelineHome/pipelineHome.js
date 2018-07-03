@@ -766,7 +766,11 @@ angular
     });
 
     setInterval(function(){
-      $("li:contains(Mapping)").off("click").on("click", function(){
+      if($("#edit-mapping-button").length < 1 ){
+        $("label:contains(Mapping)").parent().siblings().children().append("<button id='edit-mapping-button' style='margin-top:10px;'>Edit Mapping</button>")
+      }
+     
+      $("#edit-mapping-button").off("click").on("click", function(){
         $rootScope.$broadcast('showMappingView');
       })
     }, 1000);
@@ -2171,12 +2175,12 @@ angular
       
       if(options && options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
         $scope.selectedStage = options.selectedObject;
-        setTimeout(function(){
-          console.log('new mapping')
-          $("li:contains(Mapping)").off("click").on("click", function(){
-            $rootScope.$broadcast('showMappingView');
-          })
-        },2000)
+        // setTimeout(function(){
+        //   console.log('new mapping')
+        //   $("li:contains(Mapping)").off("click").on("click", function(){
+        //     $rootScope.$broadcast('showMappingView');
+        //   })
+        // },2000)
       } 
       
      

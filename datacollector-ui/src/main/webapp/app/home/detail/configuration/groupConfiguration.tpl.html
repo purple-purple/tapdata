@@ -241,12 +241,12 @@
           <i class="fa fa-plus pointer"></i>
         </button>
 
-        <div class="pull-right field-selector-btn" ng-hide="isPipelineReadOnly || isPipelineRunning">
+        <!-- <div class="pull-right field-selector-btn" ng-hide="isPipelineReadOnly || isPipelineRunning">
           <button type="button" class="btn btn-link"
                   ng-click="bulkEdit = !bulkEdit">
             {{bulkEdit ? ('home.detailPane.configurationTab.switchToSimpleMode' | translate) : ('home.detailPane.configurationTab.switchToBulkMode' | translate)}}
           </button>
-        </div>
+        </div> -->
 
         <div class="help-block">
           <div ng-repeat="issue in getConfigurationIssues(detailPaneConfig, configDefinition)">

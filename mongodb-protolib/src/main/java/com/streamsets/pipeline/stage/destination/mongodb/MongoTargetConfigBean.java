@@ -79,20 +79,21 @@ public class MongoTargetConfigBean {
             defaultValue = "",
             required = true,
             displayPosition = 1005,
-//      group = "OPERATIONS"
-            group = "MAPPING"
+            group = "MAPPING",
+            dependsOn = "isCloningMode",
+            triggeredByValue = "false"
     )
     public String mapping;
 
-    /*  @ConfigDef(
-          type = ConfigDef.Type.BOOLEAN,
-          label = "Collection Cloning",
-          defaultValue = "false",
-          description = "Check this if replicating mongo collection",
-          required = false,
-          displayPosition = 1003,
-          group = "OPERATIONS"
-      )*/
+    @ConfigDef(
+            type = ConfigDef.Type.BOOLEAN,
+            label = "Cluster Clone",
+            defaultValue = "false",
+            description = "Check this if replicating mongo collection",
+            required = false,
+            displayPosition = 1003,
+            group = "MAPPING"
+    )
     public boolean isCloningMode;
 
 

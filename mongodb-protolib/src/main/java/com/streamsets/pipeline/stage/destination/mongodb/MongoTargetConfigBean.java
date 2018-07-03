@@ -73,19 +73,6 @@ public class MongoTargetConfigBean {
      */
 
     @ConfigDef(
-            type = ConfigDef.Type.TEXT,
-            label = "Mapping",
-            description = "Define the table mapping",
-            defaultValue = "",
-            required = true,
-            displayPosition = 1005,
-            group = "MAPPING",
-            dependsOn = "isCloningMode",
-            triggeredByValue = "false"
-    )
-    public String mapping;
-
-    @ConfigDef(
             type = ConfigDef.Type.BOOLEAN,
             label = "Cluster Clone",
             defaultValue = "false",
@@ -96,5 +83,27 @@ public class MongoTargetConfigBean {
     )
     public boolean isCloningMode;
 
+    @ConfigDef(
+            type = ConfigDef.Type.TEXT,
+            label = "Mapping",
+            description = "Define the table mapping",
+            required = true,
+            displayPosition = 1005,
+            group = "MAPPING",
+            dependsOn = "isCloningMode",
+            triggeredByValue = "false"
+    )
+    public String mapping;
 
+    @ConfigDef(
+            type = ConfigDef.Type.TEXT,
+            label = "schema",
+            description = "Schema Json",
+            displayPosition = 1006,
+            required = false,
+            group = "MAPPING",
+            dependsOn = "mapping",
+            triggeredByValue = "display schema"
+    )
+    public String schema;
 }

@@ -97,7 +97,7 @@ public class PipelineConfigBean implements Stage {
       displayPosition = 20startEvent
   )
   @ValueChooserModel(DeliveryGuaranteeChooserValues.class)*/
-  public DeliveryGuarantee deliveryGuarantee;
+  public DeliveryGuarantee deliveryGuarantee = DeliveryGuarantee.AT_LEAST_ONCE;
 
 /*  @ConfigDef(
       required = false,

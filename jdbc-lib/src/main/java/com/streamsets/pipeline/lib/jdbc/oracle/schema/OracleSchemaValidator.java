@@ -25,7 +25,7 @@ public class OracleSchemaValidator implements ISchemaValidator {
             "  JOIN all_tab_columns utc ON ut.table_name = utc.table_name\n" +
             " AND ut.owner='%s'";
     /**
-     * 指定所有下的表的所有主键
+     * 指定所有用户下的表的所有主键
      */
     public static final String LOAD_SCHEMA_TABLES_ALL_PRIMARY_KEY = "SELECT\n" +
             "  ut.table_name AS tableName,\n" +

@@ -50,7 +50,7 @@ import java.util.*;
 public class MongoDBTarget extends BaseTarget {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBTarget.class);
 
-    public static final int DEFAULT_CAPACITY = 1024;
+    public static final int DEFAULT_CAPACITY = 2048;
 
     private final MongoTargetConfigBean mongoTargetConfigBean;
     private MongoClient mongoClient;

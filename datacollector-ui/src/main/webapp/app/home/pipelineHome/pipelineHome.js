@@ -1157,6 +1157,7 @@ angular
       var executionModeConfig = _.find($scope.pipelineConfig.configuration, function (c) {
         return c.name === 'executionMode';
       });
+      executionModeConfig = executionModeConfig || {name:"executionMode", value:"STANDALONE"}
       $scope.executionMode = executionModeConfig.value;
 
       if ($scope.executionMode === 'EDGE') {
@@ -2036,9 +2037,9 @@ angular
       }
     })
 
-    setInterval(function(){
-      $scope.refreshGraph();
-    }, 2000);
+    // setInterval(function(){
+    //   $scope.refreshGraph();
+    // }, 2000);
    
 
     var pipelineHome = this;
@@ -2064,7 +2065,7 @@ angular
         return null
       }
       previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
-        -2,true).then(function(data){
+        -1,true).then(function(data){
           const schemaString = getSchema(data)
           if(schemaString){ 
             const tableInfo = JSON.parse(schemaString);
@@ -2095,6 +2096,11 @@ angular
         $("#editorIframe").height((window.innerHeight - 240) + 'px')
         let ifrmNode = document.getElementById('editorIframe')
         let ifrm = ifrmNode ? ifrmNode.contentWindow || ifrmNode.contentDocument.document || ifrmNode.contentDocument : null;
+        let startTime = new Date().getTime();
+        while(! (ifrm && ifrm.mydesigner)  &&  (new Date().getTime()) < startTime + 15*1000){
+          ifrmNode = document.getElementById('editorIframe')
+          ifrm = ifrmNode ? ifrmNode.contentWindow || ifrmNode.contentDocument.document || ifrmNode.contentDocument : null;
+        }
         var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
         var current_mapping = $scope.pipelineConfig['metadata']['tapdata_mapping'];
         try{

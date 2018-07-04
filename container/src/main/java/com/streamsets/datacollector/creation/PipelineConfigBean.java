@@ -68,15 +68,15 @@ public class PipelineConfigBean implements Stage {
 
   public static final String EDGE_HTTP_URL_DEFAULT = "http://localhost:18633";
 
-/*  @ConfigDef(
+  @ConfigDef(
       required = true,
       type = ConfigDef.Type.MODEL,
       label = "Execution Mode",
       defaultValue= "STANDALONE",
       displayPosition = 10
   )
-  @ValueChooserModel(ExecutionModeChooserValues.class)*/
-  public ExecutionMode executionMode = ExecutionMode.STANDALONE;
+  @ValueChooserModel(ExecutionModeChooserValues.class)
+  public ExecutionMode executionMode;
 
 /*  @ConfigDef(
       required = true,

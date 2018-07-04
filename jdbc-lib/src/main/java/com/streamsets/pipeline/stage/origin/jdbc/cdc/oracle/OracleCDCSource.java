@@ -1432,7 +1432,7 @@ public class OracleCDCSource extends BaseSource {
 
     private void validateTablePresence
             (Statement statement, List<SchemaAndTable> schemaAndTables,
-                                       List<ConfigIssue> issues) {
+             List<ConfigIssue> issues) {
         for (SchemaAndTable schemaAndTable : schemaAndTables) {
             try {
                 statement.execute("SELECT * FROM \"" + schemaAndTable.getSchema() + "\".\"" + schemaAndTable.getTable() +
@@ -1877,7 +1877,7 @@ public class OracleCDCSource extends BaseSource {
             if (null != connection) {
                 statement = connection.createStatement();
 
-                tableSchemasJson = jdbcLoadSchema.getTableSchemasJson(connection, statement);
+                tableSchemasJson = jdbcLoadSchema.getTableSchemasJson(connection, statement, configBean.baseConfigBean.schemaTableConfigs);
             }
         } finally {
             if (null != statement) {

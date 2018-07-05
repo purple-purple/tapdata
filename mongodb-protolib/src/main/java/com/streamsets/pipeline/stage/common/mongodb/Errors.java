@@ -48,7 +48,8 @@ public enum Errors implements ErrorCode {
   MONGODB_33("Invalid Oplog Collection Name '{}', Oplog collection should start with 'oplog.'"),
   MONGODB_34("Can't create credential object: {}"),
   MONGODB_35("Mapping cannot be empty"),
-  MONGODB_36("Parse schema json string to list error: {}")
+  MONGODB_36("Parse schema json string to list error: {}"),
+  MONGODB_37("Schema cannot be empty")
 
   ;
   private final String msg;

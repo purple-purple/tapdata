@@ -247,14 +247,14 @@ public class HikariPoolConfigBean {
   @ValueChooserModel(TransactionIsolationLevelChooserValues.class)
   public TransactionIsolationLevel transactionIsolation = TransactionIsolationLevel.DEFAULT;
 
-  @ConfigDef(
+/*  @ConfigDef(
           required = true,
           type = ConfigDef.Type.STRING,
           label = "Database Owner",
           description = "Owner of your database",
           displayPosition = 12,
           group = "JDBC"
-  )
+  )*/
   public String databaseOwner = "";
 
 

@@ -47,7 +47,7 @@ public final class TableConfigBean {
   public static final String QUERIES_PER_SECOND_FIELD = "commonSourceConfigBean.queriesPerSecond";
 
   @ConfigDef(
-      required = false,
+      required = true,
       type = ConfigDef.Type.STRING,
       label = "Schema",
       description = "Schema Name",

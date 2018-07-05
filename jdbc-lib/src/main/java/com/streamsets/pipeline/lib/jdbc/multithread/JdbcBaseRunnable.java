@@ -353,7 +353,7 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
             connection = connectionManager.getConnection();
             statement = connection.createStatement();
 
-            tableSchemasJson = jdbcLoadSchema.getTableSchemasJson(connection, statement);
+            tableSchemasJson = jdbcLoadSchema.getTableSchemasJson(connection, statement, tableJdbcConfigBean.tableConfigs);
 
             LOG.debug("Load oracle schema: {}", tableSchemasJson);
         } finally {

@@ -67,21 +67,23 @@ public class TapTransformer {
             Stage.Context context
     ) {
         if (config.isCloningMode) {
-            if (StringUtils.isBlank(config.schema))
-                if (StringUtils.isNotBlank(config.schema)) {
+            if (StringUtils.isNotBlank(config.schema)) {
                 try {
                     generateClusterCloneMappings(config);
                 } catch (IOException e) {
-                    /*issues.add(context.createConfigIssue(
+                    issues.add(context.createConfigIssue(
                             Groups.MAPPING.name(),
                             MONGO_CONFIG_PREFIX + "mapping",
                             Errors.MONGODB_36,
                             e.toString()
-                    ));*/
-                    LOG.error("Parse schema json string to list error: {}", e.toString());
+                    ));
                 }
             } else {
-                LOG.error("Schema is empty");
+                issues.add(context.createConfigIssue(
+                        Groups.MAPPING.name(),
+                        MONGO_CONFIG_PREFIX + "schema",
+                        Errors.MONGODB_37
+                ));
             }
         }
 
@@ -673,6 +675,46 @@ public class TapTransformer {
  * }
  * <p>
  * <p>
+ * <p>
+ * SEQ -- 1
+ * oracle.cdc.SSN -- 0
+ * operation type UPDATE
+ * upsert criteria Document{{W_ID=null}}
+ * update spec Document{{W_ID=null}}
+ * Record[headers='HeaderImpl[ 0x000062.0000305a.0034 ::0]' data='Field[MAP:{W_YTD=Field[DECIMAL:87050177.99]}]']
+ * schema -- TAPDATA
+ * sdc.operation.type -- 3
+ * jdbc.W_YTD.scale -- 2
+ * oracle.cdc.operation -- UPDATE
+ * oracle.cdc.scn -- 1240667
+ * oracle.cdc.timestamp -- 2018-04-27 10:00:35
+ * oracle.cdc.rowId -- AAAE6sAAFAAAACWAAB
+ * jdbc.W_YTD.precision -- 12
+ * oracle.cdc.user -- TAPDATA
+ * oracle.cdc.xid -- 10.19.4717
+ * oracle.cdc.RS_ID --  0x000062.0000305a.0034
+ * oracle.cdc.table -- BMSQL_WAREHOUSE
+ * SEQ -- 1
+ * <p>
+ * SEQ -- 1
+ * oracle.cdc.SSN -- 0
+ * operation type UPDATE
+ * upsert criteria Document{{W_ID=null}}
+ * update spec Document{{W_ID=null}}
+ * Record[headers='HeaderImpl[ 0x000062.0000305a.0034 ::0]' data='Field[MAP:{W_YTD=Field[DECIMAL:87050177.99]}]']
+ * schema -- TAPDATA
+ * sdc.operation.type -- 3
+ * jdbc.W_YTD.scale -- 2
+ * oracle.cdc.operation -- UPDATE
+ * oracle.cdc.scn -- 1240667
+ * oracle.cdc.timestamp -- 2018-04-27 10:00:35
+ * oracle.cdc.rowId -- AAAE6sAAFAAAACWAAB
+ * jdbc.W_YTD.precision -- 12
+ * oracle.cdc.user -- TAPDATA
+ * oracle.cdc.xid -- 10.19.4717
+ * oracle.cdc.RS_ID --  0x000062.0000305a.0034
+ * oracle.cdc.table -- BMSQL_WAREHOUSE
+ * SEQ -- 1
  * <p>
  * SEQ -- 1
  * oracle.cdc.SSN -- 0

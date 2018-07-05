@@ -2037,9 +2037,9 @@ angular
       }
     })
 
-    // setInterval(function(){
-    //   $scope.refreshGraph();
-    // }, 2000);
+    setInterval(function(){
+      $scope.refreshGraph();
+    }, 2000);
    
 
     var pipelineHome = this;
@@ -2074,7 +2074,7 @@ angular
               if($scope.pipelineConfig.stages[i].library === 'streamsets-datacollector-mongodb_3-lib'){
                 for(var j = 0; j < $scope.pipelineConfig.stages[i].configuration.length; j++){
                     if( $scope.pipelineConfig.stages[i].configuration[j].name === "configBean.schema" ){
-                      $scope.pipelineConfig.stages[i].configuration[j].value = JSON.stringify({schema: {tables:tableInfo}})
+                      $scope.pipelineConfig.stages[i].configuration[j].value = JSON.stringify({tables:tableInfo})
                     }
                 }
               }
@@ -2117,7 +2117,7 @@ angular
         }else{
           ifrm.mydesigner && ifrm.mydesigner.init(current_schema, {mode: 'cluster-clone'}) 
         }
-        ifrm.mydesigner.on('savedocument', r => {
+        ifrm.mydesigner && ifrm.mydesigner.on('savedocument', r => {
           var result = ifrm.mydesigner.getDesignResult()
           $scope.pipelineConfig['metadata']['tapdata_mapping'] = result
           
@@ -2134,9 +2134,10 @@ angular
           $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
           $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
         })
-        ifrm.mydesigner.on('cancel', r => {
+        ifrm.mydesigner && ifrm.mydesigner.on('cancel', r => {
           $rootScope.$broadcast('hideMappingView'); 
           $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
+          setTimeout(function(){ $($("a:contains(Mapping)")[1]).click()}, 800);
         })
       }
       function getSchema(ob){

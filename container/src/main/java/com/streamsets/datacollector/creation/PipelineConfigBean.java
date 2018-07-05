@@ -82,7 +82,7 @@ public class PipelineConfigBean implements Stage {
     @ValueChooserModel(ExecutionModeChooserValues.class)
     public ExecutionMode executionMode;
 
-    /*  @ConfigDef(
+      @ConfigDef(
           required = true,
           type = ConfigDef.Type.STRING,
           label = "Data Collector Edge URL",
@@ -90,7 +90,7 @@ public class PipelineConfigBean implements Stage {
           displayPosition = 15,
           dependsOn = "executionMode",
           triggeredByValue = {"EDGE"}
-      )*/
+      )
     public String edgeHttpUrl = EDGE_HTTP_URL_DEFAULT;
 
     /*  @ConfigDef(
@@ -239,7 +239,7 @@ public class PipelineConfigBean implements Stage {
     @ValueChooserModel(StatsTargetChooserValues.class)
     public String statsAggregatorStage;
 
-    /*  @ConfigDef(
+      @ConfigDef(
           required = true,
           type = ConfigDef.Type.NUMBER,
           label = "Worker Count",
@@ -250,10 +250,10 @@ public class PipelineConfigBean implements Stage {
           group = "CLUSTER",
           dependsOn = "executionMode",
           triggeredByValue = {"CLUSTER_YARN_STREAMING"}
-      )*/
+      )
     public long workerCount;
 
-    /*  @ConfigDef(
+      @ConfigDef(
           required = true,
           type = ConfigDef.Type.NUMBER,
           label = "Worker Memory (MB)",
@@ -262,10 +262,10 @@ public class PipelineConfigBean implements Stage {
           group = "CLUSTER",
           dependsOn = "executionMode",
           triggeredByValue = {"CLUSTER_BATCH", "CLUSTER_YARN_STREAMING"}
-      )*/
+      )
     public long clusterSlaveMemory;
 
-    /*  @ConfigDef(
+      @ConfigDef(
         required = true,
         type = ConfigDef.Type.STRING,
         label = "Worker Java Options",
@@ -275,10 +275,10 @@ public class PipelineConfigBean implements Stage {
         group = "CLUSTER",
         dependsOn = "executionMode",
         triggeredByValue = {"CLUSTER_BATCH", "CLUSTER_YARN_STREAMING"}
-      )*/
+      )
     public String clusterSlaveJavaOpts;
 
-    /*  @ConfigDef(
+      @ConfigDef(
         required = false,
         type = ConfigDef.Type.MAP,
         defaultValue = "{}",
@@ -288,10 +288,10 @@ public class PipelineConfigBean implements Stage {
         group = "CLUSTER",
         dependsOn = "executionMode",
         triggeredByValue = {"CLUSTER_BATCH", "CLUSTER_YARN_STREAMING"}
-      )*/
+      )
     public Map<String, String> clusterLauncherEnv;
 
-    /*  @ConfigDef(
+      @ConfigDef(
         required = true,
         type = ConfigDef.Type.STRING,
         label = "Mesos Dispatcher URL",
@@ -300,10 +300,10 @@ public class PipelineConfigBean implements Stage {
         group = "CLUSTER",
         dependsOn = "executionMode",
         triggeredByValue = {"CLUSTER_MESOS_STREAMING"}
-      )*/
+      )
     public String mesosDispatcherURL;
 
-    /*  @ConfigDef(
+      @ConfigDef(
         required = true,
         type = ConfigDef.Type.STRING,
         label = "Checkpoint Configuration Directory",
@@ -312,7 +312,7 @@ public class PipelineConfigBean implements Stage {
         group = "CLUSTER",
         dependsOn = "executionMode",
         triggeredByValue = {"CLUSTER_MESOS_STREAMING"}
-      )*/
+      )
     public String hdfsS3ConfDir;
 
     /*  @ConfigDef(
@@ -376,17 +376,17 @@ public class PipelineConfigBean implements Stage {
     @ListBeanModel
     public List<PipelineWebhookConfig> webhookConfigs = Collections.emptyList();
 
-    /*  @ConfigDef(
-          required = false,
-          type = ConfigDef.Type.MAP,
-          defaultValue = "{}",
-          label = "Extra Spark Configuration",
-          description = "Additional Spark Configuration to pass to the spark-submit script, the parameters will be passed " +
-              "as --conf <key>=<value>",
-          displayPosition = 220,
-          group = "CLUSTER",
-          dependsOn = "executionMode",
-          triggeredByValue = {"CLUSTER_YARN_STREAMING"})*/
+    @ConfigDef(
+            required = false,
+            type = ConfigDef.Type.MAP,
+            defaultValue = "{}",
+            label = "Extra Spark Configuration",
+            description = "Additional Spark Configuration to pass to the spark-submit script, the parameters will be passed " +
+                    "as --conf <key>=<value>",
+            displayPosition = 220,
+            group = "CLUSTER",
+            dependsOn = "executionMode",
+            triggeredByValue = {"CLUSTER_YARN_STREAMING"})
     public Map<String, String> sparkConfigs;
 
     @Override

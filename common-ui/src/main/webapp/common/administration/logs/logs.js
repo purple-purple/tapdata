@@ -76,7 +76,8 @@ angular
       filterPipelineLabel: pipelineTitleParam + '/' + pipelineNameParam,
       pipelines: [],
       pauseLogAutoFetch: $rootScope.$storage.pauseLogAutoFetch,
-
+      pipelineTitleParam: pipelineTitleParam,
+      
       loadPreviousLog: function() {
         $scope.fetchingLog = true;
         api.log.getCurrentLog($scope.logEndingOffset, $scope.extraMessage, $scope.filterPipeline,

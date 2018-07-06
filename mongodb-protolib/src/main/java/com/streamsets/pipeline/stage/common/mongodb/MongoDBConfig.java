@@ -81,14 +81,14 @@ public class MongoDBConfig {
   )
   public String database;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.STRING,
       label = "Collection",
       required = true,
       group = "MONGODB",
       displayPosition = 30
-  )
-  public String collection;
+  )*/
+  public String collection = "no need";
 
   @ConfigDef(
       type = ConfigDef.Type.MODEL,

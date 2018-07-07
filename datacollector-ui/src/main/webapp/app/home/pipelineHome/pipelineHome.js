@@ -769,15 +769,7 @@ angular
       console.log("interval,!!")
       $("label:contains(Cluster Clone)").parent().siblings().children().off("click").on("click",function(){
         $rootScope.$broadcast('clusterClone');
-      })
-
-      if($(".edit-mapping-button").length < 1 ){
-        $("label:contains(Mapping)").parent().siblings().children().append("<button class='edit-mapping-button' style='margin-top:10px;'>Edit Mapping</button>")
-        $(".edit-mapping-button").off("click").on("click", function(){
-          $rootScope.$broadcast('showMappingView');
-        })
-      } 
-     
+      }) 
     }, 1000);
     /**
      * Fetch definitions for Pipeline and Stages, fetch all pipeline configuration info, status and metric.

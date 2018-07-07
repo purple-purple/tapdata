@@ -2038,6 +2038,7 @@ angular
     var pipelineHome = this;
     $scope.$on('hideMappingView', function( event, option){
       $scope.showMappingView = false;
+      $("#pipconfig").css("display","block")
     })
 
     $scope.$on("clusterClone", function (event, options) {
@@ -2165,6 +2166,7 @@ angular
             const tableInfo = JSON.parse(schemaString);
             console.log('got table schema:',tableInfo)
             $scope.showMappingView = true;
+            $("#pipconfig").css("display","none")
             $scope.refreshGraph(); 
             var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
             if(current_schema && current_schema.schema){

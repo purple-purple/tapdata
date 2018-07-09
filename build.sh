@@ -11,10 +11,11 @@ DEV_MODE="${DEV_MODE:-false}"
 DOWNLOAD_SDC="${DOWNLOAD_SDC:-false}"
 
 # Get git tag build version
-GIT_TAG_VERSION=`git describe --long HEAD`
-if [ $GIT_TAG_VERSION="fatel"* ];then
+GIT_TAG=`git tag`
+if [ -z "$GIT_TAG" ];then
     TAP_DATA_VERSION=tapdata-beta
 else
+    GIT_TAG_VERSION=`git describe --long HEAD`
     TAP_DATA_VERSION=tapdata-"${GIT_TAG_VERSION}"
 fi
 export TAP_DATA_VERSION

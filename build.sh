@@ -9,16 +9,18 @@ SKIP_BUILD_LIB="${SKIP_BUILD_LIB:-false}"
 SKIP_RUN_SDC=${SKIP_RUN_SDC:-true}
 DEV_MODE="${DEV_MODE:-false}"
 DOWNLOAD_SDC="${DOWNLOAD_SDC:-false}"
+BETA="${BETA:-false}"
 
 # Get git tag build version
 GIT_TAG=`git tag`
 echo DEV_MODE:"${DEV_MODE}"
-if [ -z "$GIT_TAG" -o "$DEV_MODE" == "true" ];then
+if [ -z "$GIT_TAG" -o "$BETA" == "true" ];then
     TAP_DATA_VERSION=tapdata-beta
 else
     GIT_TAG_VERSION=`git describe --long HEAD`
     TAP_DATA_VERSION=tapdata-"${GIT_TAG_VERSION}"
 fi
+echo TAP_DATA_VERSION:${TAP_DATA_VERSION}
 export TAP_DATA_VERSION
 
 TAPDATA_FINAL_NAME=tapdata

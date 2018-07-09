@@ -37,6 +37,7 @@ import com.streamsets.pipeline.lib.generator.DataGeneratorFactoryBuilder;
 import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.ErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.mongodb.Errors;
+import com.streamsets.pipeline.stage.common.mongodb.Groups;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -55,53 +56,54 @@ import java.util.*;
 import static com.sun.tools.doclint.Entity.nu;
 
 public class MongoDBTarget extends BaseTarget {
-  private static final Logger LOG = LoggerFactory.getLogger(MongoDBTarget.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MongoDBTarget.class);
 
-  public static final int DEFAULT_CAPACITY = 1024;
+    public static final int DEFAULT_CAPACITY = 2048;
 
-  private final MongoTargetConfigBean mongoTargetConfigBean;
-  private MongoClient mongoClient;
-  private MongoCollection<Document> mongoCollection;
-  private ErrorRecordHandler errorRecordHandler;
-  private DataGeneratorFactory generatorFactory;
+    private final MongoTargetConfigBean mongoTargetConfigBean;
+    private MongoClient mongoClient;
+    private MongoCollection<Document> mongoCollection;
+    private ErrorRecordHandler errorRecordHandler;
+    private DataGeneratorFactory generatorFactory;
 
-  private TapTransformer transformer;
+    private TapTransformer transformer;
 
-  public MongoDBTarget(MongoTargetConfigBean mongoTargetConfigBean) {
-    this.mongoTargetConfigBean = mongoTargetConfigBean;
+    public MongoDBTarget(MongoTargetConfigBean mongoTargetConfigBean) {
+        this.mongoTargetConfigBean = mongoTargetConfigBean;
 
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  protected List<ConfigIssue> init() {
-    List<ConfigIssue> issues = super.init();
-    errorRecordHandler = new DefaultErrorRecordHandler(getContext());
-
-    mongoTargetConfigBean.mongoConfig.init(
-        getContext(),
-        issues,
-        null,
-        mongoTargetConfigBean.writeConcern.getWriteConcern()
-    );
-    if (!issues.isEmpty()) {
-      return issues;
     }
 
-    // since no issue was found in validation, the followings must not be null at this point.
-    MongoDatabase mongoDatabase = Utils.checkNotNull(mongoTargetConfigBean.mongoConfig.getMongoDatabase(), "MongoDatabase");
-    mongoClient = Utils.checkNotNull(mongoTargetConfigBean.mongoConfig.getMongoClient(), "MongoClient");
-    mongoCollection = Utils.checkNotNull(mongoTargetConfigBean.mongoConfig.getMongoCollection(), "MongoCollection");
+    @SuppressWarnings("unchecked")
+    @Override
+    protected List<ConfigIssue> init() {
+        List<ConfigIssue> issues = super.init();
+        errorRecordHandler = new DefaultErrorRecordHandler(getContext());
 
-    DataGeneratorFactoryBuilder builder = new DataGeneratorFactoryBuilder(
-        getContext(),
-        DataFormat.JSON.getGeneratorFormat()
-    );
-    builder.setCharset(StandardCharsets.UTF_8);
-    builder.setMode(Mode.MULTIPLE_OBJECTS);
-    generatorFactory = builder.build();
+        mongoTargetConfigBean.mongoConfig.init(
+                getContext(),
+                issues,
+                null,
+                mongoTargetConfigBean.writeConcern.getWriteConcern()
+        );
+        if (!issues.isEmpty()) {
+            return issues;
+        }
+
+        // since no issue was found in validation, the followings must not be null at this point.
+        Utils.checkNotNull(mongoTargetConfigBean.mongoConfig.getMongoDatabase(), "MongoDatabase");
+        mongoClient = Utils.checkNotNull(mongoTargetConfigBean.mongoConfig.getMongoClient(), "MongoClient");
+        mongoCollection = Utils.checkNotNull(mongoTargetConfigBean.mongoConfig.getMongoCollection(), "MongoCollection");
+
+        DataGeneratorFactoryBuilder builder = new DataGeneratorFactoryBuilder(
+                getContext(),
+                DataFormat.JSON.getGeneratorFormat()
+        );
+        builder.setCharset(StandardCharsets.UTF_8);
+        builder.setMode(Mode.MULTIPLE_OBJECTS);
+        generatorFactory = builder.build();
 //    getContext().getPipelineConstants()
-    transformer = new TapTransformer(mongoTargetConfigBean);
+        transformer = new TapTransformer(mongoTargetConfigBean, issues, getContext());
+        return issues;
 
     if (StringUtils.isNotBlank(mongoTargetConfigBean.mapping)) {
       Document mapConfig = Document.parse(mongoTargetConfigBean.mapping);
@@ -114,137 +116,137 @@ public class MongoDBTarget extends BaseTarget {
     return issues;
   }
 
-  @Override
-  public void destroy() {
-    IOUtils.closeQuietly(mongoClient);
-    super.destroy();
-  }
+    @Override
+    public void destroy() {
+        IOUtils.closeQuietly(mongoClient);
+        super.destroy();
+    }
 
-  @Override
-  public void write(Batch batch) throws StageException {
-    Iterator<Record> records = batch.getRecords();
-    Map<String, List<WriteModel<Document>>> collectionBulkMap = new HashMap<>();
-    List<Record> recordList = new ArrayList<>();
-    int count=0;
-    while (records.hasNext()) {
-      Record record = records.next();      
-      // for(String attr: record.getHeader().getAttributeNames()){
-      //   System.out.println(attr+" -- "+record.getHeader().getAttribute(attr));
-      // }
-      try {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(DEFAULT_CAPACITY);
-        DataGenerator generator = generatorFactory.getGenerator(baos);
-        generator.write(record);
-        generator.close();
-        Document document = Document.parse(new String(baos.toByteArray()));
+    @Override
+    public void write(Batch batch) throws StageException {
+        Iterator<Record> records = batch.getRecords();
+        Map<String, List<WriteModel<Document>>> collectionBulkMap = new HashMap<>();
+        List<Record> recordList = new ArrayList<>();
+        int count = 0;
+        while (records.hasNext()) {
+            Record record = records.next();
+            // for(String attr: record.getHeader().getAttributeNames()){
+            //   System.out.println(attr+" -- "+record.getHeader().getAttribute(attr));
+            // }
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream(DEFAULT_CAPACITY);
+                DataGenerator generator = generatorFactory.getGenerator(baos);
+                generator.write(record);
+                generator.close();
+                Document document = Document.parse(new String(baos.toByteArray()));
 
-        // create a write model based on record header
-        // if (isNullOrEmpty(record.getHeader().getAttribute(OperationType.SDC_OPERATION_TYPE))) {
-        //   LOG.error(Errors.MONGODB_15.getMessage(), record.getHeader().getSourceId());
-        //   throw new OnRecordErrorException(Errors.MONGODB_15, record.getHeader().getSourceId());
-        // }
+                // create a write model based on record header
+                // if (isNullOrEmpty(record.getHeader().getAttribute(OperationType.SDC_OPERATION_TYPE))) {
+                //   LOG.error(Errors.MONGODB_15.getMessage(), record.getHeader().getSourceId());
+                //   throw new OnRecordErrorException(Errors.MONGODB_15, record.getHeader().getSourceId());
+                // }
 
-        Map<String, List<WriteModel<Document>>> map = transformer.processRecord(record, document);
-        if (MapUtils.isNotEmpty(map)) {
+                Map<String, List<WriteModel<Document>>> map = transformer.processRecord(record, document);
+                if (MapUtils.isNotEmpty(map)) {
 
-          for (Map.Entry<String, List<WriteModel<Document>>> entry : map.entrySet()) {
-            String collectionName = entry.getKey();
-            List<WriteModel<Document>> models = entry.getValue();
-            if (!collectionBulkMap.containsKey(collectionName)) {
-              collectionBulkMap.put(collectionName, new ArrayList<>());
-            }
-            collectionBulkMap.get(collectionName).addAll(models);
-          }
+                    for (Map.Entry<String, List<WriteModel<Document>>> entry : map.entrySet()) {
+                        String collectionName = entry.getKey();
+                        List<WriteModel<Document>> models = entry.getValue();
+                        if (!collectionBulkMap.containsKey(collectionName)) {
+                            collectionBulkMap.put(collectionName, new ArrayList<>());
+                        }
+                        collectionBulkMap.get(collectionName).addAll(models);
+                    }
 
-        }
+                }
 //        if(CollectionUtils.isNotEmpty(models)){
 //              recordList.add(record);
 //              collectionBulkMap.addAll(models);
 //        }
-       
-      } catch (IOException | StageException | NumberFormatException e) {
-        errorRecordHandler.onError(
-            new OnRecordErrorException(
-                record,
-                Errors.MONGODB_13,
-                e.toString(),
-                e
-            )
-        );
-      }
+
+            } catch (IOException | StageException | NumberFormatException e) {
+                errorRecordHandler.onError(
+                        new OnRecordErrorException(
+                                record,
+                                Errors.MONGODB_13,
+                                e.toString(),
+                                e
+                        )
+                );
+            }
+        }
+
+        if (!collectionBulkMap.isEmpty()) {
+            System.out.println("Writing " + collectionBulkMap.size() + " ops ");
+            try {
+                for (Map.Entry<String, List<WriteModel<Document>>> entry : collectionBulkMap.entrySet()) {
+                    String collectionName = entry.getKey();
+                    List<WriteModel<Document>> models = entry.getValue();
+                    MongoCollection<Document> collection = mongoTargetConfigBean.mongoConfig.getMongoDatabase().getCollection(collectionName);
+
+                    BulkWriteResult bulkWriteResult = collection.bulkWrite(models);
+                    if (bulkWriteResult.wasAcknowledged()) {
+                        System.out.println(bulkWriteResult);
+                        LOG.debug(
+                                "Wrote batch with {} inserts, {} updates and {} deletes to {}",
+                                bulkWriteResult.getInsertedCount(),
+                                bulkWriteResult.getModifiedCount(),
+                                bulkWriteResult.getDeletedCount(),
+                                collectionName
+                        );
+                    }
+                }
+            } catch (MongoException e) {
+                for (Record record : recordList) {
+                    errorRecordHandler.onError(
+                            new OnRecordErrorException(
+                                    record,
+                                    Errors.MONGODB_17,
+                                    e.toString(),
+                                    e
+                            )
+                    );
+                }
+            }
+        }
     }
 
-    if (!collectionBulkMap.isEmpty()) {
-      System.out.println("Writing "+ collectionBulkMap.size()+" ops ");
-      try {
-        for (Map.Entry<String, List<WriteModel<Document>>> entry : collectionBulkMap.entrySet()) {
-          String collectionName = entry.getKey();
-          List<WriteModel<Document>> models = entry.getValue();
-          MongoCollection<Document> collection = mongoTargetConfigBean.mongoConfig.getMongoDatabase().getCollection(collectionName);
+    private void processOplog() {
 
-          BulkWriteResult bulkWriteResult = collection.bulkWrite(models);
-          if (bulkWriteResult.wasAcknowledged()) {
-            System.out.println(bulkWriteResult);
-            LOG.debug(
-                    "Wrote batch with {} inserts, {} updates and {} deletes to {}",
-                    bulkWriteResult.getInsertedCount(),
-                    bulkWriteResult.getModifiedCount(),
-                    bulkWriteResult.getDeletedCount(),
-                    collectionName
+    }
+
+    private void validateUniqueKey(String operation, Record record) throws OnRecordErrorException {
+        if (mongoTargetConfigBean.uniqueKeyField == null || mongoTargetConfigBean.uniqueKeyField.isEmpty()) {
+            LOG.error(
+                    Errors.MONGODB_18.getMessage(),
+                    operation
             );
-          }
+            throw new OnRecordErrorException(
+                    Errors.MONGODB_18,
+                    operation
+            );
         }
-      } catch (MongoException e) {
-        for (Record record : recordList) {
-          errorRecordHandler.onError(
-              new OnRecordErrorException(
-                  record,
-                  Errors.MONGODB_17,
-                  e.toString(),
-                  e
-              )
-          );
+
+        if (!record.has(mongoTargetConfigBean.uniqueKeyField)) {
+            LOG.error(
+                    Errors.MONGODB_16.getMessage(),
+                    record.getHeader().getSourceId(),
+                    mongoTargetConfigBean.uniqueKeyField
+            );
+            throw new OnRecordErrorException(
+                    Errors.MONGODB_16,
+                    record.getHeader().getSourceId(),
+                    mongoTargetConfigBean.uniqueKeyField
+            );
         }
-      }
-    }
-  }
-
-  private void processOplog(){
-
-  }
-
-  private void validateUniqueKey(String operation, Record record) throws OnRecordErrorException {
-    if(mongoTargetConfigBean.uniqueKeyField == null || mongoTargetConfigBean.uniqueKeyField.isEmpty()) {
-      LOG.error(
-          Errors.MONGODB_18.getMessage(),
-          operation
-      );
-      throw new OnRecordErrorException(
-          Errors.MONGODB_18,
-          operation
-      );
     }
 
-    if (!record.has(mongoTargetConfigBean.uniqueKeyField)) {
-      LOG.error(
-        Errors.MONGODB_16.getMessage(),
-        record.getHeader().getSourceId(),
-        mongoTargetConfigBean.uniqueKeyField
-      );
-      throw new OnRecordErrorException(
-        Errors.MONGODB_16,
-        record.getHeader().getSourceId(),
-        mongoTargetConfigBean.uniqueKeyField
-      );
+    private String removeLeadingSlash(String uniqueKeyField) {
+        if (uniqueKeyField.startsWith("/")) {
+            return uniqueKeyField.substring(1);
+        }
+        return uniqueKeyField;
     }
-  }
-
-  private String removeLeadingSlash(String uniqueKeyField) {
-    if(uniqueKeyField.startsWith("/")) {
-      return uniqueKeyField.substring(1);
-    }
-    return uniqueKeyField;
-  }
 
   private void createMongoIndexes(List<Document> mappings) {
 

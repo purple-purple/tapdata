@@ -872,7 +872,14 @@ public class Pipeline {
   }
 
   private static DeliveryGuarantee getDeliveryGuarantee(PipelineConfiguration pipelineConf) {
-    Config deliveryGuaranteeConfig = Utils.checkNotNull(pipelineConf.getConfiguration(DELIVERY_GUARANTEE_CONFIG_KEY), DELIVERY_GUARANTEE_CONFIG_KEY);
+    Config deliveryGuaranteeConfig;
+    if (pipelineConf.getConfiguration(DELIVERY_GUARANTEE_CONFIG_KEY) == null) {
+      deliveryGuaranteeConfig = new Config(DELIVERY_GUARANTEE_CONFIG_KEY, "AT_LEAST_ONCE");
+    } else {
+      deliveryGuaranteeConfig = pipelineConf.getConfiguration(DELIVERY_GUARANTEE_CONFIG_KEY);
+    }
+    /** hide Delivery Guarantee */
+    //Config deliveryGuaranteeConfig = Utils.checkNotNull(pipelineConf.getConfiguration(DELIVERY_GUARANTEE_CONFIG_KEY), DELIVERY_GUARANTEE_CONFIG_KEY);
     String deliveryGuarantee = deliveryGuaranteeConfig.getValue().toString();
     Utils.checkState(deliveryGuarantee != null && !deliveryGuarantee.isEmpty(), "Delivery guarantee cannot be null or empty");
     return DeliveryGuarantee.valueOf(deliveryGuarantee);

@@ -24,7 +24,8 @@ angular.module('showLoadingDirectives', [])
       restrict: 'A',
       replace: true,
       scope: {
-        loading: '=showLoading'
+        loading: '=showLoading',
+        message: '='
       },
       templateUrl: 'common/directives/loading/loading.tpl.html'
     };

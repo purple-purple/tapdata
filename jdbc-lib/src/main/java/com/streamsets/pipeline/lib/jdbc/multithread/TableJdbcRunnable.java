@@ -77,7 +77,12 @@ public final class TableJdbcRunnable extends JdbcBaseRunnable {
     }
 
     @Override
-    public void createAndAddRecord(ResultSet rs, TableRuntimeContext tableRuntimeContext, BatchContext batchContext, String tableSchemasJson) throws SQLException, StageException {
+    public void createAndAddRecord(
+            ResultSet rs,
+            TableRuntimeContext tableRuntimeContext,
+            BatchContext batchContext,
+            String tableSchemasJson
+    ) throws SQLException, StageException {
         this.createAndAddRecordWithSchema(rs, tableRuntimeContext, batchContext, tableSchemasJson);
     }
 

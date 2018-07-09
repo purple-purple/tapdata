@@ -175,12 +175,19 @@
                    ng-class="{'has-error': getConfigurationIssues(detailPaneConfig, customFieldConfigDefinition).length > 0}"
                    ng-if="(verifyCustomFieldDependsOn(detailPaneConfig, customFieldValue, customFieldConfigDefinition))">
 
-                <label class="col-lg-3 control-label">{{customFieldConfigDefinition.label}}
-                  <i class="fa fa-info-circle help-icon"
+                <label class="col-lg-3 control-label">{{"tapdata." + customFieldConfigDefinition.label | translate}}
+               
+                  <i ng-if="customFieldConfigDefinition.description" class="fa fa-info-circle help-icon"
                      tooltip-placement="right"
                      tooltip-append-to-body="false"
-                     tooltip="{{customFieldConfigDefinition.description || customFieldConfigDefinition.label}}"
-                     tooltip-trigger="mouseenter"></i>
+                     tooltip="{{'tapdata.'+ customFieldConfigDefinition.description | translate}}"
+                     tooltip-trigger="mouseenter" style=" padding-left: 0px;"></i>
+                  <i ng-if="!customFieldConfigDefinition.description" class="fa fa-info-circle help-icon"
+                     tooltip-placement="right"
+                     tooltip-append-to-body="false"
+                     tooltip="{{'tapdata.'+ customFieldConfigDefinition.label | translate}}"
+                     tooltip-trigger="mouseenter" style=" padding-left: 0px;"></i>
+                     
                 </label>
 
                 <div class="controls col-lg-9">
@@ -233,13 +240,13 @@
                 ng-click="addToCustomField(detailPaneConfig, detailPaneConfig.configuration[configIndex], configDefinition.model.configDefinitions)">
           <i class="fa fa-plus pointer"></i>
         </button>
-
-        <div class="pull-right field-selector-btn" ng-hide="isPipelineReadOnly || isPipelineRunning">
+       
+        <!-- <div class="pull-right field-selector-btn" ng-hide="isPipelineReadOnly || isPipelineRunning">
           <button type="button" class="btn btn-link"
                   ng-click="bulkEdit = !bulkEdit">
             {{bulkEdit ? ('home.detailPane.configurationTab.switchToSimpleMode' | translate) : ('home.detailPane.configurationTab.switchToBulkMode' | translate)}}
           </button>
-        </div>
+        </div> -->
 
         <div class="help-block">
           <div ng-repeat="issue in getConfigurationIssues(detailPaneConfig, configDefinition)">

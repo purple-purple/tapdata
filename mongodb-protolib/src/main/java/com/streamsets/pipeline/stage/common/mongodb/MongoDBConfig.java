@@ -81,14 +81,14 @@ public class MongoDBConfig {
   )
   public String database;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.STRING,
       label = "Collection",
       required = true,
       group = "MONGODB",
       displayPosition = 30
-  )
-  public String collection;
+  )*/
+  public String collection = "no need";
 
   @ConfigDef(
       type = ConfigDef.Type.MODEL,
@@ -137,7 +137,7 @@ public class MongoDBConfig {
 
   // Advanced configs
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Connections Per Host",
       description = "Sets the maximum number of connections per host",
@@ -145,10 +145,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 10
-  )
+  )*/
   public int connectionsPerHost = 100;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Min Connections Per Host",
       description = "Sets the minimum number of connections per host",
@@ -156,10 +156,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 20
-  )
+  )*/
   public int minConnectionsPerHost = 0;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Connect Timeout",
       description = "Sets the connection timeout",
@@ -167,10 +167,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 30
-  )
+  )*/
   public int connectTimeout = 10000;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Max Connection Idle Time",
       description = "Sets the maximum idle time for a pooled connection",
@@ -178,10 +178,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 40
-  )
+  )*/
   public int maxConnectionIdleTime = 0;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Max Connection Life Time",
       description = "Sets the maximum life time for a pooled connection",
@@ -189,10 +189,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 50
-  )
+  )*/
   public int maxConnectionLifeTime = 0;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Max Wait Time",
       description = "Sets the maximum time that a thread will block waiting for a connection",
@@ -200,10 +200,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 60
-  )
+  )*/
   public int maxWaitTime = 120000;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Server Selection Timeout",
       description = "Sets the server selection timeout in milliseconds, " +
@@ -212,20 +212,20 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 70
-  )
+  )*/
   public int serverSelectionTimeout = 30000;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Threads Allowed To Block For Connection Multiplier",
       defaultValue = "5",
       required = false,
       group = "ADVANCED",
       displayPosition = 80
-  )
+  )*/
   public int threadsAllowedToBlockForConnectionMultiplier = 5;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Heartbeat Frequency",
       description = "Sets the heartbeat frequency",
@@ -233,10 +233,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 90
-  )
+  )*/
   public int heartbeatFrequency = 10000;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Min Heartbeat Frequency",
       description = "Sets the minimum heartbeat frequency",
@@ -244,10 +244,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 100
-  )
+  )*/
   public int minHeartbeatFrequency = 500;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Heartbeat Connect Timeout",
       description = "Sets the connect timeout for connections used for the cluster heartbeat",
@@ -255,10 +255,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 110
-  )
+  )*/
   public int heartbeatConnectTimeout = 20000;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Heartbeat Socket Timeout",
       description = "Sets the socket timeout for connections used for the cluster heartbeat",
@@ -266,10 +266,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 120
-  )
+  )*/
   public int heartbeatSocketTimeout = 20000;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Local Threshold",
       description = "Sets the local threshold",
@@ -277,10 +277,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 130
-  )
+  )*/
   public int localThreshold = 15;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.STRING,
       label = "Required Replica Set Name",
       description = "Sets the required replica set name for the cluster",
@@ -288,10 +288,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 140
-  )
+  )*/
   public String requiredReplicaSetName = "";
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.BOOLEAN,
       label = "Cursor Finalizer Enabled",
       description = "Sets whether cursor finalizers are enabled",
@@ -299,10 +299,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 150
-  )
+  )*/
   public boolean cursorFinalizerEnabled = true;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.BOOLEAN,
       label = "Socket Keep Alive",
       description = "Sets whether socket keep alive is enabled",
@@ -310,10 +310,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 160
-  )
+  )*/
   public boolean socketKeepAlive = false;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.NUMBER,
       label = "Socket Timeout",
       description = "Sets the socket timeout",
@@ -321,10 +321,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 170
-  )
+  )*/
   public int socketTimeout = 0;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.BOOLEAN,
       label = "SSL Enabled",
       description = "Sets whether to use SSL",
@@ -332,10 +332,10 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 180
-  )
+  )*/
   public boolean sslEnabled = false;
 
-  @ConfigDef(
+/*  @ConfigDef(
       type = ConfigDef.Type.BOOLEAN,
       label = "SSL Invalid Host Name Allowed",
       description = "Define whether invalid host names should be allowed",
@@ -343,7 +343,7 @@ public class MongoDBConfig {
       required = false,
       group = "ADVANCED",
       displayPosition = 190
-  )
+  )*/
   public boolean sslInvalidHostNameAllowed = false;
   private HashMap<String, MongoCollection> collections = new HashMap<String, MongoCollection>();
   public void init(

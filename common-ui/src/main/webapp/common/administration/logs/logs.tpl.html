@@ -82,7 +82,7 @@
         </ul>
       </div>
 
-      <a ng-if="filterPipeline" ng-href="/collector/pipeline/{{filterPipeline}}">( view pipeline... )</a>
+      <a ng-if="filterPipeline && pipelineTitleParam.length > 0" ng-href="/collector/pipeline/{{filterPipeline}}">( view pipeline... )</a>
 
     </div>
 
@@ -115,9 +115,9 @@
         </ul>
       </div>
 
-      <button type="button" class="btn btn-primary btn-sm"  ng-if="common.isUserAdmin" ng-click="onLogConfigClick()">
+      <!-- <button type="button" class="btn btn-primary btn-sm"  ng-if="common.isUserAdmin" ng-click="onLogConfigClick()">
         {{'logs.logConfig.headerLabel' | translate}}
-      </button>
+      </button> -->
 
       <button type="button" class="btn btn-primary btn-sm"  ng-if="common.isUserAdmin" ng-click="toggleAutoFetch()">
         {{(pauseLogAutoFetch ? 'logs.autoFetchContinue' : 'logs.autoFetchPause') | translate}}

@@ -160,10 +160,10 @@ angular.module('dataCollectorApp.common')
      * @param batchSize
      * @returns {*}
      */
-    this.getInputRecordsFromPreview = function(pipelineName, stageInstance, batchSize) {
+    this.getInputRecordsFromPreview = function(pipelineName, stageInstance, batchSize, mapping) {
       var deferred = $q.defer();
 
-      api.pipelineAgent.createPreview(pipelineName, 0, batchSize, 0, true, true, [], stageInstance.instanceName)
+      api.pipelineAgent.createPreview(pipelineName, 0, batchSize, 0, true, true, [], stageInstance.instanceName, null, mapping)
         .then(
           function (res) {
             var checkStatusDefer = $q.defer();
@@ -181,7 +181,9 @@ angular.module('dataCollectorApp.common')
             //TAPDATA TODO:
             if(previewData.batchesOutput && previewData.batchesOutput[0]){
               var stagePreviewData = self.getPreviewDataForStage(previewData.batchesOutput[0], stageInstance);
-              deferred.resolve(stagePreviewData.input);
+               //TAPDATA TODO:
+              // deferred.resolve(stagePreviewData.input);
+              deferred.resolve(previewData.batchesOutput);
             }
             else{
               deferred.resolve(previewData);

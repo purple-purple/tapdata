@@ -17,4 +17,8 @@ public interface ISchemaValidator {
      * @throws SQLException
      */
     List<RelateDataBaseTable> validateSchema(Connection conn, String databaseOwner, Statement statement) throws SQLException;
+
+    List<RelateDataBaseTable> validateSchema(Connection conn, String databaseOwner, Statement statement, List<?> tableCongifs) throws SQLException;
+
+    List<RelateDataBaseTable> validateSchema(Connection conn, Statement statement, List<?> tableCongifs) throws SQLException;
 }

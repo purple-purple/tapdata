@@ -1,6 +1,10 @@
 package com.streamsets.pipeline.lib.jdbc.oracle.schema;
 
-import java.io.IOException;
+import com.streamsets.pipeline.stage.origin.jdbc.cdc.SchemaTableConfigBean;
+import com.streamsets.pipeline.stage.origin.jdbc.table.TableConfigBean;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,31 +15,42 @@ import java.util.List;
 import java.util.Map;
 
 public class OracleSchemaValidator implements ISchemaValidator {
+
+    private final static String TABLECONFIGBEAN = "com.streamsets.pipeline.stage.origin.jdbc.table.TableConfigBean";
+    private final static String SCHEMATABLECONFIGBEAN = "com.streamsets.pipeline.stage.origin.jdbc.cdc.SchemaTableConfigBean";
+    private final static String SCHEMACONDITION = " ut.owner LIKE '%s'";
+    private final static String TABLECONDITION = " ut.table_name LIKE '%s'";
+    private final static String TABLEEXCLUDECONDITION = " ut.table_name NOT LIKE '%s'";
+    private final static String AND = " AND";
+    private final static String OR = " OR";
+    private final static String PREFIX = " (";
+    private final static String SUFFIX = " )";
+
     /**
      * 指定用户下的所有表及字段
      */
     public static final String LOAD_SCHEMA_TABLES_ALL_COLUMNS = "SELECT\n" +
             "  ut.table_name AS tableName,\n" +
-            "  utc.column_name  columnName,\n" +
-            "  utc.data_type    dataType,\n" +
-            "  utc.DATA_LENGTH  dataLength,\n" +
-            "  utc.DATA_PRECISION  precision,\n" +
-            "  utc.DATA_SCALE  scale\n" +
-            "FROM all_tables ut\n" +
-            "  JOIN all_tab_columns utc ON ut.table_name = utc.table_name\n" +
-            " AND ut.owner='%s'";
+            "  utc.column_name columnName,\n" +
+            "  utc.data_type dataType,\n" +
+            "  utc.DATA_LENGTH dataLength,\n" +
+            "  utc.DATA_PRECISION precision,\n" +
+            "  utc.DATA_SCALE scale\n" +
+            " FROM all_tables ut\n" +
+            " JOIN all_tab_columns utc ON ut.table_name = utc.table_name\n" +
+            " WHERE 1=1 %s";
     /**
-     * 指定所有下的表的所有主键
+     * 指定所有用户下的表的所有主键
      */
     public static final String LOAD_SCHEMA_TABLES_ALL_PRIMARY_KEY = "SELECT\n" +
             "  ut.table_name AS tableName,\n" +
-            "  ucc.COLUMN_NAME  columnName,\n" +
+            "  ucc.COLUMN_NAME columnName,\n" +
             "  ucc.constraint_name,\n" +
             "  ucc.position position\n" +
             "FROM all_tables ut\n" +
-            "  JOIN all_cons_columns ucc ON ut.table_name = ucc.table_name\n" +
-            "  LEFT JOIN all_CONSTRAINTS uc ON uc.constraint_name = ucc.constraint_name\n" +
-            "WHERE uc.constraint_type = 'P' AND ut.owner='%s'";
+            " JOIN all_cons_columns ucc ON ut.table_name = ucc.table_name\n" +
+            " LEFT JOIN all_CONSTRAINTS uc ON uc.constraint_name = ucc.constraint_name\n" +
+            "WHERE uc.constraint_type = 'P' %s";
 
     /**
      * 指定用户下所有表的外键
@@ -51,18 +66,32 @@ public class OracleSchemaValidator implements ISchemaValidator {
             "  JOIN all_cons_columns ucc ON ut.table_name = ucc.table_name\n" +
             "  LEFT JOIN all_CONSTRAINTS uc ON uc.constraint_name = ucc.constraint_name\n" +
             "  LEFT JOIN all_cons_columns ucc2 ON uc.R_CONSTRAINT_NAME = ucc2.constraint_name\n" +
-            "WHERE uc.constraint_type = 'R' AND ut.owner='%s'";
+            "WHERE uc.constraint_type = 'R' %s";
 
 
     @Override
-    public List<RelateDataBaseTable> validateSchema(Connection conn,String databaseOwner, Statement statement) throws SQLException {
+    public List<RelateDataBaseTable> validateSchema(Connection conn, String databaseOwner, Statement statement) throws SQLException {
+        return validateSchema(conn, databaseOwner, statement, null);
+    }
+
+    @Override
+    public List<RelateDataBaseTable> validateSchema(Connection conn, Statement statement, List<?> tableCongifs) throws SQLException {
+        return validateSchema(conn, null, statement, tableCongifs);
+    }
+
+    @Override
+    public List<RelateDataBaseTable> validateSchema(Connection conn, String databaseOwner, Statement statement, List<?> tableCongifs) throws SQLException {
         List<RelateDataBaseTable> tables = null;
         ResultSet resultSet = null;
+        String tableCondition;
         try {
+
+            tableCondition = handleTableList(tableCongifs);
 
             // tables all columns
             Map<String, Map<String, DatabaseSchemaTableColumns>> tableColumnsMap = new HashMap<>();
-            String tablesColumnsSql = String.format(LOAD_SCHEMA_TABLES_ALL_COLUMNS, databaseOwner);
+            String tablesColumnsSql = String.format(LOAD_SCHEMA_TABLES_ALL_COLUMNS, tableCondition);
+            System.out.println("tablesColumnsSql:" + tablesColumnsSql);
             resultSet = statement.executeQuery(tablesColumnsSql);
             while (resultSet.next()) {
                 DatabaseSchemaTableColumns tablesColumns = new DatabaseSchemaTableColumns(resultSet);
@@ -71,7 +100,8 @@ public class OracleSchemaValidator implements ISchemaValidator {
 
             // tables primary key
             Map<String, Map<String, DatabaseSchemaConstraints>> pkTableMap = new HashMap<>();
-            String tablesPrimaryKeySql = String.format(LOAD_SCHEMA_TABLES_ALL_PRIMARY_KEY, databaseOwner);
+            String tablesPrimaryKeySql = String.format(LOAD_SCHEMA_TABLES_ALL_PRIMARY_KEY, tableCondition);
+            System.out.println("tablesPrimaryKeySql:" + tablesPrimaryKeySql);
             resultSet = statement.executeQuery(tablesPrimaryKeySql);
             while (resultSet.next()) {
                 DatabaseSchemaConstraints constraints = DatabaseSchemaConstraints.pkConstraints(resultSet);
@@ -80,7 +110,8 @@ public class OracleSchemaValidator implements ISchemaValidator {
 
             // tables foreign key
             Map<String, Map<String, DatabaseSchemaConstraints>> fkTableMap = new HashMap<>();
-            String tablesForeignKeySql = String.format(LOAD_SCHEMA_TABLES_ALL_FOREIGN_KEY, databaseOwner);
+            String tablesForeignKeySql = String.format(LOAD_SCHEMA_TABLES_ALL_FOREIGN_KEY, tableCondition);
+            System.out.println("tablesForeignKeySql：" + tablesForeignKeySql);
             resultSet = statement.executeQuery(tablesForeignKeySql);
             while (resultSet.next()) {
                 DatabaseSchemaConstraints constraints = DatabaseSchemaConstraints.fkConstraints(resultSet);
@@ -93,12 +124,12 @@ public class OracleSchemaValidator implements ISchemaValidator {
             if (resultSet != null) {
                 resultSet.close();
             }
-            /*if (statement != null) {
+            if (statement != null) {
                 statement.close();
             }
             if (conn != null) {
                 conn.close();
-            }*/
+            }
         }
 
         return tables;
@@ -185,5 +216,71 @@ public class OracleSchemaValidator implements ISchemaValidator {
         }
 
         return tables;
+    }
+
+    public static String handleTableList(List<?> tableConfigs) {
+        String typeName;
+        StringBuffer tableCondition = new StringBuffer();
+        if (CollectionUtils.isNotEmpty(tableConfigs)) {
+
+            //get class name
+            typeName = tableConfigs.get(0).getClass().getTypeName();
+
+            if (StringUtils.isNotBlank(typeName)) {
+                for (int i = 0; i < tableConfigs.size(); i++) {
+                    Object obj = tableConfigs.get(i);
+                    String schema;
+                    String table;
+                    String tableExclude;
+                    if (typeName.equals(TABLECONFIGBEAN)) {
+                        schema = ((TableConfigBean) obj).schema;
+                        table = ((TableConfigBean) obj).tablePattern;
+                        tableExclude = ((TableConfigBean) obj).tableExclusionPattern;
+                    } else if (typeName.equals(SCHEMATABLECONFIGBEAN)) {
+                        schema = ((SchemaTableConfigBean) obj).schema;
+                        table = ((SchemaTableConfigBean) obj).table;
+                        tableExclude = ((SchemaTableConfigBean) obj).excludePattern;
+                    } else {
+                        break;
+                    }
+
+                    schema = handleCondition(schema);
+                    table = handleCondition(table);
+                    tableExclude = handleCondition(tableExclude);
+
+                    if (StringUtils.isNotBlank(schema) || StringUtils.isNotBlank(table) || StringUtils.isNotBlank(tableExclude)) {
+                        tableCondition.append(PREFIX);
+                        if (StringUtils.isNotBlank(schema)) {
+                            tableCondition.append(String.format(SCHEMACONDITION, schema)).append(AND);
+                        }
+                        if (StringUtils.isNotBlank(table)) {
+                            tableCondition.append(String.format(TABLECONDITION, table)).append(AND);
+                        }
+                        if (StringUtils.isNotBlank(tableExclude)) {
+                            tableCondition.append(String.format(TABLEEXCLUDECONDITION, tableExclude)).append(AND);
+                        }
+
+                        String tempStr = tableCondition.substring(0, tableCondition.length() - AND.length());
+                        tableCondition = new StringBuffer().append(tempStr).append(SUFFIX).append(OR);
+                    }
+                }
+                if (StringUtils.isNotBlank(tableCondition)) {
+                    String tempStr = tableCondition.substring(0, tableCondition.length() - OR.length());
+                    tableCondition = new StringBuffer().append(tempStr);
+                    tableCondition.insert(0, AND + PREFIX);
+                    tableCondition.append(SUFFIX);
+                }
+            }
+        }
+
+        return tableCondition.toString();
+    }
+
+    public static String handleCondition(String condition) {
+        if (StringUtils.isNotBlank(condition) && condition.equals("%")) {
+            return "";
+        } else {
+            return condition;
+        }
     }
 }

@@ -104,6 +104,7 @@ angular
       canWrite: false,
       canExecute: false,
       isDPMPipelineDirty: false,
+      tapdataMessage:'',
 
       /**
        * Add New Pipeline Configuration
@@ -764,6 +765,12 @@ angular
       }
     });
 
+    setInterval(function(){
+      console.log("interval,!!")
+      $("label:contains(Cluster Clone)").parent().siblings().children().off("click").on("click",function(){
+        $rootScope.$broadcast('clusterClone');
+      }) 
+    }, 1000);
     /**
      * Fetch definitions for Pipeline and Stages, fetch all pipeline configuration info, status and metric.
      */
@@ -1143,6 +1150,7 @@ angular
       var executionModeConfig = _.find($scope.pipelineConfig.configuration, function (c) {
         return c.name === 'executionMode';
       });
+      executionModeConfig = executionModeConfig || {name:"executionMode", value:"STANDALONE"}
       $scope.executionMode = executionModeConfig.value;
 
       if ($scope.executionMode === 'EDGE') {
@@ -2011,7 +2019,6 @@ angular
     $scope.$on('showJobConfigView', function (event, options) {
       $scope.showJobConfig = !$scope.showJobConfig;
       $scope.refreshGraph();
-
     });
     $scope.$on('viewJobConfigWhileRunning', function (event, options) {
       if($scope.isPipelineRunning ){
@@ -2026,94 +2033,184 @@ angular
     setInterval(function(){
       $scope.refreshGraph();
     }, 2000);
-    
+   
 
     var pipelineHome = this;
     $scope.$on('hideMappingView', function( event, option){
       $scope.showMappingView = false;
+      $("#pipconfig").css("display","block")
+    })
+
+    $scope.$on("clusterClone", function (event, options) {
+      function getSchema(ob){
+        var dict = [ob]
+        let next = dict.shift();
+        while(next){
+          for (var key in next) {
+            if(key === 'schema'){
+              return next[key]
+            }
+            if(typeof next[key] === 'object'){
+              dict.push(Object.assign({}, next[key]))
+            }      
+          }
+          next = dict.shift();
+        }
+        return null
+      }
+      previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
+        -1,true).then(function(data){
+          const schemaString = getSchema(data)
+          if(schemaString){ 
+            const tableInfo = JSON.parse(schemaString);
+            console.log('got table schema:',tableInfo)
+            for(var i = 0; i < $scope.pipelineConfig.stages.length; i++) {
+              if($scope.pipelineConfig.stages[i].library === 'streamsets-datacollector-mongodb_3-lib'){
+                for(var j = 0; j < $scope.pipelineConfig.stages[i].configuration.length; j++){
+                    if( $scope.pipelineConfig.stages[i].configuration[j].name === "configBean.schema" ){
+                      $scope.pipelineConfig.stages[i].configuration[j].value = JSON.stringify({tables:tableInfo})
+                    }
+                }
+              }
+            }
+          }
+             
+        }).catch(function(e,b){
+          console.log(e,b)
+        })
     })
 
     $scope.$on('showMappingView', function (event, options) {
-      // console.log( $scope, options,"@@")
-      // updateFieldDataForStage
-      // $rootScope.$broadcast('previewSchema',$scope.selectedStage )
-      // $scope.$on('fieldPathsUpdated', function(a,b,c){
-      //   console.log(a,b,c, 'fieldPathsUpdated!');
-      // }) 
-      
-      previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
-        10).then(function(data){
-          if(data && data.length > 0){
-            for( var i = 0; i < data.length; i++){
-              if(data[i].header.values.schema){
-                const schemaString = data[i].header.values.schema
-                const tableInfo = JSON.parse(schemaString);
-                console.log('got table schema:',tableInfo)
-                $scope.showMappingView = true;
-                $scope.refreshGraph(); 
+      if($scope.showLoading){
+        return;
+      }
+      $scope.tapdataMessage= "Loading DB Schema Info ...";
+      $scope.showLoading = true;
+      const mappingLoad = function($scope, $rootScope){
+        $("#editorIframe").height((window.innerHeight - 240) + 'px')
+        let checkMapView = setInterval(function(){
+          let ifrmNode = document.getElementById('editorIframe')
+          let ifrm = ifrmNode ? ifrmNode.contentWindow || ifrmNode.contentDocument.document || ifrmNode.contentDocument : null;
+          if(!ifrm.mydesigner){
+            console.log('checking fail!!')
+            return;
+          }else{
+            console.log('checking sucess!!',ifrm.mydesigner)
 
-                $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
-                $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
-                
-                setTimeout(function(){ 
-                  $("#editorIframe").height((window.innerHeight - 240) + 'px')
-                  let ifrmNode = document.getElementById('editorIframe')
-                  let ifrm = ifrmNode ? ifrmNode.contentWindow || ifrmNode.contentDocument.document || ifrmNode.contentDocument : null;
-                  var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
-                  var current_mapping = $scope.pipelineConfig['metadata']['tapdata_mapping'];
-                  try{
-                    if (typeof current_mapping === "string"){
-                      current_mapping = JSON.parse(current_mapping)
+            clearInterval(checkMapView);
+          }
+          var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
+          var current_mapping = $scope.pipelineConfig['metadata']['tapdata_mapping'];
+          try{
+            if (typeof current_mapping === "string"){
+              current_mapping = JSON.parse(current_mapping)
+            }
+          }catch(e){
+            console.log(e)
+          } 
+          if(current_mapping) {
+            current_mapping.schema = current_schema.schema
+            console.log(current_mapping);
+            ifrm.mydesigner && ifrm.mydesigner.restore(current_mapping) 
+          }else{
+            ifrm.mydesigner && ifrm.mydesigner.init(current_schema, {mode: 'cluster-clone'}) 
+          }
+          ifrm.mydesigner && ifrm.mydesigner.on('savedocument', r => {
+            var result = ifrm.mydesigner.getDesignResult()
+            $scope.pipelineConfig['metadata']['tapdata_mapping'] = result
+            
+            for(var i = 0; i < $scope.pipelineConfig.stages.length; i++) {
+              if($scope.pipelineConfig.stages[i].library === 'streamsets-datacollector-mongodb_3-lib'){
+                for(var j = 0; j < $scope.pipelineConfig.stages[i].configuration.length; j++){
+                    if( $scope.pipelineConfig.stages[i].configuration[j].name === "configBean.mapping" ){
+                      $scope.pipelineConfig.stages[i].configuration[j].value = JSON.stringify({mappings: result.data})
                     }
-                  }catch(e){
-                    console.log(e)
-                  }
-                  // for(var i = 0; i < $scope.pipelineConfig.stages.length; i++) {
-                  //   if($scope.pipelineConfig.stages[i].library === 'streamsets-datacollector-mongodb_3-lib'){
-                  //     for(var j = 0; j < $scope.pipelineConfig.stages[i].configuration.length; j++){
-                  //         if( $scope.pipelineConfig.stages[i].configuration[j].name === "configBean.mapping" ){
-                  //           console.log('got current configBean.mapping:', $scope.pipelineConfig.stages[i].configuration[j].value)
-                  //           current_mapping = $scope.pipelineConfig.stages[i].configuration[j].value
-                  //           try{
-                  //             if (typeof current_mapping === "string"){
-                  //               current_mapping = JSON.parse(current_mapping)
-                  //             }
-                  //           }catch(e){
-                  //             console.log(e)
-                  //           }
-                  //         }
-                  //     }
-                  //   }
-                  // }
-                  if(current_mapping) {
-                    ifrm.mydesigner && ifrm.mydesigner.restore(current_mapping, {mode: 'cluster-clone'}) 
-                  }else{
-                    ifrm.mydesigner && ifrm.mydesigner.init(current_schema, {mode: 'cluster-clone'}) 
-                  }
-                  ifrm.mydesigner.on('savedocument', r => {
-                    var result = ifrm.mydesigner.getDesignResult()
-                    $scope.pipelineConfig['metadata']['tapdata_mapping'] = result
-                    
-                    for(var i = 0; i < $scope.pipelineConfig.stages.length; i++) {
-                      if($scope.pipelineConfig.stages[i].library === 'streamsets-datacollector-mongodb_3-lib'){
-                        for(var j = 0; j < $scope.pipelineConfig.stages[i].configuration.length; j++){
-                            if( $scope.pipelineConfig.stages[i].configuration[j].name === "configBean.mapping" ){
-                              $scope.pipelineConfig.stages[i].configuration[j].value = JSON.stringify({mappings: result.data})
-                            }
-                        }
-                      }
-                    }
-                    $rootScope.$broadcast('hideMappingView');
-                    $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
-                    $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
-                  })
-                  ifrm.mydesigner.on('cancel', r => {
-                    $rootScope.$broadcast('hideMappingView'); 
-                    $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
-                  })
-                }, 1000)
+                }
               }
             }
+            $rootScope.$broadcast('hideMappingView');
+            $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
+            $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
+          })
+          ifrm.mydesigner && ifrm.mydesigner.on('cancel', r => {
+            $rootScope.$broadcast('hideMappingView'); 
+            $scope.$broadcast('onNodeSelection',  self.mongoNodeOption)
+            setTimeout(function(){ $($("a:contains(Mapping)")[1]).click()}, 1500);
+          })
+        }, 1000)
+      }
+      function getSchema(ob){
+        var dict = [ob]
+        let next = dict.shift();
+        while(next){
+          for (var key in next) {
+            if(key === 'schema'){
+              return next[key]
+            }
+            if(typeof next[key] === 'object'){
+              dict.push(Object.assign({}, next[key]))
+            }      
+          }
+          next = dict.shift();
+        }
+        return null
+      }
+       
+
+      previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
+        -1,true).then(function(data){
+          const schemaString = getSchema(data)
+          if(schemaString){ 
+            $scope.tapdataMessage= "";
+            $scope.showLoading = false;
+            const tableInfo = JSON.parse(schemaString);
+            console.log('got table schema:',tableInfo)
+            $scope.showMappingView = true;
+            $("#pipconfig").css("display","none")
+            $scope.refreshGraph(); 
+            var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
+            if(current_schema && current_schema.schema){
+              current_schema.schema.tables.sort((a,b)=> {
+                delete a.visible
+                delete b.visible
+                a.fields && a.fields.sort((i,j)=>{
+                  return i.field_name.localeCompare(j.field_name)
+                })
+                b.fields && b.fields.sort((i,j)=>{
+                  return i.field_name.localeCompare(j.field_name)
+                })
+                return a.table_name.localeCompare(b.table_name)
+              })
+              
+              tableInfo.sort((a,b)=> {
+                delete a.visible
+                delete b.visible
+                a.fields && a.fields.sort((i,j)=>{
+                  return i.field_name.localeCompare(j.field_name)
+                })
+                b.fields && b.fields.sort((i,j)=>{
+                  return i.field_name.localeCompare(j.field_name)
+                })
+                return  a.table_name.localeCompare(b.table_name)
+              })
+              var equalLastTime =  _.isEqual(current_schema.schema.tables, tableInfo);
+ 
+              console.log(current_schema,equalLastTime,"compareLastTime!")
+              if( !equalLastTime){
+                $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
+                $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''
+              }
+            }else{
+              $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
+              $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''
+            }
+            $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
+            setTimeout(mappingLoad.bind(this, $scope, $rootScope), 3000)
+          }else{
+            $scope.tapdataMessage= "Can Not Get Schema Info";
+            setTimeout(function(){
+              $scope.showLoading = false;
+            },2000)
           }
         }).catch(function(e,b){
           console.log(e,b)
@@ -2122,39 +2219,23 @@ angular
     
     var self = this;
     $scope.$on('onNodeSelection', function (event, options) {
-      updateDetailPane(options);
-      if(options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
-        $scope.selectedStage = options.selectedObject;
+      if(options){
+        updateDetailPane(options);
       }
-      var existed = $(".nav.nav-tabs:last").find("#mapping-button").length;
-      $(".nav.nav-tabs:last").find("#mapping-button").remove();
-
-      setTimeout(function(){
-        console.log(options.selectedObject.library)
-        var existed = $(".nav.nav-tabs:last").find("#mapping-button").length;
-        $(".nav.nav-tabs:last").find("#mapping-button").remove();
-        if(options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
-          self.mongoNodeOption = options
-          $(".nav.nav-tabs:last").append($(`<li id="mapping-button" 
-          ng-class="{active: active, disabled: disabled}" 
-          class="ng-isolate-scope">
-          <div  click='loadTest')}" style="margin-top: 10px;cursor: pointer;" 
-          tab-heading-transclude="" class="ng-binding">
-              <tab-heading class="ng-scope">
-              <span class="ng-binding" style="color: #337ab7;">Mapping</span>
-            </tab-heading>
-          </div>  
-          </li> `))
-        }
-        $("#mapping-button").off("click").on("click", function(){
-          $rootScope.$broadcast('showMappingView');
-        })
-      },1000)
+      
+      if(options && options.selectedObject.library === "streamsets-datacollector-mongodb_3-lib"){
+        $scope.selectedStage = options.selectedObject;
+        // setTimeout(function(){
+        //   console.log('new mapping')
+        //   $("li:contains(Mapping)").off("click").on("click", function(){
+        //     $rootScope.$broadcast('showMappingView');
+        //   })
+        // },2000)
+      } 
+      
      
     });
-
-
-
+    
     $scope.$on('onPasteNode', function (event, stageInstance) {
       var stageLibraries = $scope.stageLibraries;
       var newStage = _.find(stageLibraries, function (stage) {

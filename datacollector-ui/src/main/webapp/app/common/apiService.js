@@ -834,7 +834,8 @@ angular.module('dataCollectorApp.common')
         skipLifecycleEvents,
         stageOutputList,
         endStage,
-        timeout
+        timeout,
+        mapping
       ) {
         var url;
 
@@ -847,7 +848,7 @@ angular.module('dataCollectorApp.common')
         }
 
         url = apiBase + '/pipeline/' + name + '/preview?batchSize=' + batchSize + '&rev=' + rev +
-            '&skipTargets=' + skipTargets + '&timeout=' + timeout + '&skipLifecycleEvents=' + skipLifecycleEvents;
+            '&skipTargets=' + skipTargets + '&timeout=' + timeout + '&skipLifecycleEvents=' + skipLifecycleEvents + "&mapping="+ (mapping|| false);
 
         if (endStage) {
           url += '&endStage=' + endStage;

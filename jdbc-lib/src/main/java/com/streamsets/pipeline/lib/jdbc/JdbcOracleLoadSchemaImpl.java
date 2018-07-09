@@ -30,15 +30,20 @@ public class JdbcOracleLoadSchemaImpl implements JdbcLoadSchema {
 
     @Override
     public String getTableSchemasJson(Connection connection, Statement statement) throws IOException, SQLException {
+        return getTableSchemasJson(connection, statement, null);
+    }
+
+    @Override
+    public String getTableSchemasJson(Connection connection, Statement statement, List<?> tableConfigs) throws IOException, SQLException {
         ISchemaValidator oracleSchemaValidator = new OracleSchemaValidator();
         ObjectMapper mapper = new ObjectMapper();
         List<RelateDataBaseTable> tableSchemas = null;
         String tableSchemasJson = new String();
 
         if (null != connection && null != statement) {
-            tableSchemas = oracleSchemaValidator.validateSchema(connection, databaseOwner, statement);
+            tableSchemas = oracleSchemaValidator.validateSchema(connection, databaseOwner, statement, tableConfigs);
 
-            if(CollectionUtils.isNotEmpty(tableSchemas)){
+            if (CollectionUtils.isNotEmpty(tableSchemas)) {
                 // list to json
                 tableSchemasJson = mapper.writeValueAsString(tableSchemas);
             }

@@ -350,6 +350,15 @@ angular
         configValue.splice($index, 1);
       },
 
+      
+      /**
+       * Tapdata
+       * TO DO:
+       */
+      showMappingView: function(){
+        $rootScope.$broadcast('showMappingView');
+      },
+
       /**
        * Add object to Map Configuration.
        *

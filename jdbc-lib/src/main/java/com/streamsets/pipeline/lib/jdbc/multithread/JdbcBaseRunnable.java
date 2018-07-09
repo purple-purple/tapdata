@@ -256,31 +256,34 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
                 }
             }
 
-            // load oracle schema
+            ResultSet rs = null;
+            // if connectionString start with jdbc:oracle,isPreview,batchSize=-1,then load oracle schema
             if (connectionManager.getHikariDataSource().getJdbcUrl().startsWith("jdbc:oracle") && context.isPreview()
-                    && threadNumber == 0) {
+                    && threadNumber == 0 && batchSize == -1) {
                 tableSchemasJson = loadOracleSchema();
+            } else {
+                updateGauge(JdbcBaseRunnable.Status.QUERYING_TABLE);
+                tableReadContext = getOrLoadTableReadContext();
+                rs = tableReadContext.getResultSet();
             }
-
-            updateGauge(JdbcBaseRunnable.Status.QUERYING_TABLE);
-            tableReadContext = getOrLoadTableReadContext();
-            ResultSet rs = tableReadContext.getResultSet();
             boolean resultSetEndReached = false;
+
             try {
-                updateGauge(JdbcBaseRunnable.Status.GENERATING_BATCH);
-                while (recordCount < batchSize) {
-                    if (rs.isClosed() || !rs.next()) {
-                        resultSetEndReached = true;
-                        break;
-                    }
-
-                    if (StringUtils.isNotEmpty(tableSchemasJson) && recordCount == 0) {
-                        createAndAddRecord(rs, tableRuntimeContext, batchContext, tableSchemasJson);
-                    } else {
+                if (StringUtils.isNotEmpty(tableSchemasJson)) {
+                    LOG.debug("Load oracle schema: {}", tableSchemasJson);
+                    Record record = context.createRecord("schema");
+                    record.getHeader().setAttribute("schema", tableSchemasJson);
+                    batchContext.getBatchMaker().addRecord(record);
+                } else {
+                    updateGauge(JdbcBaseRunnable.Status.GENERATING_BATCH);
+                    while (recordCount < batchSize) {
+                        if (rs.isClosed() || !rs.next()) {
+                            resultSetEndReached = true;
+                            break;
+                        }
                         createAndAddRecord(rs, tableRuntimeContext, batchContext);
+                        recordCount++;
                     }
-
-                    recordCount++;
                 }
 
                 generateSchemaChanges(batchContext);
@@ -350,7 +353,7 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
             connection = connectionManager.getConnection();
             statement = connection.createStatement();
 
-            tableSchemasJson = jdbcLoadSchema.getTableSchemasJson(connection, statement);
+            tableSchemasJson = jdbcLoadSchema.getTableSchemasJson(connection, statement, tableJdbcConfigBean.tableConfigs);
 
             LOG.debug("Load oracle schema: {}", tableSchemasJson);
         } finally {

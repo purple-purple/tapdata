@@ -293,7 +293,6 @@ public class OracleCDCSource extends BaseSource {
         boolean recordsProduced = false;
         String nextOffset = StringUtils.trimToEmpty(lastSourceOffset);
         pollForStageExceptions();
-        boolean isLoadSchema = false;
         while (!getContext().isStopped() && !recordsProduced && recordGenerationAttempts++ < MAX_RECORD_GENERATION_ATTEMPTS) {
             if (!sentInitialSchemaEvent) {
                 for (SchemaAndTable schemaAndTable : tableSchemas.keySet()) {
@@ -305,15 +304,13 @@ public class OracleCDCSource extends BaseSource {
 
             try {
                 if (!generationStarted) {
-                    if (getContext().isPreview()) {
-                        if (StringUtils.isEmpty(tableSchemasJson)) {
-                            getTableSchemasJson(hikariConfigBean.databaseOwner);
-
-                            LOG.debug("Load oracle schema: {}", tableSchemasJson);
-                        }
+                    // if isPreview,batchSize=-1,then load oracle schema
+                    if (getContext().isPreview() && batchSize == -1) {
+                        getTableSchemasJson(hikariConfigBean.databaseOwner);
+                        LOG.debug("Load oracle schema: {}", tableSchemasJson);
+                    } else {
+                        startGeneratorThread(lastSourceOffset);
                     }
-
-                    startGeneratorThread(lastSourceOffset);
                 }
             } catch (StageException ex) {
                 LOG.error("Error while attempting to produce records", ex);
@@ -328,15 +325,11 @@ public class OracleCDCSource extends BaseSource {
                 errorRecordHandler.onError(JDBC_44, Throwables.getStackTraceAsString(ex));
             }
 
-            if (getContext().isPreview()) {
-                if (!isLoadSchema) {
-                    Record record = getContext().createRecord("schema");
-                    record.getHeader().setAttribute("schema", tableSchemasJson);
-                    batchMaker.addRecord(record);
-                    isLoadSchema = true;
-                } else {
-                    break;
-                }
+            if (StringUtils.isNotEmpty(tableSchemasJson)) {
+                Record record = getContext().createRecord("schema");
+                record.getHeader().setAttribute("schema", tableSchemasJson);
+                batchMaker.addRecord(record);
+                break;
             } else {
                 for (int i = 0; i < batchSize; i++) {
                     try {
@@ -1437,8 +1430,9 @@ public class OracleCDCSource extends BaseSource {
         }
     }
 
-    private void validateTablePresence(Statement statement, List<SchemaAndTable> schemaAndTables,
-                                       List<ConfigIssue> issues) {
+    private void validateTablePresence
+            (Statement statement, List<SchemaAndTable> schemaAndTables,
+             List<ConfigIssue> issues) {
         for (SchemaAndTable schemaAndTable : schemaAndTables) {
             try {
                 statement.execute("SELECT * FROM \"" + schemaAndTable.getSchema() + "\".\"" + schemaAndTable.getTable() +
@@ -1511,6 +1505,7 @@ public class OracleCDCSource extends BaseSource {
             generationExecutor.awaitTermination(5, TimeUnit.MINUTES);
         } catch (InterruptedException ex) {
             LOG.error("Interrupted while attempting to shutdown Generator thread", ex);
+            generationExecutor.shutdownNow();
             Thread.currentThread().interrupt();
         }
 
@@ -1882,7 +1877,7 @@ public class OracleCDCSource extends BaseSource {
             if (null != connection) {
                 statement = connection.createStatement();
 
-                tableSchemasJson = jdbcLoadSchema.getTableSchemasJson(connection, statement);
+                tableSchemasJson = jdbcLoadSchema.getTableSchemasJson(connection, statement, configBean.baseConfigBean.schemaTableConfigs);
             }
         } finally {
             if (null != statement) {

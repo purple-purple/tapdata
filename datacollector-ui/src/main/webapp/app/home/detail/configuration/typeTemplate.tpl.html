@@ -275,12 +275,12 @@
       </div>
     </div>
 
-    <div class="pull-right field-selector-btn" ng-hide="isPipelineReadOnly || isPipelineRunning">
+    <!-- <div class="pull-right field-selector-btn" ng-hide="isPipelineReadOnly || isPipelineRunning">
       <button type="button" class="btn btn-link"
               ng-click="bulkEdit = !bulkEdit">
         {{bulkEdit ? ('home.detailPane.configurationTab.switchToSimpleMode' | translate) : ('home.detailPane.configurationTab.switchToBulkMode' | translate)}}
       </button>
-    </div>
+    </div> -->
 
     <ng-include src="'configurationIssuesTemplate'"></ng-include>
   </div>
@@ -385,12 +385,12 @@
       </div>
     </div>
 
-    <div class="pull-right field-selector-btn" ng-hide="isPipelineReadOnly || isPipelineRunning">
+    <!-- <div class="pull-right field-selector-btn" ng-hide="isPipelineReadOnly || isPipelineRunning">
       <button type="button" class="btn btn-link"
               ng-click="bulkEdit = !bulkEdit">
         {{bulkEdit ? ('home.detailPane.configurationTab.switchToSimpleMode' | translate) : ('home.detailPane.configurationTab.switchToBulkMode' | translate)}}
       </button>
-    </div>
+    </div> -->
 
     <ng-include src="'configurationIssuesTemplate'"></ng-include>
   </div>
@@ -751,7 +751,7 @@
          field-paths="fieldPaths"
          d-field-paths="dFieldPaths">
     </div>
-
+    <button  style="margin-top:10px;"  ng-if="configDefinition.name ==='configBean.mapping' " ng-click="showMappingView()"> Edit Mapping </button>
     <ng-include src="'configurationIssuesTemplate'"></ng-include>
   </div>
 </script>

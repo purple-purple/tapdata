@@ -52,98 +52,87 @@ angular.module('dataCollectorApp.common')
               rulesElMetadata = definitions.rulesElMetadata,
               elFunctionDefinitions = [],
               elConstantDefinitions = [];
-            
-            // for( var i = 0; i < definitions.stages.length; i++){
-            //   if( definitions.stages[i].library === 'streamsets-datacollector-jdbc-lib'){
-                
-            //     definitions.stages[i].configGroupDefinition.groupNameToLabelMapList.push({
-            //       "name" : "TAPDATA",
-            //       "label" : "NEW CONNECTION"
-            //     })
-            //     var newItems = [{
-            //       "fieldName" : "tapdata_connectionName",
-            //       "max" : 9223372036854775807,
-            //       "mode" : "text/plain",
-            //       "triggeredByValues" : null,
-            //       "description" : "",
-            //       "required" : true,
-            //       "min" : -9223372036854775808,
-            //       "label" : "Connection Name",
-            //       "elDefs" : null,
-            //       "elFunctionDefinitionsIdx" : [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54" ],
-            //       "elConstantDefinitionsIdx" : [ "55" ],
-            //       "group" : "TAPDATA",
-            //       "evaluation" : "IMPLICIT",
-            //       "dependsOnMap" : { },
-            //       "dependsOn" : "",
-            //       "model" : null,
-            //       "lines" : 0,
-            //       "displayPosition" : 10,
-            //       "name" : "hikariConfigBean.connectionString",
-            //       "type" : "STRING",
-            //       "defaultValue" : null
-            //     },{
-            //       "fieldName" : "tapdata_connectionType",
-            //       "max" : 9223372036854775807,
-            //       "mode" : "text/plain",
-            //       "triggeredByValues" : null,
-            //       "description" : "",
-            //       "required" : true,
-            //       "min" : -9223372036854775808,
-            //       "label" : "Connection Type",
-            //       "elDefs" : null,
-            //       "elFunctionDefinitionsIdx" : [ ],
-            //       "elConstantDefinitionsIdx" : [ ],
-            //       "group" : "TAPDATA",
-            //       "evaluation" : "IMPLICIT",
-            //       "dependsOnMap" : { },
-            //       "dependsOn" : "",
-            //       "model" : {
-            //         "labels" : [ "Source", "Target", "Source and target" ],
-            //         "values" : [ "source", "target", "source_and_target" ],
-            //         "configDefinitions" : null,
-            //         "valuesProviderClass" : "com.streamsets.datacollector.config.tapdata_connection_type",
-            //         "filteringConfig" : "",
-            //         "modelType" : "VALUE_CHOOSER"
-            //       },
-            //       "lines" : 0,
-            //       "displayPosition" : 20,
-            //       "name" : "tapdata_connection_type",
-            //       "type" : "MODEL",
-            //       "defaultValue" : "source_and_target"
-            //     },{
-            //       "fieldName" : "tapdata_ssl",
-            //       "max" : 9223372036854775807,
-            //       "mode" : "text/plain",
-            //       "triggeredByValues" : null,
-            //       "description" : "Use ssl connection",
-            //       "required" : true,
-            //       "min" : -9223372036854775808,
-            //       "label" : "SSL",
-            //       "elDefs" : null,
-            //       "elFunctionDefinitionsIdx" : [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54" ],
-            //       "elConstantDefinitionsIdx" : [ "55" ],
-            //       "group" : "TAPDATA",
-            //       "evaluation" : "IMPLICIT",
-            //       "dependsOnMap" : { },
-            //       "dependsOn" : "",
-            //       "model" : null,
-            //       "lines" : 0,
-            //       "displayPosition" : 70,
-            //       "name" : "commonConf.useAuth",
-            //       "type" : "BOOLEAN",
-            //       "defaultValue" : false
-            //     }];
-            //     newItems.forEach((t)=> definitions.stages[i].configDefinitions.push( t ))
-                
-            //   }
-            // }
-            //Definitions
+
             self.pipelineConfigDefinition = definitions.pipeline[0];
             self.pipelineRulesConfigDefinition = definitions.pipelineRules[0];
             self.stageDefinitions = definitions.stages;
             self.serviceDefinitions = definitions.services;
             self.elCatalog = definitions.elCatalog;
+
+            // tapdata todo:
+            self.pipelineConfigDefinition.configGroupDefinition.groupNameToLabelMapList= [ {
+              "name" : "NOTIFICATIONS",
+              "label" : "Notifications"
+            }, {
+              "name" : "BAD_RECORDS",
+              "label" : "Error Records"
+            }, {
+              "name" : "STATS",
+              "label" : "Statistics"
+            } ]
+          
+            // for(var pi = 0; pi < self.pipelineConfigDefinition.configDefinitions.length; pi++){
+            //   if( filter.indexOf(self.pipelineConfigDefinition.configDefinitions[pi].label) >= 0){
+            //     delete self.pipelineConfigDefinition.configDefinitions[pi];
+            //   }
+            // }
+            deleteConfigDefinition = function (stage, filter){
+              var newList = [];
+              for(var pi = 0; pi <stage.configDefinitions.length; pi++){
+                if( filter.indexOf(stage.configDefinitions[pi].label) < 0){
+                  newList.push(stage.configDefinitions[pi])
+                }
+              }
+              stage.configDefinitions =  newList;
+            }
+            deleteGroupConfig = function (stag, filter){
+              var newList = []
+              for(var pi = 0; pi < stag.configGroupDefinition.groupNameToLabelMapList.length; pi++){
+                if(filter.indexOf(stag.configGroupDefinition.groupNameToLabelMapList[pi].label) < 0){
+                  newList.push(stag.configGroupDefinition.groupNameToLabelMapList[pi])
+                }
+              }
+              stag.configGroupDefinition.groupNameToLabelMapList= newList;
+            }
+            var filter = [
+              'Delivery Guarantee', 
+              'Start Event',
+              'Stop Event',
+              'Retry Pipeline on Error',
+              'Retry Attempts',
+              'Max Pipeline Memory (MB)',
+              'On Memory Exceeded',
+              'Rate Limit (records / sec)',
+              'Max runners',
+              'Create Failure Snapshot'
+            ]
+            deleteConfigDefinition(self.pipelineConfigDefinition, filter)
+            
+            for(var pi = 0; pi < self.stageDefinitions.length; pi++){
+              if(self.stageDefinitions[pi].label === 'MongoDB' ){
+                filter=['Preconditions', 'Unique Key Field','Upsert']
+                deleteConfigDefinition(self.stageDefinitions[pi], filter)
+              }
+              if(self.stageDefinitions[pi].label === 'JDBC Multitable Consumer' ){
+                filter=['Preconditions', 'Unique Key Field','Upsert','Produce Events']
+                deleteConfigDefinition(self.stageDefinitions[pi], filter)
+                deleteGroupConfig(self.stageDefinitions[pi], ['Legacy Drivers'])
+                delete self.stageDefinitions[pi].producingEvents
+              }
+              if(self.stageDefinitions[pi].label === 'Oracle CDC Client' ){
+                filter=['Preconditions', 'Unique Key Field','Upsert','Produce Events']
+                deleteConfigDefinition(self.stageDefinitions[pi], filter)
+                deleteGroupConfig(self.stageDefinitions[pi], ['Legacy'])
+                delete self.stageDefinitions[pi].producingEvents
+
+              }
+              if(self.stageDefinitions[pi].label === 'JDBC Query Consumer' ){
+                filter=['Preconditions', 'Unique Key Field','Upsert','Produce Events']
+                deleteConfigDefinition(self.stageDefinitions[pi], filter)
+                deleteGroupConfig(self.stageDefinitions[pi], ['Change Data Capture','Legacy Drivers'])
+                delete self.stageDefinitions[pi].producingEvents
+              }
+            }
 
             //General Rules
             angular.forEach(rulesElMetadata.general.elFunctionDefinitions, function(idx) {

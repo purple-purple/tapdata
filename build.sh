@@ -13,12 +13,11 @@ DOWNLOAD_SDC="${DOWNLOAD_SDC:-false}"
 # Get git tag build version
 GIT_TAG_VERSION=`git describe --long HEAD`
 if [ $GIT_TAG_VERSION="fatel"* ];then
-    echo Cannot find a tag version
-    exit 1
+    TAP_DATA_VERSION=tapdata-beta
 else
     TAP_DATA_VERSION=tapdata-"${GIT_TAG_VERSION}"
-    export TAP_DATA_VERSION
 fi
+export TAP_DATA_VERSION
 
 TAPDATA_FINAL_NAME=tapdata
 

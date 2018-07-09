@@ -100,9 +100,9 @@ public class MongoDBTarget extends BaseTarget {
 
         if (StringUtils.isNotBlank(mongoTargetConfigBean.mapping)) {
             Document mapConfig = Document.parse(mongoTargetConfigBean.mapping);
-            String mappngs = mapConfig.getString("mappngs");
+            String mappings = mapConfig.getString("mappings");
 
-            StringBuilder sb = new StringBuilder("{\"mappings\":").append(mappngs).append("}");
+            StringBuilder sb = new StringBuilder("{\"mappings\":").append(mappings).append("}");
             Document doc = Document.parse(sb.toString());
             createMongoIndexes((List<Document>) doc.get("mappings"));
         }
@@ -241,41 +241,37 @@ public class MongoDBTarget extends BaseTarget {
         return uniqueKeyField;
     }
 
-  private void createMongoIndexes(List<Document> mappings) {
-
-    for (Document mapping : mappings) {
-      String toTable = mapping.getString("to_table");
-      String relationship = mapping.getString("relationship");
-      if (!"OneOne".equals(relationship)) {
-        List<Document>  matchConditions = (List<Document>) mapping.get("match_condition");
-        if (CollectionUtils.isNotEmpty(matchConditions)) {
-          createIndexes(toTable, matchConditions);
+    private void createMongoIndexes(List<Document> mappings) {
+        for (Document mapping : mappings) {
+            String toTable = mapping.getString("to_table");
+            String relationship = mapping.getString("relationship");
+            if (!"OneOne".equals(relationship)) {
+                List<Document> matchConditions = (List<Document>) mapping.get("match_condition");
+                if (CollectionUtils.isNotEmpty(matchConditions)) {
+                    createIndexes(toTable, matchConditions);
+                }
+            } else {
+                List<Document> joinCondition = (List<Document>) mapping.get("join_condition");
+                if (CollectionUtils.isNotEmpty(joinCondition)) {
+                    createIndexes(toTable, joinCondition);
+                }
+            }
         }
-      } else {
-        List<Document>  joinCondition = (List<Document>) mapping.get("joib_condition");
-        if (CollectionUtils.isNotEmpty(joinCondition)) {
-          createIndexes(toTable, joinCondition);
+    }
+
+    private void createIndexes(String toTable, List<Document> condition) {
+        List<String> fieldNames = new ArrayList<>();
+        for (Document map : condition) {
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                fieldNames.add(entry.getKey());
+            }
         }
-      }
-
+        if (CollectionUtils.isNotEmpty(fieldNames)) {
+            List<IndexModel> indexModels = new ArrayList<>();
+            IndexModel model = new IndexModel(Indexes.ascending(fieldNames));
+            model.getOptions().name(UUID.randomUUID().toString());
+            indexModels.add(model);
+            mongoTargetConfigBean.mongoConfig.getMongoDatabase().getCollection(toTable).createIndexes(indexModels);
+        }
     }
-  }
-
-  private void createIndexes( String toTable, List<Document>  condition) {
-    List<String> fieldNames = new ArrayList<>();
-    for (Document map : condition) {
-      for (Map.Entry<String, Object> entry : map.entrySet()) {
-        fieldNames.add(entry.getKey());
-      }
-    }
-    if (CollectionUtils.isNotEmpty(fieldNames)) {
-      List<IndexModel> indexModels =new ArrayList<>();
-      IndexModel model = new IndexModel(Indexes.ascending(fieldNames));
-      model.getOptions().name(UUID.randomUUID().toString());
-      indexModels.add(model);
-      mongoTargetConfigBean.mongoConfig.getMongoDatabase().getCollection(toTable).createIndexes(indexModels);
-
-    }
-
-  }
 }

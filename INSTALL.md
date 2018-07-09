@@ -26,7 +26,7 @@
     ```
         vi etc/sdc.properties
     ```
-    Edit http.port(default port:18630),then restart tapdata
+    Modify http.port(default port:18630),then restart tapdata
     ```
         ./bin/tapdata rs
     ```

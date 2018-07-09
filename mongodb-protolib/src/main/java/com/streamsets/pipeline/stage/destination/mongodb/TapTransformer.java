@@ -336,7 +336,11 @@ public class TapTransformer {
             case "DELETE":
                 // Update delete = new Update().pull(targetPath, value);
                 // processResult.setUpdate(delete);
-                writeModel = new DeleteOneModel<>(criteria);
+                if (StringUtils.isBlank(targetPath)) {
+                    writeModel = new DeleteOneModel<>(criteria);
+                } else {
+                    writeModel = new UpdateManyModel(criteria, new Document("$unset", targetPath));
+                }
                 break;
             case "UPDATE":
             case "INSERT":

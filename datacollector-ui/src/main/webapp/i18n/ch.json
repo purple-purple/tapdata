@@ -2239,8 +2239,8 @@
       "system:runningPipelines": "运行中任务",
       "system:localPipelines": "本地任务",
       "system:nonRunningPipelines": "已停止任务",
-      "system:invalidPipelines": "无效任务",
-      "system:errorPipelines": "错误任务",
+      "system:invalidPipelines": "编译失败任务",
+      "system:errorPipelines": "运行失败任务",
       "system:sharedWithMePipelines": "与我共享任务"
 		},
 		"noPipelines": "找不到任务",

@@ -751,7 +751,7 @@
          field-paths="fieldPaths"
          d-field-paths="dFieldPaths">
     </div>
-
+    <button  style="margin-top:10px;"  ng-if="configDefinition.name ==='configBean.mapping' " ng-click="showMappingView()"> Edit Mapping </button>
     <ng-include src="'configurationIssuesTemplate'"></ng-include>
   </div>
 </script>

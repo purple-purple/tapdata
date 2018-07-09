@@ -19,7 +19,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.WriteModel;
@@ -37,14 +36,11 @@ import com.streamsets.pipeline.lib.generator.DataGeneratorFactoryBuilder;
 import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.ErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.mongodb.Errors;
-import com.streamsets.pipeline.stage.common.mongodb.Groups;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
-import org.mortbay.util.StringUtil;
-import org.mortbay.util.ajax.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +48,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-
-import static com.sun.tools.doclint.Entity.nu;
 
 public class MongoDBTarget extends BaseTarget {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBTarget.class);
@@ -103,18 +97,17 @@ public class MongoDBTarget extends BaseTarget {
         generatorFactory = builder.build();
 //    getContext().getPipelineConstants()
         transformer = new TapTransformer(mongoTargetConfigBean, issues, getContext());
+
+        if (StringUtils.isNotBlank(mongoTargetConfigBean.mapping)) {
+            Document mapConfig = Document.parse(mongoTargetConfigBean.mapping);
+            String mappngs = mapConfig.getString("mappngs");
+
+            StringBuilder sb = new StringBuilder("{\"mappings\":").append(mappngs).append("}");
+            Document doc = Document.parse(sb.toString());
+            createMongoIndexes((List<Document>) doc.get("mappings"));
+        }
         return issues;
-
-    if (StringUtils.isNotBlank(mongoTargetConfigBean.mapping)) {
-      Document mapConfig = Document.parse(mongoTargetConfigBean.mapping);
-      String mappngs = mapConfig.getString("mappngs");
-
-      StringBuilder sb = new StringBuilder("{\"mappings\":").append(mappngs).append("}");
-      Document doc = Document.parse(sb.toString());
-      createMongoIndexes((List<Document>) doc.get("mappings"));
     }
-    return issues;
-  }
 
     @Override
     public void destroy() {

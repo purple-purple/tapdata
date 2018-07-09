@@ -16,7 +16,7 @@ if [ "$BETA" == "true" ];then
     TAP_DATA_VERSION=tapdata-beta
 else
     GIT_TAG_VERSION=`git describe --long HEAD`
-    if [ !-z "${GIT_TAG_VERSION}" ];
+    if [ ! -z "${GIT_TAG_VERSION}" ];
     then
         TAP_DATA_VERSION=tapdata-"${GIT_TAG_VERSION}"
     else

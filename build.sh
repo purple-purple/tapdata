@@ -12,9 +12,12 @@ DOWNLOAD_SDC="${DOWNLOAD_SDC:-false}"
 
 # Get git tag build version
 GIT_TAG=`git tag`
-if [ -z "$GIT_TAG" || "$DEV_MODE" == "true" ];then
+echo DEV_MODE:"${DEV_MODE}"
+if [ -z "$GIT_TAG" -o "$DEV_MODE" == "true" ];then
+echo beta
     TAP_DATA_VERSION=tapdata-beta
 else
+echo tag
     GIT_TAG_VERSION=`git describe --long HEAD`
     TAP_DATA_VERSION=tapdata-"${GIT_TAG_VERSION}"
 fi

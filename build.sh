@@ -12,13 +12,17 @@ DOWNLOAD_SDC="${DOWNLOAD_SDC:-false}"
 BETA="${BETA:-false}"
 
 # Get git tag build version
-GIT_TAG=`git tag`
-echo DEV_MODE:"${DEV_MODE}"
-if [ -z "$GIT_TAG" -o "$BETA" == "true" ];then
+if [ "$BETA" == "true" ];then
     TAP_DATA_VERSION=tapdata-beta
 else
     GIT_TAG_VERSION=`git describe --long HEAD`
-    TAP_DATA_VERSION=tapdata-"${GIT_TAG_VERSION}"
+    if [ -z "${GIT_TAG_VERSION}" ];
+    then
+        TAP_DATA_VERSION=tapdata-"${GIT_TAG_VERSION}"
+    else
+        echo "Cannot find tag version"
+        exit 1
+    fi
 fi
 echo TAP_DATA_VERSION:${TAP_DATA_VERSION}
 export TAP_DATA_VERSION

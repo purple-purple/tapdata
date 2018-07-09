@@ -6,9 +6,9 @@ To build the TapData you will need the following software :
 - JDK 8+
 - Maven 3.3.9+
 - Node 0.10.32+1 ([nodejs.org](https://nodejs.org/en/))
- - npm
- - bower 1.8.2+
- - grunt-cli
+    - npm
+    - bower 1.8.2+
+    - grunt-cli
 
 ## Prerequisite Tasks for Building Data Collector
 

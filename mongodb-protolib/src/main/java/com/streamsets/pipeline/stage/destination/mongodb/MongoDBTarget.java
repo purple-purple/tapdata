@@ -262,9 +262,7 @@ public class MongoDBTarget extends BaseTarget {
     private void createIndexes(String toTable, List<Document> condition) {
         List<String> fieldNames = new ArrayList<>();
         for (Document map : condition) {
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                fieldNames.add(entry.getKey());
-            }
+            fieldNames.add(map.getString("target"));
         }
         if (CollectionUtils.isNotEmpty(fieldNames)) {
             List<IndexModel> indexModels = new ArrayList<>();

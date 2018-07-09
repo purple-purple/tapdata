@@ -19,6 +19,9 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexModel;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.WriteModel;
 import com.streamsets.pipeline.api.Batch;
 import com.streamsets.pipeline.api.Record;
@@ -37,7 +40,10 @@ import com.streamsets.pipeline.stage.common.mongodb.Errors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
+import org.mortbay.util.StringUtil;
+import org.mortbay.util.ajax.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +51,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static com.sun.tools.doclint.Entity.nu;
 
 public class MongoDBTarget extends BaseTarget {
   private static final Logger LOG = LoggerFactory.getLogger(MongoDBTarget.class);
@@ -81,7 +89,7 @@ public class MongoDBTarget extends BaseTarget {
     }
 
     // since no issue was found in validation, the followings must not be null at this point.
-    Utils.checkNotNull(mongoTargetConfigBean.mongoConfig.getMongoDatabase(), "MongoDatabase");
+    MongoDatabase mongoDatabase = Utils.checkNotNull(mongoTargetConfigBean.mongoConfig.getMongoDatabase(), "MongoDatabase");
     mongoClient = Utils.checkNotNull(mongoTargetConfigBean.mongoConfig.getMongoClient(), "MongoClient");
     mongoCollection = Utils.checkNotNull(mongoTargetConfigBean.mongoConfig.getMongoCollection(), "MongoCollection");
 
@@ -94,6 +102,15 @@ public class MongoDBTarget extends BaseTarget {
     generatorFactory = builder.build();
 //    getContext().getPipelineConstants()
     transformer = new TapTransformer(mongoTargetConfigBean);
+
+    if (StringUtils.isNotBlank(mongoTargetConfigBean.mapping)) {
+      Document mapConfig = Document.parse(mongoTargetConfigBean.mapping);
+      String mappngs = mapConfig.getString("mappngs");
+
+      StringBuilder sb = new StringBuilder("{\"mappings\":").append(mappngs).append("}");
+      Document doc = Document.parse(sb.toString());
+      createMongoIndexes((List<Document>) doc.get("mappings"));
+    }
     return issues;
   }
 
@@ -227,5 +244,43 @@ public class MongoDBTarget extends BaseTarget {
       return uniqueKeyField.substring(1);
     }
     return uniqueKeyField;
+  }
+
+  private void createMongoIndexes(List<Document> mappings) {
+
+    for (Document mapping : mappings) {
+      String toTable = mapping.getString("to_table");
+      String relationship = mapping.getString("relationship");
+      if (!"OneOne".equals(relationship)) {
+        List<Document>  matchConditions = (List<Document>) mapping.get("match_condition");
+        if (CollectionUtils.isNotEmpty(matchConditions)) {
+          createIndexes(toTable, matchConditions);
+        }
+      } else {
+        List<Document>  joinCondition = (List<Document>) mapping.get("joib_condition");
+        if (CollectionUtils.isNotEmpty(joinCondition)) {
+          createIndexes(toTable, joinCondition);
+        }
+      }
+
+    }
+  }
+
+  private void createIndexes( String toTable, List<Document>  condition) {
+    List<String> fieldNames = new ArrayList<>();
+    for (Document map : condition) {
+      for (Map.Entry<String, Object> entry : map.entrySet()) {
+        fieldNames.add(entry.getKey());
+      }
+    }
+    if (CollectionUtils.isNotEmpty(fieldNames)) {
+      List<IndexModel> indexModels =new ArrayList<>();
+      IndexModel model = new IndexModel(Indexes.ascending(fieldNames));
+      model.getOptions().name(UUID.randomUUID().toString());
+      indexModels.add(model);
+      mongoTargetConfigBean.mongoConfig.getMongoDatabase().getCollection(toTable).createIndexes(indexModels);
+
+    }
+
   }
 }

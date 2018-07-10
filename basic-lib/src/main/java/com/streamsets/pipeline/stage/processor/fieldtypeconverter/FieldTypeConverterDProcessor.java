@@ -28,14 +28,14 @@ import com.streamsets.pipeline.configurablestage.DProcessor;
 import java.util.ArrayList;
 import java.util.List;
 
-@StageDef(
+/*@StageDef(
     version = 2,
     label = "Field Type Converter",
     description = "Converts the data type of a field(s)",
     icon = "converter.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/FieldTypeConverter.html#task_g23_2tq_wq",
     upgrader = FieldTypeConverterProcessorUpgrader.class
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class FieldTypeConverterDProcessor extends DProcessor {

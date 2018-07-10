@@ -25,7 +25,7 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DPushSource;
 import com.streamsets.pipeline.lib.websocket.Groups;
 
-@StageDef(
+/*@StageDef(
     version = 2,
     label = "WebSocket Client",
     description = "Uses a WebSocket client to read from a resource URL",
@@ -34,7 +34,7 @@ import com.streamsets.pipeline.lib.websocket.Groups;
     recordsByRef = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/WebSocketClient.html#task_u4n_rzk_fbb",
     upgrader = WebSocketClientSourceUpgrader.class
-)
+)*/
 @HideConfigs({
     "conf.dataFormatConfig.jsonContent",
     "conf.tlsConfig.keyStoreFilePath",

@@ -29,13 +29,13 @@ import com.streamsets.pipeline.configurablestage.DProcessor;
 
 import java.util.List;
 
-@StageDef(
+/*@StageDef(
     version=1,
     label="Field Merger",
     description = "Merge fields of like types",
     icon="merge.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/FieldMerger.html#task_ghx_5vl_gt"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class FieldMergerDProcessor extends DProcessor {

@@ -27,14 +27,14 @@ import com.streamsets.pipeline.api.impl.Utils;
 import java.util.Iterator;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "To Event",
     description = "It echoes root field from records as a body of an event. For development purpose only.",
     icon="dev.png",
     producesEvents = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Pipeline_Design/DevStages.html"
-)
+)*/
 public class ToEventTarget extends BaseTarget {
   @Override
   public void write(Batch batch) throws StageException {

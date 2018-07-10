@@ -30,13 +30,13 @@ import com.streamsets.pipeline.lib.parser.log.RegExConfig;
 
 import java.util.List;
 
-@StageDef(
+/*@StageDef(
     version=1,
     label="Log Parser",
     description = "Parses a string field which contains a Log line",
     icon="logparser.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/LogParser.html#task_jm1_b4w_fs"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class LogParserDProcessor extends DProcessor {

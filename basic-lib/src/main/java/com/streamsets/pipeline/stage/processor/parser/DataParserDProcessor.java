@@ -25,7 +25,7 @@ import com.streamsets.pipeline.api.service.ServiceDependency;
 import com.streamsets.pipeline.api.service.dataformats.DataFormatParserService;
 import com.streamsets.pipeline.configurablestage.DProcessor;
 
-@StageDef(
+/*@StageDef(
     version=2,
     label="Data Parser",
     description = "Parses a field with data",
@@ -39,7 +39,7 @@ import com.streamsets.pipeline.configurablestage.DProcessor;
     ),
     upgrader = DataParserUpgrader.class,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/DataParser.html#task_cx3_2yk_r1b"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class DataParserDProcessor extends DProcessor {

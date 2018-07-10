@@ -23,7 +23,7 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.api.Target;
 import com.streamsets.pipeline.config.DataFormat;
 
-@StageDef(
+/*@StageDef(
     version = 2,
     label = "Write to MQTT",
     description = "Writes error records to MQTT broker",
@@ -37,7 +37,7 @@ import com.streamsets.pipeline.config.DataFormat;
     },
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Pipeline_Configuration/ErrorHandling.html#concept_kgc_l4y_5r",
     upgrader = MqttClientTargetUpgrader.class
-)
+)*/
 @HideConfigs(
     preconditions = true,
     onErrorRecord = true,

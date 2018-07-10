@@ -29,7 +29,7 @@ import com.streamsets.pipeline.lib.el.TimeNowEL;
 import java.util.List;
 import java.util.Map;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Stream Selector",
     description = "Passes records to streams based on conditions",
@@ -44,7 +44,7 @@ import java.util.Map;
         ExecutionMode.CLUSTER_MESOS_STREAMING,
         ExecutionMode.EDGE
     }
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class SelectorDProcessor extends DProcessor {

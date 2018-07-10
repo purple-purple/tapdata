@@ -51,6 +51,7 @@ public final class TableConfigBean {
       type = ConfigDef.Type.STRING,
       label = "Schema",
       description = "Schema Name",
+      defaultValue = "%",
       displayPosition = 20,
       group = "TABLE"
   )

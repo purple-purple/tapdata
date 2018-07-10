@@ -23,7 +23,7 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.api.Target;
 import com.streamsets.pipeline.configurablestage.DTarget;
 
-@StageDef(
+/*@StageDef(
   // We're reusing upgrader for both ToErrorSdcIpcDTarget and SdcIpcDTarget, make sure that you
   // upgrade both versions at the same time when changing.
     version = 2,
@@ -32,7 +32,7 @@ import com.streamsets.pipeline.configurablestage.DTarget;
     icon="sdcipc.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Destinations/SDC_RPCdest.html#task_nbl_r2x_dt",
     upgrader = SdcIpcTargetUpgrader.class
-)
+)*/
 @ConfigGroups(Groups.class)
 @HideConfigs({
     "config.tlsConfigBean.keyStoreFilePath",

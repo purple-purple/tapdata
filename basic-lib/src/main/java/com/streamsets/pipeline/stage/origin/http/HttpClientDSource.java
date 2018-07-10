@@ -24,7 +24,7 @@ import com.streamsets.pipeline.api.Source;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DSource;
 
-@StageDef(
+/*@StageDef(
     version = 14,
     label = "HTTP Client",
     description = "Uses an HTTP client to read records from an URL.",
@@ -34,7 +34,7 @@ import com.streamsets.pipeline.configurablestage.DSource;
     recordsByRef = true,
     upgrader = HttpClientSourceUpgrader.class,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/HTTPClient.html#task_akl_rkz_5r"
-)
+)*/
 @HideConfigs(value = {
     "conf.client.numThreads"
 })

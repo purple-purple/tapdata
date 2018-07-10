@@ -57,7 +57,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
   version = 5,
   label="Dev Data Generator",
   description = "Generates records with the specified field names based on the selected data type. For development only.",
@@ -66,7 +66,7 @@ import java.util.concurrent.Future;
   producesEvents = true,
   upgrader = RandomDataGeneratorSourceUpgrader.class,
   onlineHelpRefUrl ="index.html#datacollector/UserGuide/Pipeline_Design/DevStages.html"
-)
+)*/
 public class RandomDataGeneratorSource extends BasePushSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(RandomDataGeneratorSource.class);

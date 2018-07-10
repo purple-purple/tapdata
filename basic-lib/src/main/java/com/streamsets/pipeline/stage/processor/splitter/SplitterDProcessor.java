@@ -28,14 +28,14 @@ import com.streamsets.pipeline.configurablestage.DProcessor;
 
 import java.util.List;
 
-@StageDef(
+/*@StageDef(
     version=2,
     label="Field Splitter",
     description = "Splits a string field based on a separator character",
     icon="splitter.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/FieldSplitter.html#task_av1_5g3_yq",
     upgrader = SplitterProcessorUpgrader.class
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class SplitterDProcessor extends DProcessor {

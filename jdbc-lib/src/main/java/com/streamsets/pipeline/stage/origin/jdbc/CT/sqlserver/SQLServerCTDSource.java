@@ -27,7 +27,7 @@ import com.streamsets.pipeline.stage.origin.jdbc.CommonSourceConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.QuoteChar;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
 
-@StageDef(
+/*@StageDef(
     version = 2,
     label = "SQL Server Change Tracking Client",
     description = "Origin that an read change events from an SQL Server Database",
@@ -36,7 +36,7 @@ import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
     producesEvents = true,
     upgrader = SQLServerCTSourceUpgrader.class,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/SQLServerChange.html#task_vsh_22s_r1b"
-)
+)*/
 @GenerateResourceBundle
 @ConfigGroups(Groups.class)
 @HideConfigs({

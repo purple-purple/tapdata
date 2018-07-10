@@ -35,14 +35,14 @@ import java.util.Map;
 import java.util.Random;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
   version = 1,
   label = "Dev Random Record Source",
   description = "Generates records with the specified field names, using Long data. For development only.",
   execution = {ExecutionMode.STANDALONE, ExecutionMode.EDGE},
   icon = "dev.png",
   onlineHelpRefUrl ="index.html#datacollector/UserGuide/Pipeline_Design/DevStages.html"
-)
+)*/
 public class RandomSource extends BaseSource {
   private static final Logger LOG = LoggerFactory.getLogger(RandomSource.class);
   @ConfigDef(required = true, type = ConfigDef.Type.STRING,

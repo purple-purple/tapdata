@@ -23,7 +23,7 @@ import com.streamsets.pipeline.api.Source;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.stage.origin.mongodb.MongoDBDSource;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "MongoDB Oplog",
     description = "Reads OpLog records from MongoDB",
@@ -33,7 +33,7 @@ import com.streamsets.pipeline.stage.origin.mongodb.MongoDBDSource;
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/MongoDBOplog.html#task_qj5_drw_4y",
     upgrader = MongoDBOplogSourceUpgrader.class,
     resetOffset = true
-)
+)*/
 @GenerateResourceBundle
 @HideConfigs(
     {

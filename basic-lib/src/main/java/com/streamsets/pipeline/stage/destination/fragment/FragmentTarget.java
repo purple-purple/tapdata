@@ -25,7 +25,7 @@ import com.streamsets.pipeline.api.StageException;
 import com.streamsets.pipeline.api.base.BaseTarget;
 import com.streamsets.pipeline.lib.fragment.FragmentConfigBean;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Fragment Destination",
     icon="fragment.png",
@@ -37,7 +37,7 @@ import com.streamsets.pipeline.lib.fragment.FragmentConfigBean;
         ExecutionMode.EDGE
     },
     onlineHelpRefUrl =""
-)
+)*/
 @HideConfigs(preconditions = true, onErrorRecord = true)
 @GenerateResourceBundle
 public class FragmentTarget extends BaseTarget {

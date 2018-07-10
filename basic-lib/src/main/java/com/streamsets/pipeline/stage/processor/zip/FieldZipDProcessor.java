@@ -22,14 +22,14 @@ import com.streamsets.pipeline.api.Processor;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DProcessor;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Field Zip",
     description = "Zips two lists together into one.",
     icon = "zipper.png",
     upgrader = FieldZipProcessorUpgrader.class,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/FieldZip.html#task_nqj_51k_yx"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class FieldZipDProcessor extends DProcessor {

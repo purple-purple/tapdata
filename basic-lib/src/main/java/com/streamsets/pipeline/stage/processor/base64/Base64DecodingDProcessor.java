@@ -23,13 +23,13 @@ import com.streamsets.pipeline.api.Processor;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DProcessor;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Base64 Field Decoder",
     icon = "base64decoder.png",
     description = "Decodes a Base64 encoded Byte Array field",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/Base64Decoder.html#task_pnn_5py_kv"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class Base64DecodingDProcessor extends DProcessor {

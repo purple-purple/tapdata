@@ -24,13 +24,13 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DProcessor;
 import com.streamsets.pipeline.stage.destination.jdbc.Groups;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Postgres Metadata",
     description = "Create/alter tables in Postgres to match record structure",
     icon = "rdbms.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/JDBCMetadata.html#task_lpv_zsh_qcb"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 @HideConfigs(value = {

@@ -9,7 +9,22 @@ SKIP_BUILD_LIB="${SKIP_BUILD_LIB:-false}"
 SKIP_RUN_SDC=${SKIP_RUN_SDC:-true}
 DEV_MODE="${DEV_MODE:-false}"
 DOWNLOAD_SDC="${DOWNLOAD_SDC:-false}"
-TAP_DATA_VERSION=tapdata-1.0.0
+BETA="${BETA:-false}"
+
+# Get git tag build version
+if [ "$BETA" == "true" ];then
+    TAP_DATA_VERSION=tapdata-beta
+else
+    GIT_TAG_VERSION=`git describe --long HEAD`
+    if [ ! -z "${GIT_TAG_VERSION}" ];
+    then
+        TAP_DATA_VERSION=tapdata-"${GIT_TAG_VERSION}"
+    else
+        echo "Cannot find tag version"
+        exit 1
+    fi
+fi
+echo TAP_DATA_VERSION:${TAP_DATA_VERSION}
 export TAP_DATA_VERSION
 
 TAPDATA_FINAL_NAME=tapdata

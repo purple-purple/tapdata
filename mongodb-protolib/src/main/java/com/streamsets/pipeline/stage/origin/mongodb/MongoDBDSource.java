@@ -24,7 +24,7 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DSource;
 import com.streamsets.pipeline.stage.common.mongodb.Groups;
 
-@StageDef(
+/*@StageDef(
     version = 3,
     label = "MongoDB",
     description = "Reads records from a MongoDB collection",
@@ -35,7 +35,7 @@ import com.streamsets.pipeline.stage.common.mongodb.Groups;
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/MongoDB.html#task_mdf_2rs_ns",
     upgrader = MongoDBSourceUpgrader.class,
     resetOffset = true
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class MongoDBDSource extends DSource {

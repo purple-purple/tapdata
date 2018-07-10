@@ -26,14 +26,14 @@ import com.streamsets.pipeline.config.OnStagePreConditionFailure;
 import com.streamsets.pipeline.config.OnStagePreConditionFailureChooserValues;
 import com.streamsets.pipeline.configurablestage.DProcessor;
 
-@StageDef(
+/*@StageDef(
     version=2,
     label="Field Pivoter",
     description = "Produce new records for each element of a list or map field",
     icon="pivoter.png",
     upgrader = ListPivotProcessorUpgrader.class,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/ListPivoter.html#task_dn1_k13_qw"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class ListPivotDProcessor extends DProcessor {

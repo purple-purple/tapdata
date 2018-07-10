@@ -21,7 +21,7 @@ import com.streamsets.pipeline.api.HideConfigs;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.api.StatsAggregatorStage;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Write to Control Hub directly",
     description = "Writes pipeline statistics to Control Hub directly without any aggregation",
@@ -31,7 +31,7 @@ import com.streamsets.pipeline.api.StatsAggregatorStage;
         ExecutionMode.EDGE
     },
     onlineHelpRefUrl = ""
-)
+)*/
 @HideConfigs(preconditions = true, onErrorRecord = true)
 @StatsAggregatorStage
 @GenerateResourceBundle

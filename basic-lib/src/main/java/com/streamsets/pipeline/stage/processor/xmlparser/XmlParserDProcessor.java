@@ -22,13 +22,13 @@ import com.streamsets.pipeline.api.Processor;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DProcessor;
 
-@StageDef(
+/*@StageDef(
     version=1,
     label="XML Parser",
     description = "Parses a string field with XML data",
     icon="xmlparser.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/XMLParser.html#task_txd_55q_k5"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class XmlParserDProcessor extends DProcessor {

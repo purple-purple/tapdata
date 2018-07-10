@@ -24,13 +24,13 @@ import com.streamsets.pipeline.configurablestage.DProcessor;
 import com.streamsets.pipeline.stage.processor.fieldorder.config.Groups;
 import com.streamsets.pipeline.stage.processor.fieldorder.config.OrderConfigBean;
 
-@StageDef(
+/*@StageDef(
   version = 1,
   label = "Field Order",
   description = "Order MAP or LIST_MAP fields into LIST_MAP or LIST.",
   icon = "order.png",
   onlineHelpRefUrl = "index.html#datacollector/UserGuide/Processors/FieldOrder.html#task_myf_wfv_vy"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class FieldOrderDProcessor extends DProcessor {

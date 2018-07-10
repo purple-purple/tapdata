@@ -30,7 +30,7 @@ import com.streamsets.pipeline.lib.dirspooler.SpoolDirConfigBean;
 
 import static com.streamsets.pipeline.config.OriginAvroSchemaSource.SOURCE;
 
-@StageDef(
+/*@StageDef(
     version = 10,
     label = "Directory",
     description = "Reads files from a directory",
@@ -41,7 +41,7 @@ import static com.streamsets.pipeline.config.OriginAvroSchemaSource.SOURCE;
     resetOffset = true,
     producesEvents = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/Directory.html#task_gfj_ssv_yq"
-)
+)*/
 @RawSource(rawSourcePreviewer = FileRawSourcePreviewer.class)
 @ConfigGroups(Groups.class)
 @HideConfigs(value = {

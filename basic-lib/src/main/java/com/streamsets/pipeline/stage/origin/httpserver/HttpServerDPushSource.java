@@ -32,7 +32,7 @@ import com.streamsets.pipeline.stage.origin.lib.DataParserFormatConfig;
 
 import static com.streamsets.pipeline.config.OriginAvroSchemaSource.SOURCE;
 
-@StageDef(
+/*@StageDef(
     version = 10,
     label = "HTTP Server",
     description = "Listens for requests on an HTTP endpoint",
@@ -41,7 +41,7 @@ import static com.streamsets.pipeline.config.OriginAvroSchemaSource.SOURCE;
     recordsByRef = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/HTTPServer.html#task_pgw_b3b_4y",
     upgrader = HttpServerPushSourceUpgrader.class
-)
+)*/
 @ConfigGroups(Groups.class)
 @HideConfigs(value = {
     "dataFormatConfig.verifyChecksum",

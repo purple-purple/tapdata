@@ -26,7 +26,7 @@ import com.streamsets.pipeline.configurablestage.DProcessor;
 import com.streamsets.pipeline.stage.processor.scripting.ProcessingMode;
 import com.streamsets.pipeline.stage.processor.scripting.ProcessingModeChooserValues;
 
-@StageDef(
+/*@StageDef(
     version = 2,
     label = "JavaScript Evaluator",
     description = "Processes records using JavaScript",
@@ -41,7 +41,7 @@ import com.streamsets.pipeline.stage.processor.scripting.ProcessingModeChooserVa
     upgrader = JavaScriptProcessorUpgrader.class,
     producesEvents = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/JavaScript.html#task_mzc_1by_nr"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class JavaScriptDProcessor extends DProcessor {

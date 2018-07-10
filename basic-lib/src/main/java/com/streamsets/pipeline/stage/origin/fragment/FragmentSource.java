@@ -25,7 +25,7 @@ import com.streamsets.pipeline.api.base.BaseSource;
 import com.streamsets.pipeline.lib.fragment.FragmentConfigBean;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Fragment Origin",
     icon = "fragment.png",
@@ -37,7 +37,7 @@ import com.streamsets.pipeline.lib.fragment.FragmentConfigBean;
         ExecutionMode.EDGE
     },
     onlineHelpRefUrl =""
-)
+)*/
 @HideConfigs(preconditions = true, onErrorRecord = true)
 public class FragmentSource extends BaseSource {
 

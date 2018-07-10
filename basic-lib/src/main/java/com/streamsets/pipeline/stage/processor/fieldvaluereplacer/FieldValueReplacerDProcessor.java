@@ -29,14 +29,14 @@ import com.streamsets.pipeline.configurablestage.DProcessor;
 
 import java.util.List;
 
-@StageDef(
+/*@StageDef(
     version=3,
     label="Value Replacer",
     description = "Replaces null values with a constant and replaces values with NULL",
     icon="replacer.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/ValueReplacer.html#task_ihq_ymf_zq",
     upgrader = FieldValueReplacerUpgrader.class
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 @Deprecated // Use FieldReplacerProcessor that is based on field path expression rather then set of difficult conditions

@@ -22,7 +22,7 @@ import com.streamsets.pipeline.api.Processor;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DProcessor;
 
-@StageDef(
+/*@StageDef(
     version=2,
     label="Aggregator",
     description = "Aggregates data that arrives within a window of time",
@@ -30,7 +30,7 @@ import com.streamsets.pipeline.configurablestage.DProcessor;
     producesEvents = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/Aggregator.html#task_bd3_vvm_5bb",
     upgrader = AggregationProcessorUpgrader.class
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class AggregationDProcessor extends DProcessor {

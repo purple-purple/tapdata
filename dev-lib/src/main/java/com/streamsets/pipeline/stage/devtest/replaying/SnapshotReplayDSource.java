@@ -24,7 +24,7 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DSource;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Dev Snapshot Replaying",
     description = "Play snapshots as source records",
@@ -32,7 +32,7 @@ import com.streamsets.pipeline.configurablestage.DSource;
     icon = "dev.png",
     upgrader = SnapshotReplaySourceUpgrader.class,
     onlineHelpRefUrl = "index.html#Pipeline_Design/DevStages.html"
-)
+)*/
 @ConfigGroups(value = SnapshotReplaySourceGroups.class)
 public class SnapshotReplayDSource extends DSource {
 

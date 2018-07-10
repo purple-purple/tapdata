@@ -40,14 +40,14 @@ import com.streamsets.pipeline.lib.operation.ChangeLogFormatChooserValues;
 import com.streamsets.pipeline.stage.destination.jdbc.Groups;
 import java.util.List;
 
-@StageDef(
+/*@StageDef(
     version = 2,
     label = "JDBC Tee",
     description = "Write records to JDBC and enrich records with generated columns",
     upgrader = JdbcTeeUpgrader.class,
     icon = "rdbms.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/JDBCTee.html#task_qpj_ncy_hw"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 @HideConfigs(value = {

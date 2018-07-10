@@ -23,7 +23,7 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.lib.fragment.FragmentConfigBean;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Fragment Processor",
     icon="fragment.png",
@@ -37,7 +37,7 @@ import com.streamsets.pipeline.lib.fragment.FragmentConfigBean;
         ExecutionMode.EDGE
     },
     onlineHelpRefUrl =""
-)
+)*/
 @HideConfigs(preconditions = true, onErrorRecord = true)
 public class FragmentProcessor extends BaseFragmentIdentityProcessor {
 

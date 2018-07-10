@@ -28,14 +28,14 @@ import com.streamsets.pipeline.configurablestage.DTarget;
 
 import java.util.Arrays;
 
-@StageDef(
+/*@StageDef(
     version = 2,
     label = "Write to SDC RPC",
     description = "Writes pipeline Statistic records to another pipeline over SDC RPC",
     icon="sdcipc.png",
     onlineHelpRefUrl = "",
     upgrader = StatsSdcIpcTargetUpgrader.class
-)
+)*/
 @ConfigGroups(Groups.class)
 @StatsAggregatorStage
 @HideConfigs(

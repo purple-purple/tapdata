@@ -24,7 +24,7 @@ import com.streamsets.pipeline.api.Target;
 import com.streamsets.pipeline.configurablestage.DTarget;
 import com.streamsets.pipeline.lib.coap.Groups;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "CoAP Client",
     description = "Uses a CoAP client to write data",
@@ -38,7 +38,7 @@ import com.streamsets.pipeline.lib.coap.Groups;
     },
     recordsByRef = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Destinations/CoAPClient.html#task_d2p_w3n_sz"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class CoapClientDTarget extends DTarget {

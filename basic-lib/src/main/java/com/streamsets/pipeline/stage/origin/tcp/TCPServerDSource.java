@@ -25,7 +25,7 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.api.impl.Utils;
 import com.streamsets.pipeline.configurablestage.DPushSource;
 
-@StageDef(
+/*@StageDef(
     version = 2,
     label = "TCP Server",
     description = "Listens for TCP messages on one or more ports",
@@ -34,7 +34,7 @@ import com.streamsets.pipeline.configurablestage.DPushSource;
     recordsByRef = true,
     upgrader = TCPServerSourceUpgrader.class,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/TCPServer.html#task_w2y_yb1_4z"
-)
+)*/
 
 @ConfigGroups(Groups.class)
 @HideConfigs({

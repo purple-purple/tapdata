@@ -24,7 +24,7 @@ import com.streamsets.pipeline.api.Source;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DSource;
 
-@StageDef(
+/*@StageDef(
     version = 3,
     label = "SFTP FTP Client",
     description = "Uses an SFTP/FTP client to read records from an URL.",
@@ -35,7 +35,7 @@ import com.streamsets.pipeline.configurablestage.DSource;
     producesEvents = true,
     upgrader = RemoteDownloadSourceUpgrader.class,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/SFTP.html#task_lfx_fzd_5v"
-)
+)*/
 @HideConfigs(value = {"conf.dataFormatConfig.verifyChecksum"})
 @GenerateResourceBundle
 @ConfigGroups(Groups.class)

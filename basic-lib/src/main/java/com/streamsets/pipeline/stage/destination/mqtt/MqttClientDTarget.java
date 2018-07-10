@@ -26,7 +26,7 @@ import com.streamsets.pipeline.configurablestage.DTarget;
 import com.streamsets.pipeline.lib.mqtt.Groups;
 import com.streamsets.pipeline.lib.mqtt.MqttClientConfigBean;
 
-@StageDef(
+/*@StageDef(
     version = 2,
     label = "MQTT Publisher",
     description = "Uses an MQTT Client to publish data to a topic on the MQTT Broker",
@@ -41,7 +41,7 @@ import com.streamsets.pipeline.lib.mqtt.MqttClientConfigBean;
     recordsByRef = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Destinations/MQTTPublisher.html#task_vbn_cyt_lz",
     upgrader = MqttClientTargetUpgrader.class
-)
+)*/
 @ConfigGroups(Groups.class)
 @HideConfigs({
     "commonConf.tlsConfig.keyStoreFilePath",

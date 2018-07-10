@@ -25,13 +25,13 @@ import com.streamsets.pipeline.api.base.SingleLaneProcessor;
 import java.util.Iterator;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Dev Record Creator",
     description = "It creates 2 records from each original record",
     icon= "dev.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Pipeline_Design/DevStages.html"
-)
+)*/
 public class RecordCreatorProcessor extends SingleLaneProcessor {
 
   @Override

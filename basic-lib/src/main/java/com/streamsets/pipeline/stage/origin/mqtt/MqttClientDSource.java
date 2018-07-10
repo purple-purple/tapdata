@@ -26,7 +26,7 @@ import com.streamsets.pipeline.configurablestage.DPushSource;
 import com.streamsets.pipeline.lib.mqtt.Groups;
 import com.streamsets.pipeline.lib.mqtt.MqttClientConfigBean;
 
-@StageDef(
+/*@StageDef(
     version = 2,
     label = "MQTT Subscriber",
     description = "Uses an MQTT client to subscribe to a topic on the MQTT Broker",
@@ -35,7 +35,7 @@ import com.streamsets.pipeline.lib.mqtt.MqttClientConfigBean;
     recordsByRef = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/MQTTSubscriber.html#task_wnz_mxt_lz",
     upgrader = MqttClientSourceUpgrader.class
-)
+)*/
 @HideConfigs({
     "subscriberConf.dataFormatConfig.jsonContent",
     "commonConf.tlsConfig.keyStoreFilePath",

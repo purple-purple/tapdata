@@ -22,13 +22,13 @@ import com.streamsets.pipeline.api.Processor;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DProcessor;
 
-@StageDef(
+/*@StageDef(
     version=1,
     label="Field Flattener",
     description="Flattens nested structures.",
     icon="flattener.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/FieldFlattener.html#task_xdv_kkk_fx"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class FieldFlattenerDProcessor extends DProcessor {

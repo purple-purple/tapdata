@@ -2086,6 +2086,12 @@ angular
       }
       $scope.tapdataMessage= "Loading DB Schema Info ...";
       $scope.showLoading = true;
+      var mappingSpinerTimeout = setTimeout(function(){
+        $scope.tapdataMessage= "No respond data from schema preview, Please run again later.";
+        setTimeout(function(){
+          $scope.showLoading = false;
+        },3000)
+      }, 6000)
       const mappingLoad = function($scope, $rootScope){
         $("#editorIframe").height((window.innerHeight - 240) + 'px')
         let checkMapView = setInterval(function(){
@@ -2163,6 +2169,7 @@ angular
           if(schemaString){ 
             $scope.tapdataMessage= "";
             $scope.showLoading = false;
+            clearTimeout(mappingSpinerTimeout);
             const tableInfo = JSON.parse(schemaString);
             console.log('got table schema:',tableInfo)
             $scope.showMappingView = true;
@@ -2210,6 +2217,7 @@ angular
             $scope.tapdataMessage= "Can Not Get Schema Info";
             setTimeout(function(){
               $scope.showLoading = false;
+              clearTimeout(mappingSpinerTimeout);
             },2000)
           }
         }).catch(function(e,b){

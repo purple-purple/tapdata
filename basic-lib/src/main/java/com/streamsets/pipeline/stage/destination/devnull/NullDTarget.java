@@ -22,7 +22,7 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.api.Target;
 import com.streamsets.pipeline.configurablestage.DTarget;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Trash",
     icon="trash.png",
@@ -35,7 +35,7 @@ import com.streamsets.pipeline.configurablestage.DTarget;
         ExecutionMode.EDGE
     },
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Destinations/Trash.html#task_ad4_qyl_zq"
-)
+)*/
 @HideConfigs(preconditions = true, onErrorRecord = true)
 @GenerateResourceBundle
 public class NullDTarget extends DTarget {

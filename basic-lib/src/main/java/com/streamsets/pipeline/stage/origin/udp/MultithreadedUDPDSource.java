@@ -25,7 +25,7 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.api.impl.Utils;
 import com.streamsets.pipeline.configurablestage.DPushSource;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "UDP Multithreaded Source",
     description = "Listens for UDP messages on one or more port(s) and queues incoming packets on an intermediate" +
@@ -34,7 +34,7 @@ import com.streamsets.pipeline.configurablestage.DPushSource;
     execution = ExecutionMode.STANDALONE,
     recordsByRef = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/UDPMulti.html#task_g2k_v5f_5bb"
-)
+)*/
 
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle

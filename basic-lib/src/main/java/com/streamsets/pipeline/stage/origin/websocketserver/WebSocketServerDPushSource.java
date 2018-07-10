@@ -29,7 +29,7 @@ import com.streamsets.pipeline.configurablestage.DPushSource;
 import com.streamsets.pipeline.lib.websocket.Groups;
 import com.streamsets.pipeline.stage.origin.lib.DataParserFormatConfig;
 
-@StageDef(
+/*@StageDef(
     version = 10,
     label = "WebSocket Server",
     description = "Listens for requests on a WebSocket endpoint",
@@ -38,7 +38,7 @@ import com.streamsets.pipeline.stage.origin.lib.DataParserFormatConfig;
     recordsByRef = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/WebSocketServer.html#task_mzv_cvc_3z",
     upgrader = WebSocketServerPushSourceUpgrader.class
-)
+)*/
 @ConfigGroups(Groups.class)
 @HideConfigs(value = {
     "dataFormatConfig.verifyChecksum",

@@ -21,7 +21,7 @@ import com.streamsets.pipeline.api.GenerateResourceBundle;
 import com.streamsets.pipeline.api.HideConfigs;
 import com.streamsets.pipeline.api.StageDef;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Discard",
     description = "Discards Pipeline Statistic Records",
@@ -34,7 +34,7 @@ import com.streamsets.pipeline.api.StageDef;
         ExecutionMode.EDGE
     },
     onlineHelpRefUrl = ""
-)
+)*/
 @HideConfigs(preconditions = true, onErrorRecord = true)
 @StatsAggregatorStage
 @GenerateResourceBundle

@@ -31,7 +31,7 @@ import com.streamsets.pipeline.lib.jdbc.HikariPoolConfigBean;
 import com.streamsets.pipeline.lib.jdbc.UnknownTypeAction;
 import com.streamsets.pipeline.lib.jdbc.UnknownTypeActionChooserValues;
 
-@StageDef(
+/*@StageDef(
         version = 10,
         label = "JDBC Query Consumer",
         description = "Reads data from a JDBC source using a query.",
@@ -42,7 +42,7 @@ import com.streamsets.pipeline.lib.jdbc.UnknownTypeActionChooserValues;
         resetOffset = true,
         producesEvents = true,
         onlineHelpRefUrl = "index.html#datacollector/UserGuide/Origins/JDBCConsumer.html#task_ryz_tkr_bs"
-)
+)*/
 @ConfigGroups(value = Groups.class)
 @GenerateResourceBundle
 @HideConfigs({

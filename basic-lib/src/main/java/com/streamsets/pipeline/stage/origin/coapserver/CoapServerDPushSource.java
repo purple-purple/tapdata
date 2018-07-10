@@ -29,7 +29,7 @@ import com.streamsets.pipeline.configurablestage.DPushSource;
 import com.streamsets.pipeline.lib.coap.Groups;
 import com.streamsets.pipeline.stage.origin.lib.DataParserFormatConfig;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "CoAP Server",
     description = "Listens for requests on a CoAP endpoint",
@@ -37,7 +37,7 @@ import com.streamsets.pipeline.stage.origin.lib.DataParserFormatConfig;
     execution = {ExecutionMode.STANDALONE},
     recordsByRef = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/CoAPServer.html#task_hsb_l3n_sz"
-)
+)*/
 @ConfigGroups(Groups.class)
 @HideConfigs(value = {
     "dataFormatConfig.verifyChecksum",

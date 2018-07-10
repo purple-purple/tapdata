@@ -23,7 +23,7 @@ import com.streamsets.pipeline.api.StageException;
 import com.streamsets.pipeline.api.base.SingleLaneRecordProcessor;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Dev Identity",
     description = "It echoes every record it receives without changing, other than stage header information",
@@ -36,7 +36,7 @@ import com.streamsets.pipeline.api.base.SingleLaneRecordProcessor;
         ExecutionMode.EDGE
     },
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Pipeline_Design/DevStages.html"
-)
+)*/
 public class IdentityProcessor extends SingleLaneRecordProcessor {
 
   @Override

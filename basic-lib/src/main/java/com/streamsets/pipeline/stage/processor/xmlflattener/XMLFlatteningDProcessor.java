@@ -23,14 +23,14 @@ import com.streamsets.pipeline.api.Processor;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DProcessor;
 
-@StageDef(
+/*@StageDef(
     version = 3,
     label = "XML Flattener",
     description = "Flatten XML data into fields of a record",
     upgrader = XMLFlatteningProcessorUpgrader.class,
     icon = "xmlparser.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/XMLFlattener.html#task_pmb_l55_sv"
-)
+)*/
 @ConfigGroups(value = Groups.class)
 @GenerateResourceBundle
 public class XMLFlatteningDProcessor extends DProcessor {

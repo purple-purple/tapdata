@@ -24,13 +24,13 @@ import com.streamsets.pipeline.configurablestage.DProcessor;
 import com.streamsets.pipeline.stage.processor.schemagen.config.Groups;
 import com.streamsets.pipeline.stage.processor.schemagen.config.SchemaGeneratorConfig;
 
-@StageDef(
+/*@StageDef(
   version = 1,
   label = "Schema Generator",
   description = "Generate schema based on incoming records.",
   icon = "schemagen.png",
   onlineHelpRefUrl = "index.html#datacollector/UserGuide/Processors/SchemaGenerator.html#task_szj_ms3_x1b"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class SchemaGeneratorDProcessor extends DProcessor {

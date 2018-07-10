@@ -26,7 +26,7 @@ import com.streamsets.pipeline.configurablestage.DProcessor;
 
 import java.util.List;
 
-@StageDef(
+/*@StageDef(
     version=2,
     label="Expression Evaluator",
     description="Performs calculations on a field-by-field basis",
@@ -40,7 +40,7 @@ import java.util.List;
         ExecutionMode.CLUSTER_MESOS_STREAMING,
         ExecutionMode.EDGE
     }
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class ExpressionDProcessor extends DProcessor {

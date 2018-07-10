@@ -31,7 +31,7 @@ import com.streamsets.pipeline.lib.el.RecordEL;
 
 import java.util.List;
 
-@StageDef(
+/*@StageDef(
     version=1,
     label="Field Remover",
     description="Removes fields from a record",
@@ -44,7 +44,7 @@ import java.util.List;
         ExecutionMode.CLUSTER_MESOS_STREAMING,
         ExecutionMode.EDGE
     }
-)
+)*/
 @ConfigGroups(Groups.class)
 @HideConfigs(onErrorRecord = true)
 @GenerateResourceBundle

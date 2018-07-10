@@ -26,7 +26,7 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DSourceOffsetCommitter;
 import com.streamsets.pipeline.stage.origin.sdcipc.Configs;
 
-@StageDef(
+/*@StageDef(
     version = 3,
     label = "Dev SDC RPC with Buffering",
     description = "Receives records via SDC RPC from a Data Collector pipeline that uses an SDC RPC destination. " +
@@ -35,7 +35,7 @@ import com.streamsets.pipeline.stage.origin.sdcipc.Configs;
     icon = "dev.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Pipeline_Design/DevStages.html",
     upgrader = SdcIpcWithDiskBufferSourceUpgrader.class
-)
+)*/
 @ConfigGroups(Groups.class)
 @HideConfigs({
     "configs.tlsConfigBean.trustStoreFilePath",

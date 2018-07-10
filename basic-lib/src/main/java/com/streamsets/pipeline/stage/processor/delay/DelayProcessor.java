@@ -28,7 +28,7 @@ import com.streamsets.pipeline.lib.util.ThreadUtil;
 import java.util.Iterator;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Delay",
     description = "Allows you to delay any records passing through it by a given number of milliseconds",
@@ -41,7 +41,7 @@ import java.util.Iterator;
         ExecutionMode.EDGE
     },
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/Delay.html#task_jh5_qxf_wbb"
-)
+)*/
 public class DelayProcessor extends SingleLaneRecordProcessor {
 
   @ConfigDef(

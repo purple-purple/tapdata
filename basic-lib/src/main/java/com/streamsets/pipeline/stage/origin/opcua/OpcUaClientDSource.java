@@ -24,7 +24,7 @@ import com.streamsets.pipeline.api.PushSource;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DPushSource;
 
-@StageDef(
+/*@StageDef(
     version = 3,
     label = "OPC UA Client",
     description = "Uses an OPC UA Client to read data from an OPC UA Server.",
@@ -33,7 +33,7 @@ import com.streamsets.pipeline.configurablestage.DPushSource;
     recordsByRef = true,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/OPCUAClient.html#task_bqt_mx3_h1b",
     upgrader = OpcUaClientSourceUpgrader.class
-)
+)*/
 @ConfigGroups(Groups.class)
 @HideConfigs({
     "conf.tlsConfig.trustStoreFilePath",

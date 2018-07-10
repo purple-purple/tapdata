@@ -25,13 +25,13 @@ import com.streamsets.pipeline.configurablestage.DProcessor;
 
 import java.util.List;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Field Masker",
     description = "Masks field values",
     icon = "mask.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/FieldMasker.html#task_vgg_z44_wq"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class FieldMaskDProcessor extends DProcessor {

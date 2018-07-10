@@ -28,7 +28,7 @@ import com.streamsets.pipeline.configurablestage.DProcessor;
 
 import java.util.List;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Record Deduplicator",
     description = "Separates unique and duplicate records based on field comparison",
@@ -36,7 +36,7 @@ import java.util.List;
     outputStreams = OutputStreams.class,
     execution = ExecutionMode.STANDALONE,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/RDeduplicator.html#task_ikr_c2f_zq"
-)
+)*/
 @ConfigGroups(Groups.class)
 @HideConfigs(onErrorRecord = true)
 @GenerateResourceBundle

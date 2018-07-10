@@ -28,13 +28,13 @@ import com.streamsets.pipeline.stage.destination.lib.DataGeneratorFormatConfig;
 
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Named Pipe",
     description = "Sends records to a Named Pipe",
     icon="fifo.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Destinations/NamedPipe.html#task_pdv_vdg_gcb"
-)
+)*/
 
 public class FifoDTarget extends DTarget {
 

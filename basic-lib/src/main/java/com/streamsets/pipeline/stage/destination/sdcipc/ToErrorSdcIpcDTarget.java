@@ -21,7 +21,7 @@ import com.streamsets.pipeline.api.HideConfigs;
 import com.streamsets.pipeline.api.PipelineLifecycleStage;
 import com.streamsets.pipeline.api.StageDef;
 
-@StageDef(
+/*@StageDef(
   // We're reusing upgrader for both ToErrorSdcIpcDTarget and SdcIpcDTarget, make sure that you
   // upgrade both versions at the same time when changing.
     version = 2,
@@ -30,7 +30,7 @@ import com.streamsets.pipeline.api.StageDef;
     icon = "",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Pipeline_Configuration/ErrorHandling.html#concept_kgc_l4y_5r",
     upgrader = SdcIpcTargetUpgrader.class
-)
+)*/
 @ErrorStage
 @HideConfigs(
     preconditions = true,

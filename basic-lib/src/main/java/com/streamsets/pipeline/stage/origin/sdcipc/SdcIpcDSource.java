@@ -24,7 +24,7 @@ import com.streamsets.pipeline.api.Source;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DSourceOffsetCommitter;
 
-@StageDef(
+/*@StageDef(
     version = 2,
     label = "SDC RPC",
     execution = ExecutionMode.STANDALONE,
@@ -32,7 +32,7 @@ import com.streamsets.pipeline.configurablestage.DSourceOffsetCommitter;
     icon="sdcipc.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/SDC_RPCorigin.html#task_lxh_1w2_ct",
     upgrader = SdcIpcSourceUpgrader.class
-)
+)*/
 @ConfigGroups(Groups.class)
 @HideConfigs({
     "configs.tlsConfigBean.trustStoreFilePath",

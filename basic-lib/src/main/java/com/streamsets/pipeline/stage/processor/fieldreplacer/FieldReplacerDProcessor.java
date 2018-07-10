@@ -23,13 +23,13 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DProcessor;
 import com.streamsets.pipeline.stage.processor.fieldreplacer.config.ReplacerConfigBean;
 
-@StageDef(
+/*@StageDef(
     version=1,
     label="Field Replacer",
     description = "Replaces field values.",
     icon="replacer.png",
     onlineHelpRefUrl = "index.html#datacollector/UserGuide/Processors/FieldReplacer.html#task_fk5_kd3_4cb"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class FieldReplacerDProcessor extends DProcessor {

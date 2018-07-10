@@ -24,14 +24,14 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DSource;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
   version = 1,
   label = "Sensor Reader",
   description = "Sensor Reader. For development only.",
   execution = ExecutionMode.EDGE,
   icon = "sensor.png",
   onlineHelpRefUrl = "index.html#datacollector/UserGuide/Pipeline_Design/DevStages.html#concept_czx_ktn_ht"
-)
+)*/
 @ConfigGroups(Groups.class)
 public class SensorReaderDSource extends DSource {
 

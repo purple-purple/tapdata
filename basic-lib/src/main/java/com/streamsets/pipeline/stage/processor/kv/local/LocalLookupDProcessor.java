@@ -22,13 +22,13 @@ import com.streamsets.pipeline.api.Processor;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DProcessor;
 
-@StageDef(
+/*@StageDef(
     version = 1,
     label = "Static Lookup",
     description = "Performs key-value lookups in static table.",
     icon = "dedup.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/StaticLookup.html#task_xk1_z4r_pv"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class LocalLookupDProcessor extends DProcessor {

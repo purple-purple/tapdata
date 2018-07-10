@@ -36,14 +36,14 @@ import com.streamsets.pipeline.stage.processor.kv.CacheConfig;
 
 import java.util.List;
 
-@StageDef(
+/*@StageDef(
     version = 3,
     label = "JDBC Lookup",
     description = "Lookup values via JDBC to enrich records.",
     icon = "rdbms.png",
     upgrader = JdbcLookupProcessorUpgrader.class,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Processors/JDBCLookup.html#task_kbr_2cy_hw"
-)
+)*/
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class JdbcLookupDProcessor extends DProcessor {

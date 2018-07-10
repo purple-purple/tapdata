@@ -19,35 +19,36 @@ import com.streamsets.pipeline.api.ConfigDef;
 
 public class SchemaTableConfigBean {
 
-  @ConfigDef(
-      required = true,
-      type = ConfigDef.Type.STRING,
-      label = "Schema",
-      description = "Schema Name",
-      displayPosition = 10,
-      group = "#0"
-  )
-  public String schema;
+    @ConfigDef(
+            required = true,
+            type = ConfigDef.Type.STRING,
+            label = "Schema",
+            description = "Schema Name",
+            displayPosition = 10,
+            defaultValue = "%",
+            group = "#0"
+    )
+    public String schema;
 
-  @ConfigDef(
-      required = true,
-      type = ConfigDef.Type.STRING,
-      label = "Table Name Pattern",
-      description = "Pattern of the table names to read. Use a SQL like syntax.",
-      displayPosition = 20,
-      group = "#0"
-  )
-  public String table;
+    @ConfigDef(
+            required = true,
+            type = ConfigDef.Type.STRING,
+            label = "Table Name Pattern",
+            description = "Pattern of the table names to read. Use a SQL like syntax.",
+            displayPosition = 20,
+            group = "#0"
+    )
+    public String table;
 
-  @ConfigDef(
-      required = false,
-      type = ConfigDef.Type.STRING,
-      label = "Exclusion Pattern",
-      description = "Pattern of the table names to exclude from being read. Use a Java regex syntax." +
-          " Leave empty if no exclusion needed.",
-      displayPosition = 30,
-      group = "#0"
-  )
-  public String excludePattern;
+    @ConfigDef(
+            required = false,
+            type = ConfigDef.Type.STRING,
+            label = "Exclusion Pattern",
+            description = "Pattern of the table names to exclude from being read. Use a Java regex syntax." +
+                    " Leave empty if no exclusion needed.",
+            displayPosition = 30,
+            group = "#0"
+    )
+    public String excludePattern;
 
 }

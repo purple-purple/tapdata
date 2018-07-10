@@ -24,7 +24,7 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.api.impl.Utils;
 import com.streamsets.pipeline.configurablestage.DSource;
 
-@StageDef(
+/*@StageDef(
     version = 4,
     label = "UDP Source",
     description = "Listens for UDP messages on one or more ports",
@@ -33,7 +33,7 @@ import com.streamsets.pipeline.configurablestage.DSource;
     recordsByRef = true,
     upgrader = UDPSourceUpgrader.class,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/UDP.html#task_kgn_rcv_1s"
-)
+)*/
 
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle

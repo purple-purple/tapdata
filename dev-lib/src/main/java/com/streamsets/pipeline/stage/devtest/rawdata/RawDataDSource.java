@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
     version = 2,
     label = "Dev Raw Data Source",
     description = "Add Raw data to the source.",
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
     icon = "dev.png",
     upgrader = RawDataSourceUpgrader.class,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Pipeline_Design/DevStages.html"
-)
+)*/
 @ConfigGroups(value = RawDataSourceGroups.class)
 public class RawDataDSource extends DSource {
   private static final Logger LOG = LoggerFactory.getLogger(RawDataDSource.class);

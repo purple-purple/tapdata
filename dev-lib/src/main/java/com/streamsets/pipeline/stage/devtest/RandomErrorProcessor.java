@@ -30,14 +30,14 @@ import java.util.List;
 import java.util.Random;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
   version = 2,
   label = "Dev Random Error",
   description = "Generates error records and silently discards records as specified.",
   icon= "dev.png",
   upgrader = RandomErrorProcessorUpgrader.class,
   onlineHelpRefUrl ="index.html#datacollector/UserGuide/Pipeline_Design/DevStages.html"
-)
+)*/
 public class RandomErrorProcessor extends SingleLaneProcessor {
   private Random random;
   private int batchCount;

@@ -2091,7 +2091,7 @@ angular
         setTimeout(function(){
           $scope.showLoading = false;
         },3000)
-      }, 6000)
+      }, 60000)
       const mappingLoad = function($scope, $rootScope){
         $("#editorIframe").height((window.innerHeight - 240) + 'px')
         let checkMapView = setInterval(function(){

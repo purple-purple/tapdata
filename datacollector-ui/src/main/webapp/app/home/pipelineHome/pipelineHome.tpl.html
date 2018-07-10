@@ -34,9 +34,9 @@
             <bg-pane min-size="0">
               <ng-include ng-if="pipelineConfig" src="'app/home/preview/preview.tpl.html'"></ng-include>
               <ng-include ng-if="pipelineConfig" src="'app/home/snapshot/snapshot.tpl.html'"></ng-include>
-              <div id="pipconfig">
+              <span id="pipconfig">
                 <ng-include  ng-if="pipelineConfig" src="'app/home/detail/detail.tpl.html'"></ng-include>
-              </div>
+              </span>
 
               <iframe ng-if="showMappingView" id="editorIframe" src="./designer/index.html" style="width: 100%;height: 1500px"></iframe>
 

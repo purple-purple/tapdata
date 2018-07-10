@@ -104,7 +104,8 @@ angular.module('dataCollectorApp.common')
               'On Memory Exceeded',
               'Rate Limit (records / sec)',
               'Max runners',
-              'Create Failure Snapshot'
+              'Create Failure Snapshot',
+              'Execution Mode'
             ]
             deleteConfigDefinition(self.pipelineConfigDefinition, filter)
             

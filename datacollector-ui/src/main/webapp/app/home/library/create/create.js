@@ -34,6 +34,16 @@ angular
       },
 
       save : function () {
+        $scope.newConfig.name
+        var jobNameListString = localStorage.getItem('jobNameList');
+        if(jobNameListString.length > 0){
+          var jobNameList  = jobNameListString.split(',')
+          if(jobNameList.indexOf($scope.newConfig.name) >= 0){
+            alert('The job name exisited, please input new name.');
+            return;
+          }
+        }
+        
         if($scope.newConfig.name) {
           api.pipelineAgent.createNewPipelineConfig($scope.newConfig.name, $scope.newConfig.description).
             then(

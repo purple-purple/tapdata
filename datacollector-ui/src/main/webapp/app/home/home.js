@@ -115,6 +115,14 @@ angular
           function (res) {
             var pipelineInfoList = res.data[0];
             var statusList = res.data[1];
+          
+            if($scope.selectedPipelineLabel.indexOf('allPipelines') > 0){
+              var nameList = [];
+              for(var i = 0; i < pipelineInfoList.length; i++){
+                nameList.push(pipelineInfoList[i].title)
+              }
+              localStorage.setItem('jobNameList',nameList)
+            }
 
             $scope.filteredPipelines.push.apply($scope.filteredPipelines, pipelineInfoList);
 

@@ -339,7 +339,7 @@ public class TapTransformer {
                 if (StringUtils.isBlank(targetPath)) {
                     writeModel = new DeleteOneModel<>(criteria);
                 } else {
-                    writeModel = new UpdateManyModel(criteria, new Document("$unset", targetPath));
+                    writeModel = new UpdateManyModel(criteria, new Document("$unset", new Document(targetPath, 1)));
                 }
                 break;
             case "UPDATE":

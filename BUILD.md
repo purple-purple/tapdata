@@ -42,7 +42,8 @@ and
   ./build.sh
 ```
 
-- To start TapData,execute
+- To start/restart TapData,execute
 ```
-  ./dist/target/tapdata-1.2.1/bin/tapdata dc
+  ./dist/target/tapdata/bin/tapdata dc
+  ./dist/target/tapdata/bin/tapdata rs
 ```

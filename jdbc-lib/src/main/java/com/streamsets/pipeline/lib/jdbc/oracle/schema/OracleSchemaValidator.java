@@ -227,8 +227,7 @@ public class OracleSchemaValidator implements ISchemaValidator {
             typeName = tableConfigs.get(0).getClass().getTypeName();
 
             if (StringUtils.isNotBlank(typeName)) {
-                for (int i = 0; i < tableConfigs.size(); i++) {
-                    Object obj = tableConfigs.get(i);
+                for (Object obj : tableConfigs) {
                     String schema;
                     String table;
                     String tableExclude;

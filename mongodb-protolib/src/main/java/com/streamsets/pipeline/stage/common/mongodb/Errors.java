@@ -49,7 +49,8 @@ public enum Errors implements ErrorCode {
   MONGODB_34("Can't create credential object: {}"),
   MONGODB_35("Mapping cannot be empty"),
   MONGODB_36("Parse schema json string to list error: {}"),
-  MONGODB_37("Schema cannot be empty")
+  MONGODB_37("Schema cannot be empty"),
+  MONGODB_38("Parse mapping error:{}"),
 
   ;
   private final String msg;

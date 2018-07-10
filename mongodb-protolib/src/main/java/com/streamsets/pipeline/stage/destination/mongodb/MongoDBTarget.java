@@ -22,6 +22,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.WriteModel;
+import com.streamsets.datacollector.validation.ValidationError;
 import com.streamsets.pipeline.api.Batch;
 import com.streamsets.pipeline.api.Record;
 import com.streamsets.pipeline.api.StageException;
@@ -36,6 +37,7 @@ import com.streamsets.pipeline.lib.generator.DataGeneratorFactoryBuilder;
 import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.ErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.mongodb.Errors;
+import com.streamsets.pipeline.stage.common.mongodb.Groups;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -98,14 +100,25 @@ public class MongoDBTarget extends BaseTarget {
 //    getContext().getPipelineConstants()
         transformer = new TapTransformer(mongoTargetConfigBean, issues, getContext());
 
-        if (StringUtils.isNotBlank(mongoTargetConfigBean.mapping)) {
-            Document mapConfig = Document.parse(mongoTargetConfigBean.mapping);
-            String mappings = mapConfig.getString("mappings");
+        try {
+            if (StringUtils.isNotBlank(mongoTargetConfigBean.mapping)) {
+                Document mapConfig = Document.parse(mongoTargetConfigBean.mapping);
+                String mappings = mapConfig.getString("mappings");
 
-            StringBuilder sb = new StringBuilder("{\"mappings\":").append(mappings).append("}");
-            Document doc = Document.parse(sb.toString());
-            createMongoIndexes((List<Document>) doc.get("mappings"));
+                StringBuilder sb = new StringBuilder("{\"mappings\":").append(mappings).append("}");
+                Document doc = Document.parse(sb.toString());
+                createMongoIndexes((List<Document>) doc.get("mappings"));
+            }
+        } catch (Exception e) {
+            issues.add(getContext().createConfigIssue(
+                    Groups.MAPPING.name(),
+                    "",
+                    Errors.MONGODB_38,
+                    e.toString()
+                    )
+            );
         }
+
         return issues;
     }
 

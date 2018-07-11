@@ -15,7 +15,6 @@
  */
 package com.streamsets.pipeline.stage.origin.jdbc.table;
 
-import com.streamsets.datacollector.validation.ValidationError;
 import com.streamsets.pipeline.api.ConfigDef;
 import com.streamsets.pipeline.api.ListBeanModel;
 import com.streamsets.pipeline.api.PushSource;
@@ -165,23 +164,23 @@ public class TableJdbcConfigBean {
     public static final String QUOTE_CHAR = "quoteChar";
 
     public List<Stage.ConfigIssue> validateConfigs(PushSource.Context context, List<Stage.ConfigIssue> issues) {
-        if (tableConfigs.isEmpty()) {
-            issues.add(context.createConfigIssue(Groups.TABLE.name(), TABLE_CONFIG, JdbcErrors.JDBC_66));
-        } else {
-            for (TableConfigBean tableConfigBean : tableConfigs) {
-                if (StringUtils.isBlank(tableConfigBean.schema)) {
-                    issues.add(
-                            context.createConfigIssue(
-                                    Groups.TABLE.name(),
-                                    TABLE_CONFIG,
-                                    JdbcErrors.JDBC_400,
-                                    "Schema"
-                            )
-                    );
-                    break;
-                }
-            }
-        }
+//        if (tableConfigs.isEmpty()) {
+        issues.add(context.createConfigIssue(Groups.TABLE.name(), TABLE_CONFIG, JdbcErrors.JDBC_66));
+//        } else {
+//            for (TableConfigBean tableConfigBean : tableConfigs) {
+//                if (StringUtils.isBlank(tableConfigBean.schema)) {
+//                    issues.add(
+//                            context.createConfigIssue(
+//                                    Groups.TABLE.name(),
+//                                    TABLE_CONFIG,
+//                                    JdbcErrors.JDBC_400,
+//                                    "Schema"
+//                            )
+//                    );
+//                    break;
+//                }
+//            }
+//        }
         if (batchTableStrategy == BatchTableStrategy.SWITCH_TABLES && numberOfBatchesFromRs == 0) {
             issues.add(
                     context.createConfigIssue(

@@ -25,7 +25,6 @@ public class SchemaTableConfigBean {
             label = "Schema",
             description = "Schema Name",
             displayPosition = 10,
-            defaultValue = "%",
             group = "#0"
     )
     public String schema;

@@ -174,7 +174,7 @@ public class TableJdbcConfigBean {
                             context.createConfigIssue(
                                     Groups.TABLE.name(),
                                     TABLE_CONFIG,
-                                    ValidationError.VALIDATION_0007,
+                                    JdbcErrors.JDBC_400,
                                     "Schema"
                             )
                     );

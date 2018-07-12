@@ -9,7 +9,7 @@ public class Mapping {
 
     private String to_table;
 
-    private String relationship;
+    private String relationship = "OneOne";
 
     private List<String> pk;
 

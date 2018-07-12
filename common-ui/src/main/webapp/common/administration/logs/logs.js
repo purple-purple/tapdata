@@ -77,11 +77,11 @@ angular
       pipelines: [],
       pauseLogAutoFetch: $rootScope.$storage.pauseLogAutoFetch,
       pipelineTitleParam: pipelineTitleParam,
-      viewHeightCap:568,
+      viewHeightCap:450,
       
       loadPreviousLog: function() {
         $scope.fetchingLog = true;
-        $scope.viewHeightCap = location.href.indexOf('collector/pipeline') < 0 ? 111 : 468 ;
+        $scope.viewHeightCap = location.href.indexOf('collector/pipeline') < 0 ? 111 : 450 ;
         api.log.getCurrentLog($scope.logEndingOffset, $scope.extraMessage, $scope.filterPipeline,
             $scope.filterSeverity).then(function(res) {
 

@@ -77,7 +77,7 @@ angular
       pipelines: [],
       pauseLogAutoFetch: $rootScope.$storage.pauseLogAutoFetch,
       pipelineTitleParam: pipelineTitleParam,
-      viewHeightCap:468,
+      viewHeightCap:568,
       
       loadPreviousLog: function() {
         $scope.fetchingLog = true;
@@ -170,7 +170,7 @@ angular
 
       api.log.getCurrentLog(-1, $scope.extraMessage, $scope.filterPipeline, $scope.filterSeverity).then(
         function(res) {
-          $scope.viewHeightCap = location.href.indexOf('collector/pipeline') < 0 ? 111 : 468 ;
+          $scope.viewHeightCap = location.href.indexOf('collector/pipeline') < 0 ? 111 : 568 ;
           //check if first message is extra line
           if (res.data && res.data.length > 0 && !res.data[0].timeStamp && res.data[0].exception) {
             $scope.extraMessage = res.data[0].exception;

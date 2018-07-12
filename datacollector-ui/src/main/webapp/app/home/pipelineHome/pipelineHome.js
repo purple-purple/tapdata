@@ -766,7 +766,6 @@ angular
     });
 
     setInterval(function(){
-      console.log("interval,!!")
       $("label:contains(Cluster Clone)").parent().siblings().children().off("click").on("click",function(){
         $rootScope.$broadcast('clusterClone');
       }) 
@@ -2038,7 +2037,7 @@ angular
     var pipelineHome = this;
     $scope.$on('hideMappingView', function( event, option){
       $scope.showMappingView = false;
-      $("#pipconfig").css("display","block")
+      $("#pipconfig").css("display","unset")
     })
 
     $scope.$on("clusterClone", function (event, options) {

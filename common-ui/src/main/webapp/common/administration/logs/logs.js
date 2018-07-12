@@ -77,6 +77,7 @@ angular
       pipelines: [],
       pauseLogAutoFetch: $rootScope.$storage.pauseLogAutoFetch,
       pipelineTitleParam: pipelineTitleParam,
+      viewHeightCap:400,
       
       loadPreviousLog: function() {
         $scope.fetchingLog = true;
@@ -165,6 +166,7 @@ angular
       }
 
       $scope.loading = true;
+      $scope.isPipelineHome = location.href.indexOf('collector/pipeline') > 0;
 
       api.log.getCurrentLog(-1, $scope.extraMessage, $scope.filterPipeline, $scope.filterSeverity).then(
         function(res) {

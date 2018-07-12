@@ -192,7 +192,6 @@ public class MongoDBTarget extends BaseTarget {
 
                     BulkWriteResult bulkWriteResult = collection.bulkWrite(models);
                     if (bulkWriteResult.wasAcknowledged()) {
-                        System.out.println(bulkWriteResult);
                         LOG.debug(
                                 "Wrote batch with {} inserts, {} updates and {} deletes to {}",
                                 bulkWriteResult.getInsertedCount(),

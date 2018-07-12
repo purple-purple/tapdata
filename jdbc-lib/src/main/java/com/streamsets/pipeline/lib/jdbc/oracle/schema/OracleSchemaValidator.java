@@ -276,10 +276,10 @@ public class OracleSchemaValidator implements ISchemaValidator {
     }
 
     public static String handleCondition(String condition) {
-        if (StringUtils.isNotBlank(condition) && condition.equals("%")) {
-            return "";
+        if (StringUtils.isNotBlank(condition)) {
+            return condition.trim();
         } else {
-            return condition;
+            return "";
         }
     }
 }

@@ -133,7 +133,7 @@
   <ng-include src="'app/home/alerts/error/errorModal.tpl.html'"></ng-include>
 
   <div class="panel-body"
-       ng-style="{'height': (windowHeight - 60 - 51) + 'px', 'width': (windowWidth) + 'px'}" resize>
+       ng-style="{'height': (windowHeight - viewHeightCap) + 'px', 'width': (windowWidth) + 'px'}" resize>
 
     <table class="table log-table" ng-if="!loading">
       <thead>

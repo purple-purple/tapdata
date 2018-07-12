@@ -26,7 +26,7 @@ import com.streamsets.pipeline.stage.origin.jdbc.CommonSourceConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.QuoteChar;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
 
-/*@StageDef(
+@StageDef(
     version = 4,
     label = "SQL Server CDC Client",
     description = "Origin that an read change events from an MS SQL Server Database",
@@ -35,7 +35,7 @@ import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
     producesEvents = true,
     upgrader = SQLServerCDCSourceUpgrader.class,
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Origins/SQLServerCDC.html#task_nsg_fxc_v1b"
-)*/
+)
 @GenerateResourceBundle
 @ConfigGroups(Groups.class)
 public class SQLServerCDCDSource extends DPushSource {

@@ -1505,7 +1505,6 @@ public class OracleCDCSource extends BaseSource {
             generationExecutor.awaitTermination(5, TimeUnit.MINUTES);
         } catch (InterruptedException ex) {
             LOG.error("Interrupted while attempting to shutdown Generator thread", ex);
-            generationExecutor.shutdownNow();
             Thread.currentThread().interrupt();
         }
 

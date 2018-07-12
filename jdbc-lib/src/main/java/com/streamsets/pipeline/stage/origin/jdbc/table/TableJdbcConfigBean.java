@@ -164,23 +164,9 @@ public class TableJdbcConfigBean {
     public static final String QUOTE_CHAR = "quoteChar";
 
     public List<Stage.ConfigIssue> validateConfigs(PushSource.Context context, List<Stage.ConfigIssue> issues) {
-//        if (tableConfigs.isEmpty()) {
-        issues.add(context.createConfigIssue(Groups.TABLE.name(), TABLE_CONFIG, JdbcErrors.JDBC_66));
-//        } else {
-//            for (TableConfigBean tableConfigBean : tableConfigs) {
-//                if (StringUtils.isBlank(tableConfigBean.schema)) {
-//                    issues.add(
-//                            context.createConfigIssue(
-//                                    Groups.TABLE.name(),
-//                                    TABLE_CONFIG,
-//                                    JdbcErrors.JDBC_400,
-//                                    "Schema"
-//                            )
-//                    );
-//                    break;
-//                }
-//            }
-//        }
+        if (tableConfigs.isEmpty()) {
+            issues.add(context.createConfigIssue(Groups.TABLE.name(), TABLE_CONFIG, JdbcErrors.JDBC_66));
+        }
         if (batchTableStrategy == BatchTableStrategy.SWITCH_TABLES && numberOfBatchesFromRs == 0) {
             issues.add(
                     context.createConfigIssue(

@@ -40,14 +40,14 @@ import com.streamsets.pipeline.lib.operation.UnsupportedOperationActionChooserVa
 import java.util.List;
 
 @GenerateResourceBundle
-@StageDef(
+/*@StageDef(
     version = 6,
     label = "JDBC Producer",
     description = "Insert, update, delete data to a JDBC destination.",
     upgrader = JdbcTargetUpgrader.class,
     icon = "rdbms.png",
     onlineHelpRefUrl ="index.html#datacollector/UserGuide/Destinations/JDBCProducer.html#task_cx3_lhh_ht"
-)
+)*/
 @ConfigGroups(value = Groups.class)
 @HideConfigs(value = {
   "hikariConfigBean.readOnly",

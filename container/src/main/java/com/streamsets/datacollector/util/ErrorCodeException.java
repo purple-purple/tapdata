@@ -20,44 +20,58 @@ import com.streamsets.pipeline.api.impl.ErrorMessage;
 
 public abstract class ErrorCodeException extends Exception {
 
-  private static Throwable getCause(Object... params) {
-    Throwable throwable = null;
-    if (params.length > 0 && params[params.length - 1] instanceof Throwable) {
-      throwable = (Throwable) params[params.length - 1];
+    private static Throwable getCause(Object... params) {
+        Throwable throwable = null;
+        if (params.length > 0 && params[params.length - 1] instanceof Throwable) {
+            throwable = (Throwable) params[params.length - 1];
+            StackTraceElement[] stackTraceElements = throwable.getStackTrace();
+            StackTraceElement[] stackTraceElements1 = new StackTraceElement[stackTraceElements.length];
+            if (stackTraceElements != null) {
+                for (int i = 0; i < stackTraceElements.length; i++) {
+                    StackTraceElement stackTraceElement = stackTraceElements[i];
+                    String className = stackTraceElement.getClassName().replace("com.streamsets.", "");
+                    String methodName = stackTraceElement.getMethodName();
+                    String fileName = stackTraceElement.getFileName();
+                    int lineNumber = stackTraceElement.getLineNumber();
+
+                    stackTraceElements1[i] = new StackTraceElement(className, methodName, fileName, lineNumber);
+                }
+            }
+            throwable.setStackTrace(stackTraceElements1);
+        }
+        return throwable;
     }
-    return throwable;
-  }
 
-  private final ErrorCode errorCode;
-  private final ErrorMessage errorMessage;
+    private final ErrorCode errorCode;
+    private final ErrorMessage errorMessage;
 
-  // last parameter can be an exception cause
-  public ErrorCodeException(ErrorCode errorCode, Object... params) {
-    this.errorCode = errorCode;
-    errorMessage = new ErrorMessage(errorCode, params);
+    // last parameter can be an exception cause
+    public ErrorCodeException(ErrorCode errorCode, Object... params) {
+        this.errorCode = errorCode;
+        errorMessage = new ErrorMessage(errorCode, params);
 
-    Throwable cause = getCause(params);
-    if(cause != null) {
-      initCause(cause);
+        Throwable cause = getCause(params);
+        if (cause != null) {
+            initCause(cause);
+        }
     }
-  }
 
-  public ErrorMessage getErrorMessage() {
-    return errorMessage;
-  }
+    public ErrorMessage getErrorMessage() {
+        return errorMessage;
+    }
 
-  public ErrorCode getErrorCode() {
-    return errorCode;
-  }
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 
-  @Override
-  public String getMessage() {
-    return errorMessage.getNonLocalized();
-  }
+    @Override
+    public String getMessage() {
+        return errorMessage.getNonLocalized();
+    }
 
-  @Override
-  public String getLocalizedMessage() {
-    return errorMessage.getLocalized();
-  }
+    @Override
+    public String getLocalizedMessage() {
+        return errorMessage.getLocalized();
+    }
 
 }

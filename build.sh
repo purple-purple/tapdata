@@ -136,7 +136,7 @@ main () {
         sed -i.bak "s#TAPDATA_VERSION_INFO#$TAP_DATA_VERSION#" "${__bash_dir__}/dist/target/${TAPDATA_FINAL_NAME}/sdc-static-web/templates-app.js"
     fi
 }
-rm -rf designer
+git submodule foreach --recursive git pull
 git submodule update --init --remote
 main "$@"
 

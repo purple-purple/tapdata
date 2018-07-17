@@ -282,6 +282,7 @@ public class LogResource {
     String thisLine;
     boolean lastMessageFiltered = false;
     while ((thisLine = bufferedReader.readLine()) != null) {
+      thisLine = thisLine.replace("com.streamsets.","");
       Map<String, String> namedGroupToValuesMap = logFileGrok.extractNamedGroups(thisLine);
       if(namedGroupToValuesMap != null) {
         if(severity != null && !severity.equals(namedGroupToValuesMap.get("severity"))) {
@@ -394,5 +395,4 @@ public class LogResource {
     }
     return false;
   }
-
 }

@@ -4,6 +4,8 @@ import com.streamsets.pipeline.stage.origin.jdbc.cdc.SchemaTableConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableConfigBean;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -25,6 +27,7 @@ public class OracleSchemaValidator implements ISchemaValidator {
     private final static String OR = " OR";
     private final static String PREFIX = " (";
     private final static String SUFFIX = " )";
+    private final static Logger LOG = LoggerFactory.getLogger(OracleSchemaValidator.class);
 
     /**
      * 指定用户下的所有表及字段
@@ -91,7 +94,7 @@ public class OracleSchemaValidator implements ISchemaValidator {
             // tables all columns
             Map<String, Map<String, DatabaseSchemaTableColumns>> tableColumnsMap = new HashMap<>();
             String tablesColumnsSql = String.format(LOAD_SCHEMA_TABLES_ALL_COLUMNS, tableCondition);
-            System.out.println("tablesColumnsSql:" + tablesColumnsSql);
+            LOG.debug("tablesColumnsSql:" + tablesColumnsSql);
             resultSet = statement.executeQuery(tablesColumnsSql);
             while (resultSet.next()) {
                 DatabaseSchemaTableColumns tablesColumns = new DatabaseSchemaTableColumns(resultSet);
@@ -101,7 +104,7 @@ public class OracleSchemaValidator implements ISchemaValidator {
             // tables primary key
             Map<String, Map<String, DatabaseSchemaConstraints>> pkTableMap = new HashMap<>();
             String tablesPrimaryKeySql = String.format(LOAD_SCHEMA_TABLES_ALL_PRIMARY_KEY, tableCondition);
-            System.out.println("tablesPrimaryKeySql:" + tablesPrimaryKeySql);
+            LOG.debug("tablesPrimaryKeySql:" + tablesPrimaryKeySql);
             resultSet = statement.executeQuery(tablesPrimaryKeySql);
             while (resultSet.next()) {
                 DatabaseSchemaConstraints constraints = DatabaseSchemaConstraints.pkConstraints(resultSet);
@@ -111,7 +114,7 @@ public class OracleSchemaValidator implements ISchemaValidator {
             // tables foreign key
             Map<String, Map<String, DatabaseSchemaConstraints>> fkTableMap = new HashMap<>();
             String tablesForeignKeySql = String.format(LOAD_SCHEMA_TABLES_ALL_FOREIGN_KEY, tableCondition);
-            System.out.println("tablesForeignKeySql：" + tablesForeignKeySql);
+            LOG.debug("tablesForeignKeySql：" + tablesForeignKeySql);
             resultSet = statement.executeQuery(tablesForeignKeySql);
             while (resultSet.next()) {
                 DatabaseSchemaConstraints constraints = DatabaseSchemaConstraints.fkConstraints(resultSet);

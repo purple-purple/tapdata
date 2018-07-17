@@ -86,7 +86,7 @@ public class LogMessageWebSocket extends WebSocketAdapter {
           }
 
           ObjectMapper objectMapper = ObjectMapperFactory.get();
-          String logDataJson = objectMapper.writer().writeValueAsString(namedGroupToValuesMap);
+          String logDataJson = objectMapper.writer().writeValueAsString(namedGroupToValuesMap).replace("com.streamsets.", "");
           session.getRemote().sendString(logDataJson);
 
         } catch (IOException ex) {

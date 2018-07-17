@@ -37,6 +37,8 @@ import com.streamsets.pipeline.stage.origin.jdbc.table.TableConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcELEvalContext;
 import com.streamsets.pipeline.lib.jdbc.multithread.util.OffsetQueryUtil;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,15 +106,17 @@ public final class TableContextUtil {
   private static void checkForUnsupportedOffsetColumns(
       LinkedHashMap<String, Integer> offsetColumnToType
   ) throws StageException {
-    //Validate if there are partition column types for offset maintenance
-    List<String> unsupportedOffsetColumnAndType = new ArrayList<>();
-    for (Map.Entry<String, Integer> offsetColumnToTypeEntry : offsetColumnToType.entrySet()) {
-      if (OffsetQueryUtil.UNSUPPORTED_OFFSET_SQL_TYPES.contains(offsetColumnToTypeEntry.getValue())) {
-        unsupportedOffsetColumnAndType.add(offsetColumnToTypeEntry.getKey() + " - " + offsetColumnToTypeEntry.getValue());
+    if(MapUtils.isNotEmpty(offsetColumnToType)) {
+      //Validate if there are partition column types for offset maintenance
+      List<String> unsupportedOffsetColumnAndType = new ArrayList<>();
+      for (Map.Entry<String, Integer> offsetColumnToTypeEntry : offsetColumnToType.entrySet()) {
+        if (OffsetQueryUtil.UNSUPPORTED_OFFSET_SQL_TYPES.contains(offsetColumnToTypeEntry.getValue())) {
+          unsupportedOffsetColumnAndType.add(offsetColumnToTypeEntry.getKey() + " - " + offsetColumnToTypeEntry.getValue());
+        }
       }
-    }
-    if (!unsupportedOffsetColumnAndType.isEmpty()) {
-      throw new StageException(JdbcErrors.JDBC_69, COMMA_JOINER.join(unsupportedOffsetColumnAndType));
+      if (!unsupportedOffsetColumnAndType.isEmpty()) {
+        throw new StageException(JdbcErrors.JDBC_69, COMMA_JOINER.join(unsupportedOffsetColumnAndType));
+      }
     }
   }
 
@@ -181,15 +185,19 @@ public final class TableContextUtil {
     } else {
       List<String> primaryKeys = JdbcUtil.getPrimaryKeys(connection, schemaName, tableName);
       if (primaryKeys.isEmpty() && !tableConfigBean.enableNonIncremental) {
-        issues.add(context.createConfigIssue(
+        for(Map.Entry<String,Integer> entry:columnNameToType.entrySet()){
+          offsetColumnToType.put(entry.getKey(),entry.getValue());
+        }
+        /*issues.add(context.createConfigIssue(
             Groups.TABLE.name(),
             TableJdbcConfigBean.TABLE_CONFIG,
             JdbcErrors.JDBC_62,
             tableName
         ));
-        return null;
+        return null;*/
+      } else {
+        primaryKeys.forEach(primaryKey -> offsetColumnToType.put(primaryKey, columnNameToType.get(primaryKey)));
       }
-      primaryKeys.forEach(primaryKey -> offsetColumnToType.put(primaryKey, columnNameToType.get(primaryKey)));
     }
 
     checkForUnsupportedOffsetColumns(offsetColumnToType);

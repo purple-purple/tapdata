@@ -137,6 +137,6 @@ main () {
     fi
 }
 rm -rf designer
-git submodule update
+git submodule update --init --remote
 main "$@"
 

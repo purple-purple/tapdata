@@ -93,8 +93,20 @@ while test $# -gt 0; do
     rs)
       PID=`ps -ef|grep ${BASEDIR}|grep -v grep|awk '{print $2}'`
       if [ ! -z "${PID}" ];then
-        kill -9 $PID 2>/dev/null
-        echo "Detected tapdata pid:${PID},stoped success"
+        kill -15 $PID
+        echo "Detected tapdata pid:${PID},stoping tapdata,please wait..."
+        KILLTIME=0
+        while [[ ! -z "${PID}" ]]
+        do
+            if [ $KILLTIME -ge 100 ];
+            then
+                kill -9 $PID
+            fi
+            PID=`ps -ef|grep ${BASEDIR}|grep -v grep|awk '{print $2}'`
+            KILLTIME=$(($KILLTIME+1))
+            sleep 1s
+        done
+        echo "Stop tapdata success"
       fi
       nohup ${PRG} dc &
       echo "start tapdata success"

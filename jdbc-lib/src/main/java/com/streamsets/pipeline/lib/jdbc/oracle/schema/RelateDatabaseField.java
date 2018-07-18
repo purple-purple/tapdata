@@ -4,7 +4,7 @@ public class RelateDatabaseField {
     private String field_name;
     private String table_name;
     private String data_type = "";
-    private int primary_key_position;
+    private int primary_key_position = 0;
     private String foreign_key_table;
     private String foreign_key_column;
     private String key;
@@ -36,6 +36,12 @@ public class RelateDatabaseField {
         this.data_type = column.getDataType();
         this.precision = column.getPrecision();
         this.scale = column.getScale();
+    }
+
+    public RelateDatabaseField(String field_name, String table_name, String data_type) {
+        this.field_name = field_name;
+        this.table_name = table_name;
+        this.data_type = data_type;
     }
 
     public String getField_name() {

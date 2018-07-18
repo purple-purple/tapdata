@@ -274,6 +274,11 @@ public class JdbcUtil {
     return keys;
   }
 
+  public static ResultSet getPrimaryKeysResultSet(Connection connection, String schema, String tableName) throws SQLException {
+    DatabaseMetaData metadata = connection.getMetaData();
+    return metadata.getPrimaryKeys(null, schema, tableName);
+  }
+
   public static Map<String, String> getMinimumOffsetValues(
       Connection connection,
       String schema,
@@ -350,6 +355,11 @@ public class JdbcUtil {
       referredTables.add(result.getString(PK_TABLE_NAME));
     }
     return referredTables;
+  }
+
+  public static ResultSet getReferredTablesResultSet(Connection connection, String schema, String tableName) throws SQLException {
+    DatabaseMetaData metadata = connection.getMetaData();
+    return metadata.getImportedKeys(null, schema, tableName);
   }
 
   public static void setColumnSpecificHeaders(

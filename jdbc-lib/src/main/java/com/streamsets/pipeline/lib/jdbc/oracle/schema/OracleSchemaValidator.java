@@ -71,19 +71,8 @@ public class OracleSchemaValidator implements ISchemaValidator {
             "  LEFT JOIN all_cons_columns ucc2 ON uc.R_CONSTRAINT_NAME = ucc2.constraint_name\n" +
             "WHERE uc.constraint_type = 'R' %s";
 
-
-    @Override
-    public List<RelateDataBaseTable> validateSchema(Connection conn, String databaseOwner, Statement statement) throws SQLException {
-        return validateSchema(conn, databaseOwner, statement, null);
-    }
-
     @Override
     public List<RelateDataBaseTable> validateSchema(Connection conn, Statement statement, List<?> tableCongifs) throws SQLException {
-        return validateSchema(conn, null, statement, tableCongifs);
-    }
-
-    @Override
-    public List<RelateDataBaseTable> validateSchema(Connection conn, String databaseOwner, Statement statement, List<?> tableCongifs) throws SQLException {
         List<RelateDataBaseTable> tables = null;
         ResultSet resultSet = null;
         String tableCondition;
@@ -136,6 +125,11 @@ public class OracleSchemaValidator implements ISchemaValidator {
         }
 
         return tables;
+    }
+
+    @Override
+    public List<RelateDataBaseTable> validateSchema(Connection conn, List<SchemaBean> schemaBeans) throws SQLException {
+        return null;
     }
 
     /**

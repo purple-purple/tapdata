@@ -18,18 +18,15 @@ package com.streamsets.pipeline.lib.jdbc.multithread;
 import com.google.common.cache.CacheLoader;
 import com.google.common.util.concurrent.RateLimiter;
 import com.streamsets.pipeline.api.*;
-import com.streamsets.pipeline.lib.jdbc.JdbcLoadSchema;
-import com.streamsets.pipeline.lib.jdbc.JdbcOracleLoadSchemaImpl;
+import com.streamsets.pipeline.lib.jdbc.HikariPoolConfigBean;
 import com.streamsets.pipeline.lib.jdbc.JdbcUtil;
 import com.streamsets.pipeline.stage.origin.jdbc.CommonSourceConfigBean;
 import com.streamsets.pipeline.lib.jdbc.multithread.util.OffsetQueryUtil;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
 import org.apache.commons.lang3.StringUtils;
-import org.mortbay.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -49,7 +46,7 @@ public final class TableJdbcRunnable extends JdbcBaseRunnable {
             CommonSourceConfigBean commonSourceConfigBean,
             CacheLoader<TableRuntimeContext, TableReadContext> tableReadContextCache,
             RateLimiter queryRateLimiter,
-            String databaseOwner
+            HikariPoolConfigBean hikariPoolConfigBean
     ) {
         super(
                 context,
@@ -62,7 +59,7 @@ public final class TableJdbcRunnable extends JdbcBaseRunnable {
                 commonSourceConfigBean,
                 tableReadContextCache,
                 queryRateLimiter,
-                databaseOwner
+                hikariPoolConfigBean
         );
 
     }

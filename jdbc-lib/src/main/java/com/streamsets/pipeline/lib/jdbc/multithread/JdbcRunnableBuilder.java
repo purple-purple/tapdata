@@ -19,6 +19,7 @@ package com.streamsets.pipeline.lib.jdbc.multithread;
 import com.google.common.cache.CacheLoader;
 import com.google.common.util.concurrent.RateLimiter;
 import com.streamsets.pipeline.api.PushSource;
+import com.streamsets.pipeline.lib.jdbc.HikariPoolConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.CommonSourceConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
 
@@ -35,7 +36,7 @@ public class JdbcRunnableBuilder {
     private MultithreadedTableProvider tableProvider;
     private CacheLoader<TableRuntimeContext, TableReadContext> tableReadContextCache;
     private RateLimiter queryRateLimiter;
-    private String databaseOwner;
+    private HikariPoolConfigBean hikariPoolConfigBean;
 
     public JdbcRunnableBuilder() {
     }
@@ -90,6 +91,11 @@ public class JdbcRunnableBuilder {
         return this;
     }
 
+    public JdbcRunnableBuilder hikariPoolConfigBean(HikariPoolConfigBean hikariPoolConfigBean) {
+        this.hikariPoolConfigBean = hikariPoolConfigBean;
+        return this;
+    }
+
     public JdbcBaseRunnable build() {
         final String SQLServerCT = "SQLServerChangeTrackingClient";
         final String SQLServerCDC = "SQLServerCDCClient";
@@ -132,13 +138,8 @@ public class JdbcRunnableBuilder {
                     commonSourceConfigBean,
                     tableReadContextCache,
                     queryRateLimiter,
-                    databaseOwner
+                    hikariPoolConfigBean
             );
         }
-    }
-
-    public JdbcRunnableBuilder databaseOwner(String databaseOwner) {
-        this.databaseOwner = databaseOwner;
-        return this;
     }
 }

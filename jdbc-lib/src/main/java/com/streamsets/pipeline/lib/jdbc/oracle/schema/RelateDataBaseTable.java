@@ -4,6 +4,13 @@ import java.util.List;
 
 public class RelateDataBaseTable {
 
+    public RelateDataBaseTable() {
+    }
+
+    public RelateDataBaseTable(String table_name) {
+        this.table_name = table_name;
+    }
+
     private String table_name;
 
     private List<RelateDatabaseField> fields;

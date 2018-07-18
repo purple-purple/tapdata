@@ -22,13 +22,13 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.RateLimiter;
 import com.streamsets.pipeline.api.*;
+import com.streamsets.pipeline.lib.jdbc.HikariPoolConfigBean;
 import com.streamsets.pipeline.lib.jdbc.JdbcErrors;
-import com.streamsets.pipeline.lib.jdbc.JdbcLoadSchema;
-import com.streamsets.pipeline.lib.jdbc.JdbcOracleLoadSchemaImpl;
 import com.streamsets.pipeline.lib.jdbc.JdbcUtil;
 import com.streamsets.pipeline.lib.jdbc.multithread.cache.JdbcTableReadContextInvalidationListener;
 import com.streamsets.pipeline.lib.jdbc.multithread.cache.JdbcTableReadContextLoader;
 import com.streamsets.pipeline.lib.jdbc.multithread.util.OffsetQueryUtil;
+import com.streamsets.pipeline.lib.jdbc.oracle.schema.SchemaFactory;
 import com.streamsets.pipeline.lib.util.ThreadUtil;
 import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.ErrorRecordHandler;
@@ -36,15 +36,11 @@ import com.streamsets.pipeline.stage.origin.jdbc.CommonSourceConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcELEvalContext;
 import org.apache.commons.lang.StringUtils;
-import org.mortbay.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -94,7 +90,7 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
 
     private final RateLimiter queryRateLimiter;
 
-    private String databaseOwner;
+    private HikariPoolConfigBean hikariPoolConfigBean;
 
     private enum Status {
         WAITING_FOR_RATE_LIMIT_PERMIT,
@@ -147,7 +143,7 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
             CommonSourceConfigBean commonSourceConfigBean,
             CacheLoader<TableRuntimeContext, TableReadContext> tableCacheLoader,
             RateLimiter queryRateLimiter,
-            String databaseOwner
+            HikariPoolConfigBean hikariPoolConfigBean
     ) {
         this.context = context;
         this.threadNumber = threadNumber;
@@ -167,8 +163,7 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
         // Metrics
         this.gaugeMap = context.createGauge(TABLE_METRICS + threadNumber).getValue();
         this.queryRateLimiter = queryRateLimiter;
-
-        this.databaseOwner = databaseOwner;
+        this.hikariPoolConfigBean = hikariPoolConfigBean;
     }
 
     public LoadingCache<TableRuntimeContext, TableReadContext> getTableReadContextCache() {
@@ -258,9 +253,19 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
 
             ResultSet rs = null;
             // if connectionString start with jdbc:oracle,isPreview,batchSize=-1,then load oracle schema
-            if (connectionManager.getHikariDataSource().getJdbcUrl().startsWith("jdbc:oracle") && context.isPreview()
-                    && threadNumber == 0 && batchSize == -1) {
-                tableSchemasJson = loadOracleSchema();
+            if (context.isPreview() && threadNumber == 0 && batchSize == -1) {
+//                tableSchemasJson = loadOracleSchema();
+                tableSchemasJson = new SchemaFactory().loadSchemaJson(hikariPoolConfigBean, tableJdbcConfigBean.tableConfigs);
+
+                if (tableSchemasJson == null) {
+                    errorRecordHandler.onError(JdbcErrors.JDBC_79);
+                    return;
+                }
+
+                if (StringUtils.isBlank(tableSchemasJson)) {
+                    errorRecordHandler.onError(JdbcErrors.JDBC_66);
+                    return;
+                }
             } else {
                 updateGauge(JdbcBaseRunnable.Status.QUERYING_TABLE);
                 tableReadContext = getOrLoadTableReadContext();
@@ -321,7 +326,7 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
             } finally {
                 handlePostBatchAsNeeded(resultSetEndReached, recordCount, eventCount, batchContext);
             }
-        } catch (SQLException | ExecutionException | StageException | InterruptedException | IOException e) {
+        } catch (SQLException | ExecutionException | StageException | InterruptedException e) {
             //invalidate if the connection is closed
             tableReadContextCache.invalidateAll();
             connectionManager.closeConnection();
@@ -342,30 +347,6 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
                 handleStageError(JdbcErrors.JDBC_67, e);
             }
         }
-    }
-
-    private String loadOracleSchema() throws SQLException, IOException {
-        String tableSchemasJson = new String("");
-        JdbcLoadSchema jdbcLoadSchema = new JdbcOracleLoadSchemaImpl(databaseOwner);
-        Connection connection = null;
-        Statement statement = null;
-        try {
-            connection = connectionManager.getConnection();
-            statement = connection.createStatement();
-
-            tableSchemasJson = jdbcLoadSchema.getTableSchemasJson(connection, statement, tableJdbcConfigBean.tableConfigs);
-
-            LOG.debug("Load oracle schema: {}", tableSchemasJson);
-        } finally {
-            if (null != connection) {
-                connectionManager.closeConnection();
-            }
-            if (null != statement) {
-                statement.close();
-            }
-        }
-
-        return tableSchemasJson;
     }
 
     private void handleSqlException(SQLException sqlE) {

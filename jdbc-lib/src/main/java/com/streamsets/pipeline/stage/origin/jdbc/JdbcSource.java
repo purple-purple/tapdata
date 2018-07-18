@@ -41,7 +41,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -119,8 +118,6 @@ public class JdbcSource extends BaseSource {
     private String tableNames;
     private boolean shouldFire = true;
     private boolean firstTime = true;
-
-    private JdbcLoadSchema jdbcLoadSchema;
 
     public JdbcSource(
             boolean isIncrementalMode,
@@ -369,135 +366,112 @@ public class JdbcSource extends BaseSource {
                         statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
                     }
 
-                    // if connectionString start with jdbc:oracle,isPreview,batchSize=-1,then load oracle schema
-                    if (getContext().isPreview() && hikariConfigBean.connectionString.startsWith("jdbc:oracle") && batchSize == -1) {
-                        jdbcLoadSchema = new JdbcOracleLoadSchemaImpl(hikariConfigBean.databaseOwner);
+                    int fetchSize = batchSize;
+                    // MySQL does not support cursors or fetch size except 0 and "streaming" (1 at a time).
+                    if (hikariConfigBean.connectionString.toLowerCase().contains("mysql")) {
+                        // Enable MySQL streaming mode.
+                        fetchSize = Integer.MIN_VALUE;
+                    }
+                    LOG.debug("Using query fetch size: {}", fetchSize);
+                    statement.setFetchSize(fetchSize);
 
-                        try {
-                            tableSchemasJson = jdbcLoadSchema.getTableSchemasJson(connection, statement);
-                        } catch (IOException e) {
-                            LOG.error("Load oracle schema error: {}", e.toString());
-                        }
+                    if (getContext().isPreview()) {
+                        statement.setMaxRows(batchSize);
+                    }
 
-                        LOG.debug("Load oracle schema: {}", tableSchemasJson);
+                    preparedQuery = prepareQuery(query, lastSourceOffset);
+                    LOG.trace("Executing query: " + preparedQuery);
+                    hashedQuery = hasher.putString(preparedQuery, Charsets.UTF_8).hash().toString();
+                    LOG.debug("Executing query: " + hashedQuery);
+                    resultSet = statement.executeQuery(preparedQuery);
+                    queryRowCount = 0;
+                    numQueryErrors = 0;
+                    firstQueryException = null;
+                }
 
-                        if (StringUtils.isNotEmpty(tableSchemasJson)) {
-                            Record record = getContext().createRecord("schema");
+                // Read Data and track last offset
+                int rowCount = 0;
+                String lastTransactionId = "";
+                boolean haveNext = true;
+                while (continueReading(rowCount, batchSize) && (haveNext = resultSet.next())) {
+                    final Record record = processRow(resultSet, rowCount);
 
-                            record.getHeader().setAttribute("schema", tableSchemasJson);
+                    if (null != record) {
+                        if (!txnColumnName.isEmpty()) {
+                            String newTransactionId = resultSet.getString(txnColumnName);
+                            if (lastTransactionId.isEmpty()) {
+                                lastTransactionId = newTransactionId;
+                                batchMaker.addRecord(record);
+                            } else if (lastTransactionId.equals(newTransactionId)) {
+                                batchMaker.addRecord(record);
+                            } else {
+                                // The Transaction ID Column Name config should not be used with MySQL as it
+                                // does not provide a change log table and the JDBC driver may not support scrollable cursors.
+                                resultSet.relative(-1);
+                                break; // Complete this batch without including the new record.
+                            }
+                        } else {
+
+                            // put schema in header
+                            if (rowCount == 0 && StringUtils.isNotEmpty(tableSchemasJson)) {
+                                Record.Header header = record.getHeader();
+                                header.setAttribute("schema", tableSchemasJson);
+                            }
 
                             batchMaker.addRecord(record);
                         }
+                    }
+
+                    // Get the offset column value for this record
+                    if (isIncrementalMode) {
+                        nextSourceOffset = resultSet.getString(offsetColumn);
                     } else {
-                        int fetchSize = batchSize;
-                        // MySQL does not support cursors or fetch size except 0 and "streaming" (1 at a time).
-                        if (hikariConfigBean.connectionString.toLowerCase().contains("mysql")) {
-                            // Enable MySQL streaming mode.
-                            fetchSize = Integer.MIN_VALUE;
-                        }
-                        LOG.debug("Using query fetch size: {}", fetchSize);
-                        statement.setFetchSize(fetchSize);
-
-                        if (getContext().isPreview()) {
-                            statement.setMaxRows(batchSize);
-                        }
-
-                        preparedQuery = prepareQuery(query, lastSourceOffset);
-                        LOG.trace("Executing query: " + preparedQuery);
-                        hashedQuery = hasher.putString(preparedQuery, Charsets.UTF_8).hash().toString();
-                        LOG.debug("Executing query: " + hashedQuery);
-                        resultSet = statement.executeQuery(preparedQuery);
-                        queryRowCount = 0;
-                        numQueryErrors = 0;
-                        firstQueryException = null;
+                        nextSourceOffset = initialOffset;
                     }
+                    ++rowCount;
+                    ++queryRowCount;
+                    ++noMoreDataRecordCount;
+                    shouldFire = true;
                 }
+                LOG.debug("Processed rows: " + rowCount);
 
-                if (StringUtils.isEmpty(tableSchemasJson)) {
-                    // Read Data and track last offset
-                    int rowCount = 0;
-                    String lastTransactionId = "";
-                    boolean haveNext = true;
-                    while (continueReading(rowCount, batchSize) && (haveNext = resultSet.next())) {
-                        final Record record = processRow(resultSet, rowCount);
+                if (!haveNext || rowCount == 0) {
+                    // We didn't have any data left in the cursor. Close everything
+                    // We may not have the statement here if we're not producing the
+                    // same batch as when we got it, so get it from the result set
+                    // Get it before we close the result set, just to be safe!
+                    statement = resultSet.getStatement();
+                    closeQuietly(resultSet);
+                    closeQuietly(statement);
+                    closeQuietly(connection);
+                    lastQueryCompletedTime = System.currentTimeMillis();
+                    LOG.debug("Query completed at: {}", lastQueryCompletedTime);
+                    QUERY_SUCCESS.create(getContext())
+                            .with(QUERY, preparedQuery)
+                            .with(TIMESTAMP, lastQueryCompletedTime)
+                            .with(ROW_COUNT, queryRowCount)
+                            .with(SOURCE_OFFSET, nextSourceOffset)
+                            .createAndSend();
 
-                        if (null != record) {
-                            if (!txnColumnName.isEmpty()) {
-                                String newTransactionId = resultSet.getString(txnColumnName);
-                                if (lastTransactionId.isEmpty()) {
-                                    lastTransactionId = newTransactionId;
-                                    batchMaker.addRecord(record);
-                                } else if (lastTransactionId.equals(newTransactionId)) {
-                                    batchMaker.addRecord(record);
-                                } else {
-                                    // The Transaction ID Column Name config should not be used with MySQL as it
-                                    // does not provide a change log table and the JDBC driver may not support scrollable cursors.
-                                    resultSet.relative(-1);
-                                    break; // Complete this batch without including the new record.
-                                }
-                            } else {
-
-                                // put schema in header
-                                if (rowCount == 0 && StringUtils.isNotEmpty(tableSchemasJson)) {
-                                    Record.Header header = record.getHeader();
-                                    header.setAttribute("schema", tableSchemasJson);
-                                }
-
-                                batchMaker.addRecord(record);
-                            }
-                        }
-
-                        // Get the offset column value for this record
-                        if (isIncrementalMode) {
-                            nextSourceOffset = resultSet.getString(offsetColumn);
-                        } else {
-                            nextSourceOffset = initialOffset;
-                        }
-                        ++rowCount;
-                        ++queryRowCount;
-                        ++noMoreDataRecordCount;
-                        shouldFire = true;
-                    }
-                    LOG.debug("Processed rows: " + rowCount);
-
-                    if (!haveNext || rowCount == 0) {
-                        // We didn't have any data left in the cursor. Close everything
-                        // We may not have the statement here if we're not producing the
-                        // same batch as when we got it, so get it from the result set
-                        // Get it before we close the result set, just to be safe!
-                        statement = resultSet.getStatement();
-                        closeQuietly(resultSet);
-                        closeQuietly(statement);
-                        closeQuietly(connection);
-                        lastQueryCompletedTime = System.currentTimeMillis();
-                        LOG.debug("Query completed at: {}", lastQueryCompletedTime);
-                        QUERY_SUCCESS.create(getContext())
-                                .with(QUERY, preparedQuery)
-                                .with(TIMESTAMP, lastQueryCompletedTime)
-                                .with(ROW_COUNT, queryRowCount)
-                                .with(SOURCE_OFFSET, nextSourceOffset)
-                                .createAndSend();
-
-                        // In case of non-incremental mode, we need to generate no-more-data event as soon as we hit end of the
-                        // result set. Incremental mode will try to run the query again and generate the event if and only if
-                        // the next query results in zero rows.
-                        if (!isIncrementalMode) {
-                            generateNoMoreDataEvent();
-                        }
-                    }
-
-                    /*
-                     * We want to generate no-more data event on next batch if:
-                     * 1) We run a query in this batch and returned empty.
-                     * 2) We consumed at least some data since last time (to not generate the event all the time)
-                     */
-
-                    if (isIncrementalMode && rowCount == 0 && !haveNext && shouldFire && !firstTime) {
+                    // In case of non-incremental mode, we need to generate no-more-data event as soon as we hit end of the
+                    // result set. Incremental mode will try to run the query again and generate the event if and only if
+                    // the next query results in zero rows.
+                    if (!isIncrementalMode) {
                         generateNoMoreDataEvent();
-                        shouldFire = false;
                     }
-                    firstTime = false;
                 }
+
+                /*
+                 * We want to generate no-more data event on next batch if:
+                 * 1) We run a query in this batch and returned empty.
+                 * 2) We consumed at least some data since last time (to not generate the event all the time)
+                 */
+
+                if (isIncrementalMode && rowCount == 0 && !haveNext && shouldFire && !firstTime) {
+                    generateNoMoreDataEvent();
+                    shouldFire = false;
+                }
+                firstTime = false;
 
             } catch (SQLException e) {
                 if (++numQueryErrors == 1) {

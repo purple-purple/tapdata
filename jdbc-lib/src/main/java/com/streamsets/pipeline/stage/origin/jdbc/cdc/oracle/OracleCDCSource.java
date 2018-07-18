@@ -28,9 +28,7 @@ import com.streamsets.pipeline.api.StageException;
 import com.streamsets.pipeline.api.base.BaseSource;
 import com.streamsets.pipeline.api.impl.Utils;
 import com.streamsets.pipeline.lib.jdbc.*;
-import com.streamsets.pipeline.lib.jdbc.oracle.schema.ISchemaValidator;
-import com.streamsets.pipeline.lib.jdbc.oracle.schema.OracleSchemaValidator;
-import com.streamsets.pipeline.lib.jdbc.oracle.schema.RelateDataBaseTable;
+import com.streamsets.pipeline.lib.jdbc.oracle.schema.*;
 import com.streamsets.pipeline.lib.operation.OperationType;
 import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.ErrorRecordHandler;
@@ -45,7 +43,6 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.mortbay.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import plsql.plsqlLexer;
@@ -306,7 +303,7 @@ public class OracleCDCSource extends BaseSource {
                 if (!generationStarted) {
                     // if isPreview,batchSize=-1,then load oracle schema
                     if (getContext().isPreview() && batchSize == -1) {
-                        getTableSchemasJson(hikariConfigBean.databaseOwner);
+                        tableSchemasJson = new SchemaFactory().loadSchemaJson(hikariConfigBean, configBean.baseConfigBean.schemaTableConfigs);
                         LOG.debug("Load oracle schema: {}", tableSchemasJson);
                     } else {
                         startGeneratorThread(lastSourceOffset);
@@ -1867,22 +1864,4 @@ public class OracleCDCSource extends BaseSource {
             this.sql = sql;
         }
     }
-
-    private void getTableSchemasJson(String databaseOwner) throws SQLException, IOException {
-        JdbcLoadSchema jdbcLoadSchema = new JdbcOracleLoadSchemaImpl(databaseOwner);
-        Statement statement = null;
-
-        try {
-            if (null != connection) {
-                statement = connection.createStatement();
-
-                tableSchemasJson = jdbcLoadSchema.getTableSchemasJson(connection, statement, configBean.baseConfigBean.schemaTableConfigs);
-            }
-        } finally {
-            if (null != statement) {
-                statement.close();
-            }
-        }
-    }
-
 }

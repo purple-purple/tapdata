@@ -341,7 +341,7 @@ public abstract class AbstractTableJdbcSource extends BasePushSource {
                         .commonSourceConfigBean(commonSourceConfigBean)
                         .tableJdbcConfigBean(tableJdbcConfigBean)
                         .queryRateLimiter(commonSourceConfigBean.creatQueryRateLimiter())
-                        .databaseOwner(hikariConfigBean.databaseOwner)
+                        .hikariPoolConfigBean(hikariConfigBean)
                         .build();
 
                 toBeInvalidatedThreadCaches.add(runnable.getTableReadContextCache());

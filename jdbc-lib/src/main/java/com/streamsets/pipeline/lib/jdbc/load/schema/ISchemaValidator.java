@@ -1,8 +1,5 @@
-package com.streamsets.pipeline.lib.jdbc.oracle.schema;
+package com.streamsets.pipeline.lib.jdbc.load.schema;
 
-import org.codehaus.jackson.JsonProcessingException;
-
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;

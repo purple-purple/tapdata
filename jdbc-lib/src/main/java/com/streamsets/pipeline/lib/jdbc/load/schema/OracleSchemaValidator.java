@@ -1,4 +1,4 @@
-package com.streamsets.pipeline.lib.jdbc.oracle.schema;
+package com.streamsets.pipeline.lib.jdbc.load.schema;
 
 import com.streamsets.pipeline.stage.origin.jdbc.cdc.SchemaTableConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableConfigBean;

@@ -1,4 +1,4 @@
-package com.streamsets.pipeline.lib.jdbc.oracle.schema;
+package com.streamsets.pipeline.lib.jdbc.load.schema;
 
 public class SchemaBean {
     private String schema;

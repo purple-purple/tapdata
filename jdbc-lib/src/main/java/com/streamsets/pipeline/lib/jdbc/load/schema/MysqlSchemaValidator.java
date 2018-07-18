@@ -1,4 +1,4 @@
-package com.streamsets.pipeline.lib.jdbc.oracle.schema;
+package com.streamsets.pipeline.lib.jdbc.load.schema;
 
 import com.streamsets.pipeline.lib.jdbc.JdbcUtil;
 import org.apache.commons.collections.CollectionUtils;

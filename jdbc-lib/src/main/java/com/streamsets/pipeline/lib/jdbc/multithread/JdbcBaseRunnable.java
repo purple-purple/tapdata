@@ -28,7 +28,7 @@ import com.streamsets.pipeline.lib.jdbc.JdbcUtil;
 import com.streamsets.pipeline.lib.jdbc.multithread.cache.JdbcTableReadContextInvalidationListener;
 import com.streamsets.pipeline.lib.jdbc.multithread.cache.JdbcTableReadContextLoader;
 import com.streamsets.pipeline.lib.jdbc.multithread.util.OffsetQueryUtil;
-import com.streamsets.pipeline.lib.jdbc.oracle.schema.SchemaFactory;
+import com.streamsets.pipeline.lib.jdbc.load.schema.SchemaFactory;
 import com.streamsets.pipeline.lib.util.ThreadUtil;
 import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.ErrorRecordHandler;

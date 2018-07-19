@@ -15,10 +15,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SchemaFactory {
 
@@ -35,6 +37,8 @@ public class SchemaFactory {
     final static String PK_TABLE_NAME = "PKTABLE_NAME";
     final static String PK_COLUMN_NAME = "PKCOLUMN_NAME";
     final static String FK_COLUMN_NAME = "FKCOLUMN_NAME";
+
+    private final static String LOAD_SCHEMA_ERROR = "Load {} schema error: {}";
 
 
     public static List<SchemaBean> getSchemaConfigs(List<?> tableConfigs) {
@@ -113,9 +117,10 @@ public class SchemaFactory {
                     }
 
                     try {
-                        relateDataBaseTables = iSchemaValidator.validateSchema(conn, statement, tableConfigs);
+//                        relateDataBaseTables = iSchemaValidator.validateSchema(conn, statement, tableConfigs);
+                        relateDataBaseTables = iSchemaValidator.validateSchema(conn, schemaBeans);
                     } catch (SQLException e) {
-                        LOG.error("Load oracle schema error: {}", e.toString(), e);
+                        LOG.error(LOAD_SCHEMA_ERROR, "oracle", e.toString(), e);
                         return null;
                     }
                 } else if (connectionString.startsWith(DatabaseType.MYSQL.getType())) {
@@ -124,7 +129,16 @@ public class SchemaFactory {
                     try {
                         relateDataBaseTables = iSchemaValidator.validateSchema(conn, schemaBeans);
                     } catch (SQLException e) {
-                        LOG.error("Load mysql schema error: {}", e.toString(), e);
+                        LOG.error(LOAD_SCHEMA_ERROR, "mysql", e.toString(), e);
+                        return null;
+                    }
+                } else if (connectionString.startsWith(DatabaseType.SQLSERVER.getType())) {
+                    iSchemaValidator = new SqlserverSchemaValidator();
+
+                    try {
+                        relateDataBaseTables = iSchemaValidator.validateSchema(conn, schemaBeans);
+                    } catch (SQLException e) {
+                        LOG.error(LOAD_SCHEMA_ERROR, "sqlserver", e.toString(), e);
                         return null;
                     }
                 }
@@ -158,5 +172,43 @@ public class SchemaFactory {
         }
 
         return tableSchemasJson;
+    }
+
+    static void setPrimaryKey(RelateDatabaseField field, Map<String, Integer> map) {
+        if (field != null && map != null) {
+            if (map.containsKey(field.getField_name())) {
+                field.setKey(PRI);
+                field.setPrimary_key_position(map.get(field.getField_name()));
+            }
+        }
+    }
+
+    static void setForeignKey(RelateDatabaseField field, Map<String, SchemaBean> map) {
+        if (field != null && map != null) {
+            if (map.containsKey(field.getField_name())) {
+                SchemaBean schemaBean = map.get(field.getField_name());
+                field.setForeign_key_column(schemaBean.getPk_column_name());
+                field.setForeign_key_table(schemaBean.getPk_table_name());
+            }
+        }
+    }
+
+    static void pkResultsetToMap(ResultSet rs, Map<String, Integer> map) throws SQLException {
+        if (rs != null) {
+            while (rs.next()) {
+                map.put(rs.getString(COLUMN_NAME), rs.getInt(KEY_SEQ));
+            }
+        }
+    }
+
+    static void fkResultsetToMap(ResultSet rs, Map<String, SchemaBean> map) throws SQLException {
+        if (rs != null) {
+            while (rs.next()) {
+                map.put(rs.getString(FK_COLUMN_NAME), new SchemaBean(
+                        rs.getString(PK_COLUMN_NAME),
+                        rs.getString(PK_TABLE_NAME)
+                ));
+            }
+        }
     }
 }

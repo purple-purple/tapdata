@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OracleSchemaValidator implements ISchemaValidator {
+public class OracleSchemaValidator extends MysqlSchemaValidator implements ISchemaValidator {
 
     private final static String TABLECONFIGBEAN = "com.streamsets.pipeline.stage.origin.jdbc.table.TableConfigBean";
     private final static String SCHEMATABLECONFIGBEAN = "com.streamsets.pipeline.stage.origin.jdbc.cdc.SchemaTableConfigBean";
@@ -129,7 +129,7 @@ public class OracleSchemaValidator implements ISchemaValidator {
 
     @Override
     public List<RelateDataBaseTable> validateSchema(Connection conn, List<SchemaBean> schemaBeans) throws SQLException {
-        return null;
+        return super.validateSchema(conn, schemaBeans);
     }
 
     /**

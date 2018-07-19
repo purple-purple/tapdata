@@ -8,10 +8,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class MysqlSchemaValidator extends SchemaFactory implements ISchemaValidator {
@@ -52,11 +49,16 @@ public class MysqlSchemaValidator extends SchemaFactory implements ISchemaValida
 
                     if (CollectionUtils.isNotEmpty(tableSet)) {
                         for (String tableName : tableSet) {
+                            RelateDataBaseTable table = new RelateDataBaseTable(tableName);
+                            List<RelateDatabaseField> fields = new ArrayList<>();
+
                             colRs = JdbcUtil.getColumnMetadata(conn, schema, tableName);
                             pkRs = JdbcUtil.getPrimaryKeysResultSet(conn, schema, tableName);
                             fkRs = JdbcUtil.getReferredTablesResultSet(conn, schema, tableName);
-                            RelateDataBaseTable table = new RelateDataBaseTable(tableName);
-                            List<RelateDatabaseField> fields = new ArrayList<>();
+                            Map<String, Integer> pkMap = new HashMap<>();
+                            Map<String, SchemaBean> fkMap = new HashMap<>();
+                            pkResultsetToMap(pkRs, pkMap);
+                            fkResultsetToMap(fkRs, fkMap);
 
                             while (colRs.next()) {
                                 RelateDatabaseField field = new RelateDatabaseField(
@@ -65,8 +67,8 @@ public class MysqlSchemaValidator extends SchemaFactory implements ISchemaValida
                                         colRs.getString(TYPE_NAME)
                                 );
 
-                                setPrimaryKey(field, pkRs);
-                                setForeignKey(field, fkRs);
+                                setPrimaryKey(field, pkMap);
+                                setForeignKey(field, fkMap);
 
                                 fields.add(field);
                             }
@@ -87,31 +89,5 @@ public class MysqlSchemaValidator extends SchemaFactory implements ISchemaValida
         }
 
         return relateDataBaseTables;
-    }
-
-    private static void setPrimaryKey(RelateDatabaseField field, ResultSet rs) throws SQLException {
-        if (field != null && rs != null) {
-            rs.beforeFirst();
-            while (rs.next()) {
-                if (field.getField_name().equals(rs.getString(COLUMN_NAME))) {
-                    field.setKey(PRI);
-                    field.setPrimary_key_position(rs.getShort(KEY_SEQ));
-                    break;
-                }
-            }
-        }
-    }
-
-    private static void setForeignKey(RelateDatabaseField field, ResultSet rs) throws SQLException {
-        if (field != null && rs != null) {
-            rs.beforeFirst();
-            while (rs.next()) {
-                if (field.getField_name().equals(rs.getString(FK_COLUMN_NAME))) {
-                    field.setForeign_key_column(rs.getString(PK_COLUMN_NAME));
-                    field.setForeign_key_table(rs.getString(PK_TABLE_NAME));
-                    break;
-                }
-            }
-        }
     }
 }

@@ -61,7 +61,7 @@
 
         <button class="btn btn-link dropdown-toggle icon-button" type="button" data-toggle="dropdown">
           <span ng-if="!filterPipeline" translate="logs.all">All</span>
-          <span ng-if="filterPipeline">{{filterPipelineLabel}}</span>
+          <span ng-if="filterPipeline">Job-{{pipelineTitleParam}}</span>
         </button>
 
         <ul class="dropdown-menu" role="menu"

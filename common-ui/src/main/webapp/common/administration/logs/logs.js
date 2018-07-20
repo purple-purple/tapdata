@@ -50,7 +50,7 @@ angular
     $rootScope, $scope, $routeParams, $interval, api, configuration, Analytics, $timeout, $modal
   ) {
     var pipelineNameParam = $routeParams.pipelineName;
-    var pipelineTitleParam = $routeParams.pipelineTitle || pipelineNameParam.substring(0, pipelineNameParam.length-36);
+    var pipelineTitleParam = $routeParams.pipelineTitle || (pipelineNameParam && pipelineNameParam.substring(0, pipelineNameParam.length-36)) || '';
     var webSocketLogURL = $rootScope.common.webSocketBaseURL + 'rest/v1/webSocket?type=log';
     var logWebSocket;
     var logWebSocketMessages = [];

@@ -75,7 +75,9 @@
 
           <li role="presentation" ng-repeat="pipeline in pipelines">
             <a role="menuitem" tabindex="-1" ng-href="/collector/logs/{{pipeline.title}}/{{pipeline.name}}">
-              <span>{{pipeline.title}}/{{pipeline.name}}</span>
+              <!-- <span>{{pipeline.title}}/{{pipeline.name}}</span> -->
+              <span>Job-{{pipeline.title}}</span>
+
             </a>
           </li>
 

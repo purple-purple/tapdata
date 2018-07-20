@@ -736,6 +736,7 @@
 
     <div ui-codemirror
          class="codemirror-editor"
+         ng-hide="configDefinition.name ==='configBean.mapping' "
          ng-class="{'codemirror-read-only': isPipelineReadOnly || isPipelineRunning}"
          focus-me="{{autoFocusConfigName === configDefinition.name}}"
          ng-model="detailPaneConfig.configuration[configIndex].value"
@@ -751,7 +752,7 @@
          field-paths="fieldPaths"
          d-field-paths="dFieldPaths">
     </div>
-    <button  style="margin-top:10px;"  ng-if="configDefinition.name ==='configBean.mapping' " ng-click="showMappingView()"> Edit Mapping </button>
+    <button class="btn btn-primary btn-sm create-pipeline-btn ng-scope" style="margin-top:10px;"  ng-if="configDefinition.name ==='configBean.mapping' " ng-click="showMappingView()"> Edit Mapping </button>
     <ng-include src="'configurationIssuesTemplate'"></ng-include>
   </div>
 </script>

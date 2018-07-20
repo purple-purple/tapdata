@@ -204,7 +204,7 @@ public final class MSQueryUtil {
       query.append(String.format(WHERE_CLAUSE, String.format(OR_CLAUSE, condition1, condition2)));
     }
 
-    query.append(String.format(ORDER_BY_CLAUSE, COMMA_SPACE_JOINER.join(ImmutableList.of(CDC_START_LSN, CDC_SEQVAL))));
+//    query.append(String.format(ORDER_BY_CLAUSE, COMMA_SPACE_JOINER.join(ImmutableList.of(CDC_START_LSN, CDC_SEQVAL))));
 
     if (allowLateTable) {
       query.append(END_QUERY);

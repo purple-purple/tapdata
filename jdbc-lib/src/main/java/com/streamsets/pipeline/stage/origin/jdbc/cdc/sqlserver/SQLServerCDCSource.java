@@ -40,77 +40,77 @@ import java.util.List;
 import java.util.Map;
 
 public class SQLServerCDCSource extends AbstractTableJdbcSource {
-  private static final Logger LOG = LoggerFactory.getLogger(SQLServerCTSource.class);
-  public static final String OFFSET_VERSION =
-      "$com.streamsets.pipeline.stage.origin.jdbc.CDC.sqlserver.SQLServerCDCSource.offset.version$";
-  public static final String OFFSET_VERSION_1 = "1";
+    private static final Logger LOG = LoggerFactory.getLogger(SQLServerCTSource.class);
+    public static final String OFFSET_VERSION =
+            "$com.streamsets.pipeline.stage.origin.jdbc.CDC.sqlserver.SQLServerCDCSource.offset.version$";
+    public static final String OFFSET_VERSION_1 = "1";
 
-  private final CommonSourceConfigBean commonSourceConfigBean;
-  private final TableJdbcConfigBean tableJdbcConfigBean;
-  private final CDCTableJdbcConfigBean cdcTableJdbcConfigBean;
+    private final CommonSourceConfigBean commonSourceConfigBean;
+    private final TableJdbcConfigBean tableJdbcConfigBean;
+    private final CDCTableJdbcConfigBean cdcTableJdbcConfigBean;
 
-  public SQLServerCDCSource(
-      HikariPoolConfigBean hikariConfigBean,
-      CommonSourceConfigBean commonSourceConfigBean,
-      CDCTableJdbcConfigBean cdcTableJdbcConfigBean,
-      TableJdbcConfigBean tableJdbcConfigBean
-  ) {
-    super(hikariConfigBean, commonSourceConfigBean, tableJdbcConfigBean);
-    this.commonSourceConfigBean = commonSourceConfigBean;
-    this.cdcTableJdbcConfigBean = cdcTableJdbcConfigBean;
-    this.tableJdbcConfigBean = tableJdbcConfigBean;
-  }
-
-  @Override
-  protected void handleLastOffset(Map<String, String> lastOffsets) throws StageException {
-    if (lastOffsets != null) {
-      getOffsets().putAll(lastOffsets);
-      //Only if it is not already committed
-      if (!lastOffsets.containsKey(OFFSET_VERSION)) {
-        //Version the offset so as to allow for future evolution.
-        getContext().commitOffset(OFFSET_VERSION, OFFSET_VERSION_1);
-      }
+    public SQLServerCDCSource(
+            HikariPoolConfigBean hikariConfigBean,
+            CommonSourceConfigBean commonSourceConfigBean,
+            CDCTableJdbcConfigBean cdcTableJdbcConfigBean,
+            TableJdbcConfigBean tableJdbcConfigBean
+    ) {
+        super(hikariConfigBean, commonSourceConfigBean, tableJdbcConfigBean, cdcTableJdbcConfigBean);
+        this.commonSourceConfigBean = commonSourceConfigBean;
+        this.cdcTableJdbcConfigBean = cdcTableJdbcConfigBean;
+        this.tableJdbcConfigBean = tableJdbcConfigBean;
     }
 
-    OffsetQueryUtil.validateV1Offset(getAllTableContexts(), getOffsets());
-  }
+    @Override
+    protected void handleLastOffset(Map<String, String> lastOffsets) throws StageException {
+        if (lastOffsets != null) {
+            getOffsets().putAll(lastOffsets);
+            //Only if it is not already committed
+            if (!lastOffsets.containsKey(OFFSET_VERSION)) {
+                //Version the offset so as to allow for future evolution.
+                getContext().commitOffset(OFFSET_VERSION, OFFSET_VERSION_1);
+            }
+        }
 
-  @Override
-  protected void validateTableJdbcConfigBean(PushSource.Context context, List<Stage.ConfigIssue> issues) {
-    //no-op
-  }
-
-  @Override
-  protected Map<String, TableContext> listTablesForConfig(
-      PushSource.Context context,
-      List<ConfigIssue> issues,
-      ConnectionManager connectionManager
-  ) throws SQLException, StageException {
-    Map<String, TableContext> allTableContexts = new HashMap<>();
-    for (CDCTableConfigBean tableConfigBean : cdcTableJdbcConfigBean.tableConfigs) {
-      //No duplicates even though a table matches multiple configurations, we will add it only once.
-      allTableContexts.putAll(
-          TableContextUtil.listCDCTablesForConfig(
-              connectionManager.getConnection(),
-              tableConfigBean,
-              commonSourceConfigBean.enableSchemaChanges
-          ));
+        OffsetQueryUtil.validateV1Offset(getAllTableContexts(), getOffsets());
     }
 
-    return allTableContexts;
-  }
+    @Override
+    protected void validateTableJdbcConfigBean(PushSource.Context context, List<Stage.ConfigIssue> issues) {
+        //no-op
+    }
 
-  @Override
-  protected CacheLoader<TableRuntimeContext, TableReadContext> getTableReadContextCache(
-      ConnectionManager connectionManager,
-      Map<String, String> offsets
-  ) {
-    return new SQLServerCDCContextLoader(
-        connectionManager,
-        offsets,
-        cdcTableJdbcConfigBean.fetchSize,
-        commonSourceConfigBean.allowLateTable,
-        commonSourceConfigBean.enableSchemaChanges
-    );
-  }
+    @Override
+    protected Map<String, TableContext> listTablesForConfig(
+            PushSource.Context context,
+            List<ConfigIssue> issues,
+            ConnectionManager connectionManager
+    ) throws SQLException, StageException {
+        Map<String, TableContext> allTableContexts = new HashMap<>();
+        for (CDCTableConfigBean tableConfigBean : cdcTableJdbcConfigBean.tableConfigs) {
+            //No duplicates even though a table matches multiple configurations, we will add it only once.
+            allTableContexts.putAll(
+                    TableContextUtil.listCDCTablesForConfig(
+                            connectionManager.getConnection(),
+                            tableConfigBean,
+                            commonSourceConfigBean.enableSchemaChanges
+                    ));
+        }
+
+        return allTableContexts;
+    }
+
+    @Override
+    protected CacheLoader<TableRuntimeContext, TableReadContext> getTableReadContextCache(
+            ConnectionManager connectionManager,
+            Map<String, String> offsets
+    ) {
+        return new SQLServerCDCContextLoader(
+                connectionManager,
+                offsets,
+                cdcTableJdbcConfigBean.fetchSize,
+                commonSourceConfigBean.allowLateTable,
+                commonSourceConfigBean.enableSchemaChanges
+        );
+    }
 }

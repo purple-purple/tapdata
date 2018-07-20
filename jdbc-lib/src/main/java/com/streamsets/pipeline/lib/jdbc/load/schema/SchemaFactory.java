@@ -5,6 +5,7 @@ import com.streamsets.pipeline.lib.jdbc.HikariPoolConfigBean;
 import com.streamsets.pipeline.lib.jdbc.JdbcErrors;
 import com.streamsets.pipeline.lib.jdbc.JdbcUtil;
 import com.streamsets.pipeline.stage.origin.jdbc.cdc.SchemaTableConfigBean;
+import com.streamsets.pipeline.stage.origin.jdbc.cdc.sqlserver.CDCTableConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableConfigBean;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.collections.CollectionUtils;
@@ -21,6 +22,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 public class SchemaFactory {
 
@@ -28,6 +31,7 @@ public class SchemaFactory {
 
     private final static String TABLECONFIGBEAN = "com.streamsets.pipeline.stage.origin.jdbc.table.TableConfigBean";
     private final static String SCHEMATABLECONFIGBEAN = "com.streamsets.pipeline.stage.origin.jdbc.cdc.SchemaTableConfigBean";
+    private final static String CDC_TABLE_CONFIG_BEAN = "com.streamsets.pipeline.stage.origin.jdbc.cdc.sqlserver.CDCTableConfigBean";
 
     final static String TABLE_NAME = "TABLE_NAME";
     final static String COLUMN_NAME = "COLUMN_NAME";
@@ -38,7 +42,11 @@ public class SchemaFactory {
     final static String PK_COLUMN_NAME = "PKCOLUMN_NAME";
     final static String FK_COLUMN_NAME = "FKCOLUMN_NAME";
 
-    private final static String LOAD_SCHEMA_ERROR = "Load {} schema error: {}";
+    private final static String LOAD_SCHEMA_ERROR = "Load %s schema error: %s";
+    private final static String UNSUPPORT_DATABASE = "%s is unsupport for now";
+    private final static String CONN_ERROR = "Try connect to database failed,please check your jdbc configure";
+
+    private static boolean is_mssql_cdc = false;
 
 
     public static List<SchemaBean> getSchemaConfigs(List<?> tableConfigs) {
@@ -52,7 +60,7 @@ public class SchemaFactory {
 
                 if (StringUtils.isNotBlank(typeName)) {
                     if (typeName.equals(TABLECONFIGBEAN)) {
-                        // jdbc cdc
+                        // oracle cdc
                         for (Object field : tableConfigs) {
                             SchemaBean schemaBean = new SchemaBean();
 
@@ -63,7 +71,7 @@ public class SchemaFactory {
                             schemaConfigBeans.add(schemaBean);
                         }
                     } else if (typeName.equals(SCHEMATABLECONFIGBEAN)) {
-                        // jdbc table
+                        // jdbc multitable
                         for (Object field : tableConfigs) {
                             SchemaBean schemaBean = new SchemaBean();
 
@@ -72,6 +80,18 @@ public class SchemaFactory {
                             schemaBean.setTableExceludePattern(((SchemaTableConfigBean) field).excludePattern);
 
                             schemaConfigBeans.add(schemaBean);
+                        }
+                    } else if (typeName.equals(CDC_TABLE_CONFIG_BEAN)) {
+                        // sql server cdc
+                        for (Object field : tableConfigs) {
+                            SchemaBean schemaBean = new SchemaBean();
+
+                            schemaBean.setSchema("cdc");
+                            schemaBean.setTablePattern(((CDCTableConfigBean) field).capture_instance);
+                            schemaBean.setTableExceludePattern(((CDCTableConfigBean) field).tableExclusionPattern);
+
+                            schemaConfigBeans.add(schemaBean);
+                            is_mssql_cdc = true;
                         }
                     }
                 }
@@ -82,16 +102,17 @@ public class SchemaFactory {
     }
 
     public List<RelateDataBaseTable> loadSchemaList(HikariPoolConfigBean hikariConfigBean, List<?> tableConfigs) {
-        List<RelateDataBaseTable> relateDataBaseTables = new ArrayList<>();
+        List<RelateDataBaseTable> relateDataBaseTables;
         List<SchemaBean> schemaBeans = getSchemaConfigs(tableConfigs);
         String connectionString = hikariConfigBean.connectionString;
-        ISchemaValidator iSchemaValidator;
+        ISchemaValidator iSchemaValidator = null;
         HikariDataSource dataSource = null;
         Connection conn = null;
         Statement statement = null;
+        String dbName = "";
 
         if (CollectionUtils.isEmpty(schemaBeans)) {
-            throw new RuntimeException("Table config cannot be empty.");
+            throw new RuntimeException("Table config cannot be empty");
         }
 
         try {
@@ -99,49 +120,39 @@ public class SchemaFactory {
                 dataSource = JdbcUtil.createDataSourceForRead(hikariConfigBean);
                 conn = dataSource.getConnection();
             } catch (StageException e) {
-                LOG.error(JdbcErrors.JDBC_00.getMessage(), e.toString(), e);
-                return null;
+                throw new RuntimeException(JdbcErrors.JDBC_00.getMessage(), e);
             } catch (SQLException e) {
-                LOG.error(JdbcErrors.JDBC_06.getMessage(), e.toString(), e);
-                return null;
+                throw new RuntimeException(JdbcErrors.JDBC_06.getMessage(), e);
             }
 
+            // instantiation interface iSchemaValidator
             if (dataSource != null && conn != null) {
                 if (connectionString.startsWith(DatabaseType.ORACLE.getType())) {
                     iSchemaValidator = new OracleSchemaValidator();
-                    try {
-                        statement = conn.createStatement();
-                    } catch (SQLException e) {
-                        LOG.error("Cannot create statement when load oracle schema: {}", e.toString(), e);
-                        return null;
-                    }
-
-                    try {
-//                        relateDataBaseTables = iSchemaValidator.validateSchema(conn, statement, tableConfigs);
-                        relateDataBaseTables = iSchemaValidator.validateSchema(conn, schemaBeans);
-                    } catch (SQLException e) {
-                        LOG.error(LOAD_SCHEMA_ERROR, "oracle", e.toString(), e);
-                        return null;
-                    }
+                    dbName = "oracle";
                 } else if (connectionString.startsWith(DatabaseType.MYSQL.getType())) {
                     iSchemaValidator = new MysqlSchemaValidator();
-
-                    try {
-                        relateDataBaseTables = iSchemaValidator.validateSchema(conn, schemaBeans);
-                    } catch (SQLException e) {
-                        LOG.error(LOAD_SCHEMA_ERROR, "mysql", e.toString(), e);
-                        return null;
-                    }
+                    dbName = "mysql";
                 } else if (connectionString.startsWith(DatabaseType.SQLSERVER.getType())) {
                     iSchemaValidator = new SqlserverSchemaValidator();
+                    dbName = "sql server";
+                }
 
+                if (iSchemaValidator != null) {
                     try {
                         relateDataBaseTables = iSchemaValidator.validateSchema(conn, schemaBeans);
+
+                        if (relateDataBaseTables == null) {
+                            throw new RuntimeException(String.format(LOAD_SCHEMA_ERROR, dbName, "Missing schema or table pattern"));
+                        }
                     } catch (SQLException e) {
-                        LOG.error(LOAD_SCHEMA_ERROR, "sqlserver", e.toString(), e);
-                        return null;
+                        throw new RuntimeException(String.format(LOAD_SCHEMA_ERROR, dbName, e.toString()), e);
                     }
+                } else {
+                    throw new RuntimeException(String.format(UNSUPPORT_DATABASE, hikariConfigBean.connectionString));
                 }
+            } else {
+                throw new RuntimeException(CONN_ERROR);
             }
         } finally {
             JdbcUtil.closeQuietly(conn);
@@ -163,12 +174,10 @@ public class SchemaFactory {
                 // list to json
                 tableSchemasJson = mapper.writeValueAsString(tableSchemas);
             } catch (IOException e) {
-                LOG.error("Parse schema list to json failed: {}", e.toString(), e);
-                return null;
+                throw new RuntimeException(String.format("Parse schema list to json failed: %s", e.toString()), e);
             }
         } else {
-            LOG.error("Load schema list error");
-            return null;
+            throw new RuntimeException(String.format("Load schema list failed"));
         }
 
         return tableSchemasJson;
@@ -210,5 +219,40 @@ public class SchemaFactory {
                 ));
             }
         }
+    }
+
+    static void tbResultsetToSet(ResultSet rs, Set<String> set, Pattern p) throws SQLException {
+        if (rs != null && set != null) {
+            while (rs.next()) {
+                String tableName = rs.getString(TABLE_NAME);
+
+                if (is_mssql_cdc) {
+                    String[] tableNames = tableName.split("_");
+                    if (tableNames.length > 1) {
+                        tableName = tableNames[1];
+                    }
+                }
+
+                if (p == null || !p.matcher(tableName).matches()) {
+                    set.add(tableName);
+                }
+            }
+        }
+    }
+
+    static String getSchema(SchemaBean schemaBean) {
+        String schema = "";
+        if (schemaBean != null) {
+            schema = schemaBean.getSchema();
+
+            if (is_mssql_cdc) {
+                String[] strs = schemaBean.getTablePattern().split("_");
+                if (strs.length > 0) {
+                    schema = strs[0];
+                }
+            }
+        }
+
+        return schema;
     }
 }

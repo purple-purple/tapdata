@@ -41,6 +41,8 @@ import com.streamsets.pipeline.lib.jdbc.multithread.TableOrderProvider;
 import com.streamsets.pipeline.lib.jdbc.multithread.TableOrderProviderFactory;
 import com.streamsets.pipeline.lib.jdbc.multithread.TableReadContext;
 import com.streamsets.pipeline.lib.jdbc.multithread.TableRuntimeContext;
+import com.streamsets.pipeline.stage.origin.jdbc.cdc.sqlserver.CDCTableConfigBean;
+import com.streamsets.pipeline.stage.origin.jdbc.cdc.sqlserver.CDCTableJdbcConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.PartitioningMode;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
@@ -86,6 +88,7 @@ public abstract class AbstractTableJdbcSource extends BasePushSource {
     //can keep track of different closeables from different threads
     private final Collection<Cache<TableRuntimeContext, TableReadContext>> toBeInvalidatedThreadCaches;
     private ScheduledExecutorService executorServiceForTableSpooler;
+    private final CDCTableJdbcConfigBean cdcTableJdbcConfigBean;
 
     private HikariDataSource hikariDataSource;
     private ConnectionManager connectionManager;
@@ -101,6 +104,21 @@ public abstract class AbstractTableJdbcSource extends BasePushSource {
         this.hikariConfigBean = hikariConfigBean;
         this.commonSourceConfigBean = commonSourceConfigBean;
         this.tableJdbcConfigBean = tableJdbcConfigBean;
+        this.cdcTableJdbcConfigBean = null;
+        allTableContexts = new LinkedHashMap<>();
+        qualifiedTableNameToConfigIndex = new HashMap<>();
+        toBeInvalidatedThreadCaches = new ArrayList<>();
+    }
+
+    public AbstractTableJdbcSource(
+            HikariPoolConfigBean hikariConfigBean,
+            CommonSourceConfigBean commonSourceConfigBean,
+            TableJdbcConfigBean tableJdbcConfigBean,
+            CDCTableJdbcConfigBean cdcTableJdbcConfigBean) {
+        this.hikariConfigBean = hikariConfigBean;
+        this.commonSourceConfigBean = commonSourceConfigBean;
+        this.tableJdbcConfigBean = tableJdbcConfigBean;
+        this.cdcTableJdbcConfigBean = cdcTableJdbcConfigBean;
         allTableContexts = new LinkedHashMap<>();
         qualifiedTableNameToConfigIndex = new HashMap<>();
         toBeInvalidatedThreadCaches = new ArrayList<>();
@@ -342,6 +360,7 @@ public abstract class AbstractTableJdbcSource extends BasePushSource {
                         .tableJdbcConfigBean(tableJdbcConfigBean)
                         .queryRateLimiter(commonSourceConfigBean.creatQueryRateLimiter())
                         .hikariPoolConfigBean(hikariConfigBean)
+                        .cdcTableJdbcConfigBean(cdcTableJdbcConfigBean)
                         .build();
 
                 toBeInvalidatedThreadCaches.add(runnable.getTableReadContextCache());

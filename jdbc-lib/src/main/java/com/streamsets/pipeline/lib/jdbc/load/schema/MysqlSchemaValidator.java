@@ -12,7 +12,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class MysqlSchemaValidator extends SchemaFactory implements ISchemaValidator {
-    private static final String TABLE_METADATA_TABLE_NAME_CONSTANT = "TABLE_NAME";
 
     @Override
     public List<RelateDataBaseTable> validateSchema(Connection conn, Statement statement, List<?> tableCongifs) throws SQLException {
@@ -31,19 +30,20 @@ public class MysqlSchemaValidator extends SchemaFactory implements ISchemaValida
             if (conn != null) {
                 if (schemaBeans != null && CollectionUtils.isNotEmpty(schemaBeans)) {
                     Set<String> tableSet = new HashSet<>();
-                    String schema = schemaBeans.get(0).getSchema();
+                    String schema = "";
 
                     for (SchemaBean schemaBean : schemaBeans) {
-                        Pattern p = StringUtils.isBlank(schemaBean.getTableExceludePattern()) ? null : Pattern.compile(schemaBean.getTableExceludePattern());
-                        tableRs = JdbcUtil.getTableMetadata(conn, null, schema, schemaBean.getTablePattern(), false);
+                        if (StringUtils.isNotBlank(schemaBean.getSchema()) && StringUtils.isNotBlank(schemaBean.getTablePattern())) {
+                            Pattern p = StringUtils.isBlank(schemaBean.getTableExceludePattern()) ? null : Pattern.compile(schemaBean.getTableExceludePattern());
+                            tableRs = JdbcUtil.getTableMetadata(conn, null, schemaBean.getSchema(), schemaBean.getTablePattern(), false);
 
-                        // get table names
-                        while (tableRs.next()) {
-                            String tableName = tableRs.getString(TABLE_METADATA_TABLE_NAME_CONSTANT);
+                            // get schema
+                            schema = getSchema(schemaBean);
 
-                            if (p == null || !p.matcher(tableName).matches()) {
-                                tableSet.add(tableName);
-                            }
+                            // trans table resultset to set(unique)
+                            tbResultsetToSet(tableRs, tableSet, p);
+                        } else {
+                            return null;
                         }
                     }
 

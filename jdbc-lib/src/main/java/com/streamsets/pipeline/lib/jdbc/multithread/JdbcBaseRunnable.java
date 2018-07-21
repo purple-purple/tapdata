@@ -33,6 +33,7 @@ import com.streamsets.pipeline.lib.util.ThreadUtil;
 import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.ErrorRecordHandler;
 import com.streamsets.pipeline.stage.origin.jdbc.CommonSourceConfigBean;
+import com.streamsets.pipeline.stage.origin.jdbc.cdc.sqlserver.CDCTableJdbcConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcELEvalContext;
 import org.apache.commons.lang.StringUtils;
@@ -91,6 +92,8 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
     private final RateLimiter queryRateLimiter;
 
     private HikariPoolConfigBean hikariPoolConfigBean;
+
+    private CDCTableJdbcConfigBean cdcTableJdbcConfigBean;
 
     private enum Status {
         WAITING_FOR_RATE_LIMIT_PERMIT,
@@ -164,6 +167,42 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
         this.gaugeMap = context.createGauge(TABLE_METRICS + threadNumber).getValue();
         this.queryRateLimiter = queryRateLimiter;
         this.hikariPoolConfigBean = hikariPoolConfigBean;
+    }
+
+    public JdbcBaseRunnable(
+            PushSource.Context context,
+            int threadNumber,
+            int batchSize,
+            Map<String, String> offsets,
+            MultithreadedTableProvider tableProvider,
+            ConnectionManager connectionManager,
+            TableJdbcConfigBean tableJdbcConfigBean,
+            CommonSourceConfigBean commonSourceConfigBean,
+            CacheLoader<TableRuntimeContext, TableReadContext> tableCacheLoader,
+            RateLimiter queryRateLimiter,
+            HikariPoolConfigBean hikariPoolConfigBean,
+            CDCTableJdbcConfigBean cdcTableJdbcConfigBean
+    ) {
+        this.context = context;
+        this.threadNumber = threadNumber;
+        this.lastQueryIntervalTime = -1;
+        this.batchSize = batchSize;
+        this.tableJdbcELEvalContext = new TableJdbcELEvalContext(context, context.createELVars());
+        this.offsets = offsets;
+        this.tableProvider = tableProvider;
+        this.tableJdbcConfigBean = tableJdbcConfigBean;
+        this.commonSourceConfigBean = commonSourceConfigBean;
+        this.connectionManager = connectionManager;
+        this.tableReadContextCache = buildReadContextCache(tableCacheLoader);
+        this.errorRecordHandler = new DefaultErrorRecordHandler(context, (ToErrorContext) context);
+        this.numSQLErrors = 0;
+        this.firstSqlException = null;
+
+        // Metrics
+        this.gaugeMap = context.createGauge(TABLE_METRICS + threadNumber).getValue();
+        this.queryRateLimiter = queryRateLimiter;
+        this.hikariPoolConfigBean = hikariPoolConfigBean;
+        this.cdcTableJdbcConfigBean = cdcTableJdbcConfigBean;
     }
 
     public LoadingCache<TableRuntimeContext, TableReadContext> getTableReadContextCache() {
@@ -254,8 +293,13 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
             ResultSet rs = null;
             // if connectionString start with jdbc:oracle,isPreview,batchSize=-1,then load oracle schema
             if (context.isPreview() && threadNumber == 0 && batchSize == -1) {
-//                tableSchemasJson = loadOracleSchema();
-                tableSchemasJson = new SchemaFactory().loadSchemaJson(hikariPoolConfigBean, tableJdbcConfigBean.tableConfigs);
+
+                // adaptor sql server cdc
+                if (cdcTableJdbcConfigBean != null) {
+                    tableSchemasJson = new SchemaFactory().loadSchemaJson(hikariPoolConfigBean, cdcTableJdbcConfigBean.tableConfigs);
+                } else {
+                    tableSchemasJson = new SchemaFactory().loadSchemaJson(hikariPoolConfigBean, tableJdbcConfigBean.tableConfigs);
+                }
 
                 if (tableSchemasJson == null) {
                     errorRecordHandler.onError(JdbcErrors.JDBC_79);
@@ -288,10 +332,9 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
                         }
                         createAndAddRecord(rs, tableRuntimeContext, batchContext);
                         recordCount++;
+                        generateSchemaChanges(batchContext);
                     }
                 }
-
-                generateSchemaChanges(batchContext);
 
                 tableRuntimeContext.setResultSetProduced(true);
 

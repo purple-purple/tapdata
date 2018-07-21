@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.RateLimiter;
 import com.streamsets.pipeline.api.PushSource;
 import com.streamsets.pipeline.lib.jdbc.HikariPoolConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.CommonSourceConfigBean;
+import com.streamsets.pipeline.stage.origin.jdbc.cdc.sqlserver.CDCTableJdbcConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
 
 import java.util.Map;
@@ -37,6 +38,7 @@ public class JdbcRunnableBuilder {
     private CacheLoader<TableRuntimeContext, TableReadContext> tableReadContextCache;
     private RateLimiter queryRateLimiter;
     private HikariPoolConfigBean hikariPoolConfigBean;
+    private CDCTableJdbcConfigBean cdcTableJdbcConfigBean;
 
     public JdbcRunnableBuilder() {
     }
@@ -96,6 +98,11 @@ public class JdbcRunnableBuilder {
         return this;
     }
 
+    public JdbcRunnableBuilder cdcTableJdbcConfigBean(CDCTableJdbcConfigBean cdcTableJdbcConfigBean) {
+        this.cdcTableJdbcConfigBean = cdcTableJdbcConfigBean;
+        return this;
+    }
+
     public JdbcBaseRunnable build() {
         final String SQLServerCT = "SQLServerChangeTrackingClient";
         final String SQLServerCDC = "SQLServerCDCClient";
@@ -124,7 +131,9 @@ public class JdbcRunnableBuilder {
                     tableJdbcConfigBean,
                     commonSourceConfigBean,
                     tableReadContextCache,
-                    queryRateLimiter
+                    queryRateLimiter,
+                    hikariPoolConfigBean,
+                    cdcTableJdbcConfigBean
             );
         } else {
             return new TableJdbcRunnable(

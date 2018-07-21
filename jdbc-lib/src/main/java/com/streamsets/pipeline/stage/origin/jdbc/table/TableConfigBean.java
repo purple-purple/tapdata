@@ -16,6 +16,7 @@
 package com.streamsets.pipeline.stage.origin.jdbc.table;
 
 import com.streamsets.pipeline.api.ConfigDef;
+import com.streamsets.pipeline.api.HideConfigs;
 import com.streamsets.pipeline.api.ListBeanModel;
 import com.streamsets.pipeline.api.ValueChooserModel;
 import com.streamsets.pipeline.lib.el.TimeEL;

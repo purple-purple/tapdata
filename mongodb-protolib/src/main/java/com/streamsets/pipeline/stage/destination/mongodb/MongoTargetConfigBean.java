@@ -91,7 +91,8 @@ public class MongoTargetConfigBean {
             displayPosition = 1005,
             group = "MAPPING",
             dependsOn = "isCloningMode",
-            triggeredByValue = "false"
+            triggeredByValue = "false",
+            defaultValue = "{\"mappings\":\"[]\"}"
     )
     public String mapping;
 
@@ -101,9 +102,7 @@ public class MongoTargetConfigBean {
             description = "Schema Json",
             displayPosition = 1006,
             required = false,
-            group = "MAPPING",
-            dependsOn = "mapping",
-            triggeredByValue = "display schema"
+            group = "MAPPING"
     )
     public String schema;
 }

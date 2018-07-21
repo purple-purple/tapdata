@@ -2084,6 +2084,7 @@ angular
       if($scope.showLoading){
         return;
       }
+      
       $scope.tapdataMessage= "Loading DB Schema Info ...";
       $scope.showLoading = true;
       var mappingSpinerTimeout = setTimeout(function(){
@@ -2169,7 +2170,7 @@ angular
             $(".mapping-message").text(data.message)
           }
           const schemaString = getSchema(data)
-          if(schemaString){ 
+          if(schemaString){
             $scope.tapdataMessage= "";
             $scope.showLoading = false;
             clearTimeout(mappingSpinerTimeout);
@@ -2179,6 +2180,20 @@ angular
             $("#pipconfig").css("display","none")
             $scope.refreshGraph(); 
             var current_schema = $scope.pipelineConfig['metadata']['tapdata_schema']
+            {
+              var database_type= '';
+              for( var ci = 0; ci < $scope.pipelineConfig.stages[0].configuration.length; ci++){
+                if($scope.pipelineConfig.stages[0].configuration[ci].value.indexOf('jdbc:mysql') >= 0 ){
+                  database_type= 'Mysql';
+                }
+                if($scope.pipelineConfig.stages[0].configuration[ci].value.indexOf('jdbc:oracle') >= 0 ){
+                  database_type= 'Oracle';
+                }
+                if($scope.pipelineConfig.stages[0].configuration[ci].value.indexOf('jdbc:microsoft:sqlserver') >= 0 ){
+                  database_type= 'Sqlserver';
+                }
+              }
+            }
             if(current_schema && current_schema.schema){
               current_schema.schema.tables.sort((a,b)=> {
                 delete a.visible
@@ -2207,11 +2222,11 @@ angular
  
               console.log(current_schema,equalLastTime,"compareLastTime!")
               if( !equalLastTime){
-                $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
+                $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo, database_type:database_type}}
                 $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''
               }
             }else{
-              $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
+              $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo, database_type:database_type}}
               $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''
             }
             $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)

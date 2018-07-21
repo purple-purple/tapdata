@@ -2120,7 +2120,8 @@ angular
             console.log(current_mapping);
             ifrm.mydesigner && ifrm.mydesigner.restore(current_mapping) 
           }else{
-            ifrm.mydesigner && ifrm.mydesigner.init(current_schema.schema, {mode: 'cluster-clone'}) 
+            current_schema.database_type = current_schema.schema.database_type
+            ifrm.mydesigner && ifrm.mydesigner.init(current_schema, {mode: 'cluster-clone'}) 
           }
           ifrm.mydesigner && ifrm.mydesigner.on('savedocument', r => {
             var result = ifrm.mydesigner.getDesignResult()

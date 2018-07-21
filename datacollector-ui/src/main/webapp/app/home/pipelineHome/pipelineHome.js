@@ -2183,14 +2183,16 @@ angular
             {
               var database_type= '';
               for( var ci = 0; ci < $scope.pipelineConfig.stages[0].configuration.length; ci++){
-                if($scope.pipelineConfig.stages[0].configuration[ci].value.indexOf('jdbc:mysql') >= 0 ){
-                  database_type= 'Mysql';
-                }
-                if($scope.pipelineConfig.stages[0].configuration[ci].value.indexOf('jdbc:oracle') >= 0 ){
-                  database_type= 'Oracle';
-                }
-                if($scope.pipelineConfig.stages[0].configuration[ci].value.indexOf('jdbc:microsoft:sqlserver') >= 0 ){
-                  database_type= 'Sqlserver';
+                if($scope.pipelineConfig.stages[0].configuration[ci].name === "hikariConfigBean.connectionString"){
+                  if($scope.pipelineConfig.stages[0].configuration[ci].value.indexOf('jdbc:mysql') >= 0 ){
+                    database_type= 'Mysql';
+                  }
+                  if($scope.pipelineConfig.stages[0].configuration[ci].value.indexOf('jdbc:oracle') >= 0 ){
+                    database_type= 'Oracle';
+                  }
+                  if($scope.pipelineConfig.stages[0].configuration[ci].value.indexOf('jdbc:microsoft:sqlserver') >= 0) {
+                    database_type= 'Sqlserver';
+                  }
                 }
               }
             }

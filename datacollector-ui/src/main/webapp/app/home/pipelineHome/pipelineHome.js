@@ -2080,6 +2080,7 @@ angular
     })
 
     $scope.$on('showMappingView', function (event, options) {
+      $(".mapping-message").text('')
       if($scope.showLoading){
         return;
       }
@@ -2164,6 +2165,9 @@ angular
 
       previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
         -1,true).then(function(data){
+          if(!data.batchesOutput && data.message){
+            $(".mapping-message").text(data.message)
+          }
           const schemaString = getSchema(data)
           if(schemaString){ 
             $scope.tapdataMessage= "";

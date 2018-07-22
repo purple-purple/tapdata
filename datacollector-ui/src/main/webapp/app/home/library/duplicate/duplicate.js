@@ -31,6 +31,14 @@ angular
       },
       operationInProgress: false,
       save : function () {
+        var jobNameListString = localStorage.getItem('jobNameList');
+        if(jobNameListString.length > 0){
+          var jobNameList  = jobNameListString.split(',')
+          if(jobNameList.indexOf($scope.newConfig.title) >= 0){
+            alert('The job name exisited, please input new name.');
+            return;
+          }
+        }
         if ($scope.newConfig.numberOfCopies === 1) {
           $scope.operationInProgress = true;
           $q.all([

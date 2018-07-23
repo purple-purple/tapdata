@@ -40,9 +40,9 @@ import java.util.List;
 import java.util.Map;
 
 public class SQLServerCDCSource extends AbstractTableJdbcSource {
-    private static final Logger LOG = LoggerFactory.getLogger(SQLServerCTSource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SQLServerCDCSource.class);
     public static final String OFFSET_VERSION =
-            "$com.streamsets.pipeline.stage.origin.jdbc.CDC.sqlserver.SQLServerCDCSource.offset.version$";
+            "$pipeline.stage.origin.jdbc.CDC.sqlserver.SQLServerCDCSource.offset.version$";
     public static final String OFFSET_VERSION_1 = "1";
 
     private final CommonSourceConfigBean commonSourceConfigBean;

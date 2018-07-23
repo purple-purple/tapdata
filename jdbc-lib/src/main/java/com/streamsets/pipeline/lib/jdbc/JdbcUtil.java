@@ -394,6 +394,7 @@ public class JdbcUtil {
       tableNames.addAll(knownTableNames);
     }
 
+
     header.setAttribute(jdbcNameSpacePrefix + "tables", Joiner.on(",").join(tableNames));
   }
 

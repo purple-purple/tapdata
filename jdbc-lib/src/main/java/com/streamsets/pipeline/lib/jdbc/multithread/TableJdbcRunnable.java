@@ -68,19 +68,10 @@ public final class TableJdbcRunnable extends JdbcBaseRunnable {
     public void createAndAddRecord(
             ResultSet rs,
             TableRuntimeContext tableRuntimeContext,
-            BatchContext batchContext
-    ) throws SQLException, StageException {
-        this.createAndAddRecordWithSchema(rs, tableRuntimeContext, batchContext, "");
-    }
-
-    @Override
-    public void createAndAddRecord(
-            ResultSet rs,
-            TableRuntimeContext tableRuntimeContext,
             BatchContext batchContext,
-            String tableSchemasJson
+            String connectionString
     ) throws SQLException, StageException {
-        this.createAndAddRecordWithSchema(rs, tableRuntimeContext, batchContext, tableSchemasJson);
+        this.createAndAddRecordWithSchema(rs, tableRuntimeContext, batchContext);
     }
 
     @Override
@@ -91,8 +82,7 @@ public final class TableJdbcRunnable extends JdbcBaseRunnable {
     private void createAndAddRecordWithSchema(
             ResultSet rs,
             TableRuntimeContext tableRuntimeContext,
-            BatchContext batchContext,
-            String tableSchemasJson
+            BatchContext batchContext
     ) throws SQLException, StageException {
         ResultSetMetaData md = rs.getMetaData();
 
@@ -129,10 +119,6 @@ public final class TableJdbcRunnable extends JdbcBaseRunnable {
 
         record.getHeader().setAttribute(PARTITION_ATTRIBUTE, tableRuntimeContext.getDescription());
         record.getHeader().setAttribute(THREAD_NUMBER_ATTRIBUTE, String.valueOf(threadNumber));
-
-        if (StringUtils.isNotEmpty(tableSchemasJson)) {
-            record.getHeader().setAttribute("schema", tableSchemasJson);
-        }
 
         batchContext.getBatchMaker().addRecord(record);
 

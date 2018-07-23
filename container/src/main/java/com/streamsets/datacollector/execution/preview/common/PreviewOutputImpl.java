@@ -19,40 +19,55 @@ import com.streamsets.datacollector.execution.PreviewOutput;
 import com.streamsets.datacollector.execution.PreviewStatus;
 import com.streamsets.datacollector.runner.StageOutput;
 import com.streamsets.datacollector.validation.Issues;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
 public class PreviewOutputImpl implements PreviewOutput {
 
-  private final PreviewStatus previewStatus;
-  private final Issues issues;
-  private final List<List<StageOutput>> output;
-  private final String message;
+    private final PreviewStatus previewStatus;
+    private final Issues issues;
+    private final List<List<StageOutput>> output;
+    private final String message;
 
-  public PreviewOutputImpl(PreviewStatus previewStatus, Issues issues, List<List<StageOutput>> output, String message) {
-    this.previewStatus = previewStatus;
-    this.issues = issues;
-    this.output = output;
-    this.message = message;
-  }
+    private final static String JDBC_LIB_EDITMAPPING_ERROR_PREFIX = "EDITMAPPING_ERROR:";
 
-  @Override
-  public PreviewStatus getStatus() {
-    return previewStatus;
-  }
+    public PreviewOutputImpl(PreviewStatus previewStatus, Issues issues, List<List<StageOutput>> output, String message) {
+        this.previewStatus = previewStatus;
+        this.issues = issues;
+        this.output = output;
+        this.message = this.handleMessage(message);
+    }
 
-  @Override
-  public Issues getIssues() {
-    return issues;
-  }
+    @Override
+    public PreviewStatus getStatus() {
+        return previewStatus;
+    }
 
-  @Override
-  public List<List<StageOutput>> getOutput() {
-    return output;
-  }
+    @Override
+    public Issues getIssues() {
+        return issues;
+    }
 
-  @Override
-  public String getMessage() {
-    return message;
-  }
+    @Override
+    public List<List<StageOutput>> getOutput() {
+        return output;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
+    private String handleMessage(String message) {
+        String retMessage = "";
+        if (StringUtils.isNotBlank(message)) {
+            retMessage = message.replace("com.streamsets.", "");
+            if (retMessage.contains(JDBC_LIB_EDITMAPPING_ERROR_PREFIX)) {
+                retMessage = retMessage.substring(retMessage.indexOf(JDBC_LIB_EDITMAPPING_ERROR_PREFIX, 0))
+                        .replace(JDBC_LIB_EDITMAPPING_ERROR_PREFIX, "");
+            }
+        }
+        return retMessage;
+    }
 }

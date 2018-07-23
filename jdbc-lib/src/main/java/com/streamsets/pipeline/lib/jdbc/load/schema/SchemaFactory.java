@@ -42,9 +42,11 @@ public class SchemaFactory {
     final static String PK_COLUMN_NAME = "PKCOLUMN_NAME";
     final static String FK_COLUMN_NAME = "FKCOLUMN_NAME";
 
-    private final static String LOAD_SCHEMA_ERROR = "Load %s schema error: %s";
-    private final static String UNSUPPORT_DATABASE = "%s is unsupport for now";
-    private final static String CONN_ERROR = "Try connect to database failed,please check your jdbc configure";
+    private final static String ERROR_PREFIX = "EDITMAPPING_ERROR:";
+    private final static String LOAD_SCHEMA_ERROR = ERROR_PREFIX + "Load %s schema error: %s";
+    private final static String UNSUPPORT_DATABASE = ERROR_PREFIX + "%s is unsupport for now";
+    private final static String CONN_ERROR = ERROR_PREFIX + "Try connect to database failed,please check your jdbc configure";
+    private final static String TABLECONFIG_EMPTY_ERROR = ERROR_PREFIX + "Table config cannot be empty";
 
     private static boolean is_mssql_cdc = false;
 
@@ -112,7 +114,7 @@ public class SchemaFactory {
         String dbName = "";
 
         if (CollectionUtils.isEmpty(schemaBeans)) {
-            throw new RuntimeException("Table config cannot be empty");
+            throw new RuntimeException(TABLECONFIG_EMPTY_ERROR);
         }
 
         try {
@@ -120,9 +122,9 @@ public class SchemaFactory {
                 dataSource = JdbcUtil.createDataSourceForRead(hikariConfigBean);
                 conn = dataSource.getConnection();
             } catch (StageException e) {
-                throw new RuntimeException(JdbcErrors.JDBC_00.getMessage(), e);
+                throw new RuntimeException(ERROR_PREFIX + JdbcErrors.JDBC_00.getMessage(), e);
             } catch (SQLException e) {
-                throw new RuntimeException(JdbcErrors.JDBC_06.getMessage(), e);
+                throw new RuntimeException(ERROR_PREFIX + JdbcErrors.JDBC_06.getMessage(), e);
             }
 
             // instantiation interface iSchemaValidator
@@ -174,11 +176,12 @@ public class SchemaFactory {
                 // list to json
                 tableSchemasJson = mapper.writeValueAsString(tableSchemas);
             } catch (IOException e) {
-                throw new RuntimeException(String.format("Parse schema list to json failed: %s", e.toString()), e);
+                throw new RuntimeException(ERROR_PREFIX + String.format("Parse schema list to json failed: %s", e.toString()), e);
             }
         } else {
-            throw new RuntimeException(String.format("Load schema list failed"));
+            throw new RuntimeException(ERROR_PREFIX + String.format("Load schema list failed"));
         }
+
 
         return tableSchemasJson;
     }

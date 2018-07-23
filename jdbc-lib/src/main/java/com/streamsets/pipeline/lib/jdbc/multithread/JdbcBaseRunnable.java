@@ -330,7 +330,7 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
                             resultSetEndReached = true;
                             break;
                         }
-                        createAndAddRecord(rs, tableRuntimeContext, batchContext);
+                        createAndAddRecord(rs, tableRuntimeContext, batchContext, hikariPoolConfigBean.connectionString);
                         recordCount++;
                         generateSchemaChanges(batchContext);
                     }

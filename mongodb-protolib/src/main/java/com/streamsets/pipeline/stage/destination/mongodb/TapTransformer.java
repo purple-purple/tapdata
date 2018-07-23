@@ -117,15 +117,10 @@ public class TapTransformer {
         String operationCode = record.getHeader().getAttribute(OperationType.SDC_OPERATION_TYPE);
         String tableName = null;
 
+        // get table name
         for (RecordTableEnum recordTableEnum : RecordTableEnum.values()) {
-            if (recordTableEnum == RecordTableEnum.ORALCE_CDC_TALBE) {
-                tableName = record.getHeader().getAttribute(recordTableEnum.getFieldName());
-                if (StringUtils.isNotBlank(tableName)) {
-                    break;
-                }
-            }
-            if (recordTableEnum == RecordTableEnum.JDBC_TABLES) {
-                tableName = record.getHeader().getAttribute(recordTableEnum.getFieldName());
+            tableName = record.getHeader().getAttribute(recordTableEnum.getFieldName());
+            if (StringUtils.isNotBlank(tableName)) {
                 break;
             }
         }
@@ -681,6 +676,46 @@ public class TapTransformer {
  * }
  * <p>
  * <p>
+ * <p>
+ * SEQ -- 1
+ * oracle.cdc.SSN -- 0
+ * operation type UPDATE
+ * upsert criteria Document{{W_ID=null}}
+ * update spec Document{{W_ID=null}}
+ * Record[headers='HeaderImpl[ 0x000062.0000305a.0034 ::0]' data='Field[MAP:{W_YTD=Field[DECIMAL:87050177.99]}]']
+ * schema -- TAPDATA
+ * sdc.operation.type -- 3
+ * jdbc.W_YTD.scale -- 2
+ * oracle.cdc.operation -- UPDATE
+ * oracle.cdc.scn -- 1240667
+ * oracle.cdc.timestamp -- 2018-04-27 10:00:35
+ * oracle.cdc.rowId -- AAAE6sAAFAAAACWAAB
+ * jdbc.W_YTD.precision -- 12
+ * oracle.cdc.user -- TAPDATA
+ * oracle.cdc.xid -- 10.19.4717
+ * oracle.cdc.RS_ID --  0x000062.0000305a.0034
+ * oracle.cdc.table -- BMSQL_WAREHOUSE
+ * SEQ -- 1
+ * <p>
+ * SEQ -- 1
+ * oracle.cdc.SSN -- 0
+ * operation type UPDATE
+ * upsert criteria Document{{W_ID=null}}
+ * update spec Document{{W_ID=null}}
+ * Record[headers='HeaderImpl[ 0x000062.0000305a.0034 ::0]' data='Field[MAP:{W_YTD=Field[DECIMAL:87050177.99]}]']
+ * schema -- TAPDATA
+ * sdc.operation.type -- 3
+ * jdbc.W_YTD.scale -- 2
+ * oracle.cdc.operation -- UPDATE
+ * oracle.cdc.scn -- 1240667
+ * oracle.cdc.timestamp -- 2018-04-27 10:00:35
+ * oracle.cdc.rowId -- AAAE6sAAFAAAACWAAB
+ * jdbc.W_YTD.precision -- 12
+ * oracle.cdc.user -- TAPDATA
+ * oracle.cdc.xid -- 10.19.4717
+ * oracle.cdc.RS_ID --  0x000062.0000305a.0034
+ * oracle.cdc.table -- BMSQL_WAREHOUSE
+ * SEQ -- 1
  * <p>
  * SEQ -- 1
  * oracle.cdc.SSN -- 0

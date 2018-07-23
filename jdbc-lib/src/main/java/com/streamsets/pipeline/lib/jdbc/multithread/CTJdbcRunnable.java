@@ -95,7 +95,8 @@ public final class CTJdbcRunnable extends JdbcBaseRunnable {
   public void createAndAddRecord(
       ResultSet rs,
       TableRuntimeContext tableRuntimeContext,
-      BatchContext batchContext
+      BatchContext batchContext,
+      String connectionString
   ) throws SQLException, StageException {
     ResultSetMetaData md = rs.getMetaData();
 
@@ -142,11 +143,6 @@ public final class CTJdbcRunnable extends JdbcBaseRunnable {
     batchContext.getBatchMaker().addRecord(record);
 
     offsets.put(tableRuntimeContext.getOffsetKey(), offsetFormat);
-  }
-
-  @Override
-  public void createAndAddRecord(ResultSet rs, TableRuntimeContext tableRuntimeContext, BatchContext batchContext, String tableSchemasJson) throws SQLException, StageException {
-    this.createAndAddRecord(rs,tableRuntimeContext,batchContext);
   }
 
   @Override

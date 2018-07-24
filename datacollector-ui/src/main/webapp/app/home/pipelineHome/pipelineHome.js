@@ -2229,9 +2229,10 @@ angular
  
               console.log(current_schema,equalLastTime,"compareLastTime!")
               if( !equalLastTime){
-                $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo, database_type:database_type}}
+                $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
                 $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''
               }
+              $scope.pipelineConfig['metadata']['tapdata_schema']['schema']['database_type'] = database_type;
             }else{
               $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo, database_type:database_type}}
               $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''

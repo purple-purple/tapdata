@@ -338,7 +338,7 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
                         }
                         createAndAddRecord(rs, tableRuntimeContext, batchContext, is_mssql_cdc);
                         recordCount++;
-                        generateSchemaChanges(batchContext);
+//                        generateSchemaChanges(batchContext);
                     }
                 }
 

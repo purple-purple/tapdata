@@ -2187,13 +2187,15 @@ angular
               var database_type= '';
               for( var ci = 0; ci < $scope.pipelineConfig.stages[0].configuration.length; ci++){
                 if($scope.pipelineConfig.stages[0].configuration[ci].name === "hikariConfigBean.connectionString"){
-                  if($scope.pipelineConfig.stages[0].configuration[ci].value.indexOf('jdbc:mysql') >= 0 ){
+                  var connectionString = $scope.pipelineConfig.stages[0].configuration[ci].value;
+                  connectionString = connectionString && connectionString.toLowerCase()
+                  if(connectionString.indexOf('jdbc:mysql') >= 0 ){
                     database_type= 'Mysql';
                   }
-                  if($scope.pipelineConfig.stages[0].configuration[ci].value.indexOf('jdbc:oracle') >= 0 ){
+                  if(connectionString.indexOf('jdbc:oracle') >= 0 ){
                     database_type= 'Oracle';
                   }
-                  if($scope.pipelineConfig.stages[0].configuration[ci].value.indexOf('jdbc:microsoft:sqlserver') >= 0) {
+                  if(connectionString.indexOf('jdbc:microsoft:sqlserver') >= 0) {
                     database_type= 'Sqlserver';
                   }
                 }
@@ -2227,9 +2229,10 @@ angular
  
               console.log(current_schema,equalLastTime,"compareLastTime!")
               if( !equalLastTime){
-                $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo, database_type:database_type}}
+                $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
                 $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''
               }
+              $scope.pipelineConfig['metadata']['tapdata_schema']['schema']['database_type'] = database_type;
             }else{
               $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo, database_type:database_type}}
               $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''

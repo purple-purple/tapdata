@@ -1106,6 +1106,9 @@ angular.module('dataCollectorApp.common')
         dFieldPaths = [];
       }
       var keys;
+      if(!record){
+        return;
+      }
       if (record.type === 'LIST') {
         angular.forEach(record.value, function(value) {
           if (value.type === 'MAP' || value.type === 'LIST' || value.type === 'LIST_MAP') {

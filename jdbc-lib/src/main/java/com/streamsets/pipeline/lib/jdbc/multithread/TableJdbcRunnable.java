@@ -69,7 +69,7 @@ public final class TableJdbcRunnable extends JdbcBaseRunnable {
             ResultSet rs,
             TableRuntimeContext tableRuntimeContext,
             BatchContext batchContext,
-            String connectionString
+            boolean is_mssql_cdc
     ) throws SQLException, StageException {
         this.createAndAddRecordWithSchema(rs, tableRuntimeContext, batchContext);
     }

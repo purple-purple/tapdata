@@ -277,6 +277,7 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
         int recordCount = 0;
         int eventCount = 0;
         String tableSchemasJson = "";
+        boolean is_mssql_cdc = false;
         try {
             while (tableRuntimeContext == null) {
                 tableRuntimeContext = tableProvider.nextTable(threadNumber);
@@ -330,7 +331,12 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
                             resultSetEndReached = true;
                             break;
                         }
-                        createAndAddRecord(rs, tableRuntimeContext, batchContext, hikariPoolConfigBean.connectionString);
+
+                        if (cdcTableJdbcConfigBean != null && (hikariPoolConfigBean.connectionString.startsWith("jdbc:sqlserver")
+                                || hikariPoolConfigBean.connectionString.startsWith("jdbc:jtds:sqlserver"))) {
+                            is_mssql_cdc = true;
+                        }
+                        createAndAddRecord(rs, tableRuntimeContext, batchContext, is_mssql_cdc);
                         recordCount++;
                         generateSchemaChanges(batchContext);
                     }

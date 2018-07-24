@@ -96,7 +96,7 @@ public final class CTJdbcRunnable extends JdbcBaseRunnable {
       ResultSet rs,
       TableRuntimeContext tableRuntimeContext,
       BatchContext batchContext,
-      String connectionString
+      boolean is_mssql_cdc
   ) throws SQLException, StageException {
     ResultSetMetaData md = rs.getMetaData();
 

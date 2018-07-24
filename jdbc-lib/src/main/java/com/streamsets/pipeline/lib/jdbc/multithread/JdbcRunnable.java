@@ -30,7 +30,7 @@ public interface JdbcRunnable {
           ResultSet rs,
           TableRuntimeContext tableRuntimeContext,
           BatchContext batchContext,
-          String connectionString
+          boolean is_mssql_cdc
   ) throws SQLException, StageException;
 
   /**

@@ -22,7 +22,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.WriteModel;
-import com.streamsets.datacollector.validation.ValidationError;
 import com.streamsets.pipeline.api.Batch;
 import com.streamsets.pipeline.api.Record;
 import com.streamsets.pipeline.api.StageException;
@@ -158,10 +157,12 @@ public class MongoDBTarget extends BaseTarget {
                     for (Map.Entry<String, List<WriteModel<Document>>> entry : map.entrySet()) {
                         String collectionName = entry.getKey();
                         List<WriteModel<Document>> models = entry.getValue();
-                        if (!collectionBulkMap.containsKey(collectionName)) {
-                            collectionBulkMap.put(collectionName, new ArrayList<>());
+                        if (CollectionUtils.isNotEmpty(models)) {
+                            if (!collectionBulkMap.containsKey(collectionName)) {
+                                collectionBulkMap.put(collectionName, new ArrayList<>());
+                            }
+                            collectionBulkMap.get(collectionName).addAll(models);
                         }
-                        collectionBulkMap.get(collectionName).addAll(models);
                     }
 
                 }
@@ -191,6 +192,7 @@ public class MongoDBTarget extends BaseTarget {
                     MongoCollection<Document> collection = mongoTargetConfigBean.mongoConfig.getMongoDatabase().getCollection(collectionName);
 
                     BulkWriteResult bulkWriteResult = collection.bulkWrite(models);
+
                     if (bulkWriteResult.wasAcknowledged()) {
                         LOG.debug(
                                 "Wrote batch with {} inserts, {} updates and {} deletes to {}",

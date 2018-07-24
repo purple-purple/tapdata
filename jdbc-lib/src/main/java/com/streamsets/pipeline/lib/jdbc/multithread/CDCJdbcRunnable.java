@@ -97,7 +97,7 @@ public class CDCJdbcRunnable extends JdbcBaseRunnable {
             ResultSet rs,
             TableRuntimeContext tableRuntimeContext,
             BatchContext batchContext,
-            String connectionString
+            boolean is_mssql_cdc
     ) throws SQLException, StageException {
         ResultSetMetaData md = rs.getMetaData();
 
@@ -127,7 +127,8 @@ public class CDCJdbcRunnable extends JdbcBaseRunnable {
                 record,
                 Collections.singleton(tableRuntimeContext.getSourceTableContext().getTableName()),
                 md,
-                JDBC_NAMESPACE_HEADER
+                JDBC_NAMESPACE_HEADER,
+                is_mssql_cdc
         );
 
         for (String fieldName : recordHeader) {

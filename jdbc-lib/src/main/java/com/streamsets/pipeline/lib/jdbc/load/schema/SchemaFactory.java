@@ -11,6 +11,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.mortbay.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,7 @@ public class SchemaFactory {
                             schemaBean.setTableExceludePattern(((TableConfigBean) field).tableExclusionPattern);
 
                             schemaConfigBeans.add(schemaBean);
+                            is_mssql_cdc = false;
                         }
                     } else if (typeName.equals(SCHEMATABLECONFIGBEAN)) {
                         // jdbc multitable
@@ -82,6 +84,7 @@ public class SchemaFactory {
                             schemaBean.setTableExceludePattern(((SchemaTableConfigBean) field).excludePattern);
 
                             schemaConfigBeans.add(schemaBean);
+                            is_mssql_cdc = false;
                         }
                     } else if (typeName.equals(CDC_TABLE_CONFIG_BEAN)) {
                         // sql server cdc

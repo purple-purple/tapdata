@@ -293,6 +293,7 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
 
             ResultSet rs = null;
             // if connectionString start with jdbc:oracle,isPreview,batchSize=-1,then load oracle schema
+            updateGauge(JdbcBaseRunnable.Status.QUERYING_TABLE);
             if (context.isPreview() && threadNumber == 0 && batchSize == -1) {
 
                 // adaptor sql server cdc
@@ -312,20 +313,20 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
                     return;
                 }
             } else {
-                updateGauge(JdbcBaseRunnable.Status.QUERYING_TABLE);
                 tableReadContext = getOrLoadTableReadContext();
                 rs = tableReadContext.getResultSet();
             }
             boolean resultSetEndReached = false;
 
             try {
+                updateGauge(JdbcBaseRunnable.Status.GENERATING_BATCH);
                 if (StringUtils.isNotEmpty(tableSchemasJson)) {
                     LOG.debug("Load oracle schema: {}", tableSchemasJson);
                     Record record = context.createRecord("schema");
                     record.getHeader().setAttribute("schema", tableSchemasJson);
                     batchContext.getBatchMaker().addRecord(record);
+                    resultSetEndReached = true;
                 } else {
-                    updateGauge(JdbcBaseRunnable.Status.GENERATING_BATCH);
                     while (recordCount < batchSize) {
                         if (rs.isClosed() || !rs.next()) {
                             resultSetEndReached = true;
@@ -338,7 +339,7 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
                         }
                         createAndAddRecord(rs, tableRuntimeContext, batchContext, is_mssql_cdc);
                         recordCount++;
-//                        generateSchemaChanges(batchContext);
+                        // generateSchemaChanges(batchContext);
                     }
                 }
 

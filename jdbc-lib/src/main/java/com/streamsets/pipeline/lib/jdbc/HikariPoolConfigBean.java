@@ -15,11 +15,7 @@
  */
 package com.streamsets.pipeline.lib.jdbc;
 
-import com.streamsets.pipeline.api.ConfigDef;
-import com.streamsets.pipeline.api.ListBeanModel;
-import com.streamsets.pipeline.api.Stage;
-import com.streamsets.pipeline.api.StageException;
-import com.streamsets.pipeline.api.ValueChooserModel;
+import com.streamsets.pipeline.api.*;
 import com.streamsets.pipeline.api.credential.CredentialValue;
 import com.streamsets.pipeline.lib.el.TimeEL;
 import com.streamsets.pipeline.stage.destination.jdbc.Groups;
@@ -257,6 +253,17 @@ public class HikariPoolConfigBean {
   )*/
   public String databaseOwner = "";
 
+  @ConfigDef(
+          type = ConfigDef.Type.TEXT,
+          label = "Mapping",
+          description = "Define the table mapping",
+          required = false,
+          displayPosition = 1005,
+          group = "JDBC"/*,
+          dependsOn = "connectionString",
+          triggeredByValue = "display mapping"*/
+  )
+  public String mapping;
 
   private static final String HIKARI_CONFIG_PREFIX = "hikariConfigBean.";
   private static final String DRIVER_CLASSNAME = HIKARI_CONFIG_PREFIX + "driverClassName";

@@ -102,7 +102,9 @@ public class MongoTargetConfigBean {
             description = "Schema Json",
             displayPosition = 1006,
             required = false,
-            group = "MAPPING"
+            group = "MAPPING",
+            dependsOn = "mapping",
+            triggeredByValue = "display"
     )
     public String schema;
 }

@@ -28,6 +28,7 @@ import com.streamsets.pipeline.api.StageException;
 import com.streamsets.pipeline.api.base.BaseSource;
 import com.streamsets.pipeline.api.impl.Utils;
 import com.streamsets.pipeline.lib.jdbc.*;
+import com.streamsets.pipeline.lib.jdbc.load.schema.MappingBean;
 import com.streamsets.pipeline.lib.jdbc.load.schema.SchemaFactory;
 import com.streamsets.pipeline.lib.operation.OperationType;
 import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
@@ -40,6 +41,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -276,6 +278,8 @@ public class OracleCDCSource extends BaseSource {
     private final SQLListener sqlListener = new SQLListener();
 
     private String tableSchemasJson = new String();
+
+    private MappingBean mappingBean;
 
     public OracleCDCSource(HikariPoolConfigBean hikariConf, OracleCDCConfigBean oracleCDCConfigBean) {
         this.configBean = oracleCDCConfigBean;
@@ -716,78 +720,82 @@ public class OracleCDCSource extends BaseSource {
     ) throws UnparseableSQLException, StageException {
         String operation;
         SchemaAndTable table = new SchemaAndTable(attributes.get(SCHEMA), attributes.get(TABLE));
-        int sdcOperationType = getOperation(operationCode);
-        operation = OperationType.getLabelFromIntCode(sdcOperationType);
-        attributes.put(OperationType.SDC_OPERATION_TYPE, String.valueOf(sdcOperationType));
-        attributes.put(OPERATION, operation);
-        String id = useLocalBuffering ?
-                attributes.get(RS_ID) + OFFSET_DELIM + attributes.get(SSN) :
-                attributes.get(SCN) + OFFSET_DELIM + attributes.get(SEQ);
-        Record record = getContext().createRecord(id);
-        if (configBean.parseQuery) {
-            // Walk it and attach our sqlListener
-            sqlListener.reset();
-            if (configBean.allowNulls && table.isNotEmpty()) {
-                sqlListener.setColumns(tableSchemas.get(table).keySet());
-            }
-
-            parseTreeWalker.walk(sqlListener, getParserRuleContext(sql, operationCode));
-
-            Map<String, String> columns = sqlListener.getColumns();
-            String rowId = columns.get(ROWID);
-            columns.remove(ROWID);
-            if (rowId != null) {
-                attributes.put(ROWID_KEY, rowId);
-            }
-            Map<String, Field> fields = new HashMap<>();
-
-            List<UnsupportedFieldTypeException> fieldTypeExceptions = new ArrayList<>();
-            for (Map.Entry<String, String> column : columns.entrySet()) {
-                String columnName = column.getKey();
-                try {
-                    fields.put(columnName, objectToField(table, columnName, column.getValue()));
-                } catch (UnsupportedFieldTypeException ex) {
-                    if (configBean.sendUnsupportedFields) {
-                        fields.put(columnName, Field.create(column.getValue()));
-                    }
-                    fieldTypeExceptions.add(ex);
+        if (tableSchemas.containsKey(table)) {
+            int sdcOperationType = getOperation(operationCode);
+            operation = OperationType.getLabelFromIntCode(sdcOperationType);
+            attributes.put(OperationType.SDC_OPERATION_TYPE, String.valueOf(sdcOperationType));
+            attributes.put(OPERATION, operation);
+            String id = useLocalBuffering ?
+                    attributes.get(RS_ID) + OFFSET_DELIM + attributes.get(SSN) :
+                    attributes.get(SCN) + OFFSET_DELIM + attributes.get(SEQ);
+            Record record = getContext().createRecord(id);
+            if (configBean.parseQuery) {
+                // Walk it and attach our sqlListener
+                sqlListener.reset();
+                if (configBean.allowNulls && table.isNotEmpty()) {
+                    sqlListener.setColumns(tableSchemas.get(table).keySet());
                 }
-                if (decimalColumns.containsKey(table) && decimalColumns.get(table).containsKey(columnName)) {
-                    int precision = decimalColumns.get(table).get(columnName).precision;
-                    int scale = decimalColumns.get(table).get(columnName).scale;
-                    attributes.put("jdbc." + columnName + ".precision", String.valueOf(precision));
-                    attributes.put("jdbc." + columnName + ".scale", String.valueOf(scale));
-                }
-            }
-            record.set(Field.create(fields));
-            attributes.forEach((k, v) -> record.getHeader().setAttribute(k, v));
 
-            LOG.debug(GENERATED_RECORD, record, attributes.get(XID));
-            Joiner errorStringJoiner = Joiner.on(", ");
-            List<String> errorColumns = Collections.emptyList();
-            if (!fieldTypeExceptions.isEmpty()) {
-                errorColumns = fieldTypeExceptions.stream().map(ex -> {
-                            String fieldTypeName = JDBCTypeNames.getOrDefault(ex.fieldType, "unknown");
-                            return "[Column = '" + ex.column + "', Type = '" + fieldTypeName + "', Value = '" + ex.columnVal + "']";
+                parseTreeWalker.walk(sqlListener, getParserRuleContext(sql, operationCode));
+
+                Map<String, String> columns = sqlListener.getColumns();
+                String rowId = columns.get(ROWID);
+                columns.remove(ROWID);
+                if (rowId != null) {
+                    attributes.put(ROWID_KEY, rowId);
+                }
+                Map<String, Field> fields = new HashMap<>();
+
+                List<UnsupportedFieldTypeException> fieldTypeExceptions = new ArrayList<>();
+                for (Map.Entry<String, String> column : columns.entrySet()) {
+                    String columnName = column.getKey();
+                    try {
+                        fields.put(columnName, objectToField(table, columnName, column.getValue()));
+                    } catch (UnsupportedFieldTypeException ex) {
+                        if (configBean.sendUnsupportedFields) {
+                            fields.put(columnName, Field.create(column.getValue()));
                         }
-                ).collect(Collectors.toList());
-            }
-            if (!fieldTypeExceptions.isEmpty()) {
-                boolean add = handleUnsupportedFieldTypes(record, errorStringJoiner.join(errorColumns));
-                if (add) {
-                    return record;
+                        fieldTypeExceptions.add(ex);
+                    }
+                    if (decimalColumns.containsKey(table) && decimalColumns.get(table).containsKey(columnName)) {
+                        int precision = decimalColumns.get(table).get(columnName).precision;
+                        int scale = decimalColumns.get(table).get(columnName).scale;
+                        attributes.put("jdbc." + columnName + ".precision", String.valueOf(precision));
+                        attributes.put("jdbc." + columnName + ".scale", String.valueOf(scale));
+                    }
+                }
+                record.set(Field.create(fields));
+                attributes.forEach((k, v) -> record.getHeader().setAttribute(k, v));
+
+                LOG.debug(GENERATED_RECORD, record, attributes.get(XID));
+                Joiner errorStringJoiner = Joiner.on(", ");
+                List<String> errorColumns = Collections.emptyList();
+                if (!fieldTypeExceptions.isEmpty()) {
+                    errorColumns = fieldTypeExceptions.stream().map(ex -> {
+                                String fieldTypeName = JDBCTypeNames.getOrDefault(ex.fieldType, "unknown");
+                                return "[Column = '" + ex.column + "', Type = '" + fieldTypeName + "', Value = '" + ex.columnVal + "']";
+                            }
+                    ).collect(Collectors.toList());
+                }
+                if (!fieldTypeExceptions.isEmpty()) {
+                    boolean add = handleUnsupportedFieldTypes(record, errorStringJoiner.join(errorColumns));
+                    if (add) {
+                        return record;
+                    } else {
+                        return null;
+                    }
                 } else {
-                    return null;
+                    return record;
                 }
             } else {
+                attributes.forEach((k, v) -> record.getHeader().setAttribute(k, v));
+                Map<String, Field> fields = new HashMap<>();
+                fields.put("sql", Field.create(sql));
+                record.set(Field.create(fields));
                 return record;
             }
         } else {
-            attributes.forEach((k, v) -> record.getHeader().setAttribute(k, v));
-            Map<String, Field> fields = new HashMap<>();
-            fields.put("sql", Field.create(sql));
-            record.set(Field.create(fields));
-            return record;
+            return null;
         }
 
     }
@@ -1147,6 +1155,11 @@ public class OracleCDCSource extends BaseSource {
                     issues.add(getContext().createConfigIssue(Groups.CREDENTIALS.name(), USERNAME, JDBC_50));
                 }
             }
+
+            if (!getContext().isPreview()) {
+                handleTableSchemas();
+            }
+
             container = CDB_ROOT;
             if (majorVersion >= 12) {
                 try {
@@ -1643,7 +1656,6 @@ public class OracleCDCSource extends BaseSource {
             default:
                 throw new UnsupportedFieldTypeException(column, columnValue, columnType);
         }
-
         return field;
     }
 
@@ -1862,6 +1874,32 @@ public class OracleCDCSource extends BaseSource {
 
         UnparseableSQLException(String sql) {
             this.sql = sql;
+        }
+    }
+
+    private void handleTableSchemas() {
+        Map<SchemaAndTable, Map<String, Integer>> newTableSchemas = new HashMap<>();
+
+        if (StringUtils.isNotBlank(hikariConfigBean.mapping)) {
+            mappingBean = new MappingBean(hikariConfigBean.mapping, true);
+
+            if (CollectionUtils.isNotEmpty(mappingBean.getMappings())) {
+                List<MappingBean.MappingInfo> mappings = mappingBean.getMappings();
+
+                if (mappings.size() < tableSchemas.size()) {
+                    for (Map.Entry<SchemaAndTable, Map<String, Integer>> entry : tableSchemas.entrySet()) {
+                        for (MappingBean.MappingInfo info : mappings) {
+                            if (info.getFrom_table().equals(entry.getKey().getTable())) {
+                                newTableSchemas.put(entry.getKey(), entry.getValue());
+                                continue;
+                            }
+                        }
+                    }
+
+                    tableSchemas.clear();
+                    tableSchemas.putAll(newTableSchemas);
+                }
+            }
         }
     }
 }

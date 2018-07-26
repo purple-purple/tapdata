@@ -29,6 +29,7 @@ import com.streamsets.pipeline.lib.executor.SafeScheduledExecutorService;
 import com.streamsets.pipeline.lib.jdbc.HikariPoolConfigBean;
 import com.streamsets.pipeline.lib.jdbc.JdbcErrors;
 import com.streamsets.pipeline.lib.jdbc.JdbcUtil;
+import com.streamsets.pipeline.lib.jdbc.load.schema.MappingBean;
 import com.streamsets.pipeline.lib.jdbc.multithread.BatchTableStrategy;
 import com.streamsets.pipeline.lib.jdbc.multithread.ConnectionManager;
 import com.streamsets.pipeline.lib.jdbc.multithread.JdbcBaseRunnable;
@@ -46,7 +47,9 @@ import com.streamsets.pipeline.stage.origin.jdbc.cdc.sqlserver.CDCTableJdbcConfi
 import com.streamsets.pipeline.stage.origin.jdbc.table.PartitioningMode;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
+import com.sun.xml.internal.ws.api.databinding.MappingInfo;
 import com.zaxxer.hikari.HikariDataSource;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,6 +99,8 @@ public abstract class AbstractTableJdbcSource extends BasePushSource {
     private ScheduledExecutorService executorService;
     private MultithreadedTableProvider tableOrderProvider;
     private int numberOfThreads;
+
+    private MappingBean mappingBean;
 
     public AbstractTableJdbcSource(
             HikariPoolConfigBean hikariConfigBean,
@@ -296,6 +301,10 @@ public abstract class AbstractTableJdbcSource extends BasePushSource {
             issues = validatePartitioningConfigs(context, issues, allTableContexts, qualifiedTableNameToConfigIndex);
             if (!issues.isEmpty()) {
                 return;
+            }
+
+            if (!context.isPreview()) {
+                handleAllTableContexts();
             }
 
             numberOfThreads = tableJdbcConfigBean.numberOfThreads;
@@ -521,4 +530,29 @@ public abstract class AbstractTableJdbcSource extends BasePushSource {
             ConnectionManager connectionManager,
             Map<String, String> offsets
     );
+
+    private void handleAllTableContexts() {
+        Map<String, TableContext> newAllTableContexts = new HashMap<>();
+        if (StringUtils.isNotBlank(hikariConfigBean.mapping)) {
+            mappingBean = new MappingBean(hikariConfigBean.mapping, true);
+
+            if (CollectionUtils.isNotEmpty(mappingBean.getMappings())) {
+                List<MappingBean.MappingInfo> mappings = mappingBean.getMappings();
+
+                if (mappings.size() < allTableContexts.size()) {
+                    for (Map.Entry<String, TableContext> entry : allTableContexts.entrySet()) {
+                        for (MappingBean.MappingInfo info : mappings) {
+                            if (info.getFrom_table().equals(entry.getValue().getTableName())) {
+                                newAllTableContexts.put(entry.getKey(), entry.getValue());
+                                continue;
+                            }
+                        }
+                    }
+
+                    allTableContexts.clear();
+                    allTableContexts.putAll(newAllTableContexts);
+                }
+            }
+        }
+    }
 }

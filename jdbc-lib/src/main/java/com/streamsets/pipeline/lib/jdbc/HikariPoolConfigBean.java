@@ -259,6 +259,7 @@ public class HikariPoolConfigBean {
           description = "Define the table mapping",
           required = false,
           displayPosition = 1005,
+          defaultValue = "{\"mappings\":\"[{\\\"from_table\\\":\\\"SUB\\\",\\\"custom_sql\\\":\\\"\\\",\\\"offset\\\":\\\"\\\",\\\"to_table\\\":\\\"subinfo\\\",\\\"join_condition\\\":[{\\\"source\\\":\\\"PK_ONE\\\",\\\"target\\\":\\\"PK_ONE\\\"}],\\\"relationship\\\":\\\"OneOne\\\",\\\"target_path\\\":\\\"\\\"},{\\\"from_table\\\":\\\"SUB_D\\\",\\\"custom_sql\\\":\\\"\\\",\\\"offset\\\":\\\"\\\",\\\"to_table\\\":\\\"subinfo\\\",\\\"join_condition\\\":[{\\\"source\\\":\\\"AA\\\",\\\"target\\\":\\\"PK_ONE\\\"}],\\\"relationship\\\":\\\"OneOne\\\",\\\"target_path\\\":\\\"SUB_D\\\"}]\"}",
           group = "JDBC"/*,
           dependsOn = "connectionString",
           triggeredByValue = "display mapping"*/

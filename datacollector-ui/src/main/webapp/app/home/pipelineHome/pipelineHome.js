@@ -2093,9 +2093,11 @@ angular
           $scope.showLoading = false;
         },3000)
       }, 60000)
+    
       const mappingLoad = function($scope, $rootScope){
         $("#editorIframe").height((window.innerHeight - 240) + 'px')
         let checkMapView = setInterval(function(){
+          
           let ifrmNode = document.getElementById('editorIframe')
           let ifrm = ifrmNode ? ifrmNode.contentWindow || ifrmNode.contentDocument.document || ifrmNode.contentDocument : null;
           if(!ifrm.mydesigner){
@@ -2128,7 +2130,15 @@ angular
           ifrm.mydesigner && ifrm.mydesigner.on('savedocument', r => {
             var result = ifrm.mydesigner.getDesignResult()
             $scope.pipelineConfig['metadata']['tapdata_mapping'] = result
-            
+            var updateJDBCMappingConfig = function (stage,value){
+              for(var jIndex = 0; jIndex < stage.configuration.length; jIndex++){
+                if(stage.configuration[jIndex].name ===  'hikariConfigBean.mapping'){
+                  stage.configuration[jIndex].value = value
+                }
+              }
+            }
+            updateJDBCMappingConfig($scope.pipelineConfig.stages[0], result)
+
             for(var i = 0; i < $scope.pipelineConfig.stages.length; i++) {
               if($scope.pipelineConfig.stages[i].library === 'streamsets-datacollector-mongodb_3-lib'){
                 for(var j = 0; j < $scope.pipelineConfig.stages[i].configuration.length; j++){
@@ -2170,7 +2180,27 @@ angular
       previewService.getInputRecordsFromPreview($scope.activeConfigInfo.name, $scope.selectedStage,
         -1,true).then(function(data){
           if(!data.batchesOutput && data.message){
-            $(".mapping-message").text(data.message)
+            errorMessage = '';
+          if(data && data.issues && data.issues.stageIssues){
+              for( var key in data.issues.stageIssues){
+                  if(key.indexOf('JDBC')>=0){
+                      var list = data.issues.stageIssues[key];
+                      for(var eIndex = 0; eIndex < list.length; eIndex++){
+                          if( list[eIndex].message.indexOf('VALIDATION_0011' < 0)){
+                              errorMessage = list[eIndex].message
+                          }   
+                      }
+                  }
+              }
+          }
+            $(".mapping-message").text(errorMessage)
+          }
+          var updateJDBCMappingConfig = function (stage,value){
+            for(var jIndex = 0; jIndex < stage.configuration.length; jIndex++){
+              if(stage.configuration[jIndex].name ===  'hikariConfigBean.mapping'){
+                stage.configuration[jIndex].value = ":"+value
+              }
+            }
           }
           const schemaString = getSchema(data)
           if(schemaString){
@@ -2201,6 +2231,7 @@ angular
                 }
               }
             }
+            
             if(current_schema && current_schema.schema){
               current_schema.schema.tables.sort((a,b)=> {
                 delete a.visible
@@ -2226,17 +2257,22 @@ angular
                 return  a.table_name.localeCompare(b.table_name)
               })
               var equalLastTime =  _.isEqual(current_schema.schema.tables, tableInfo);
- 
+              
               console.log(current_schema,equalLastTime,"compareLastTime!")
               if( !equalLastTime){
                 $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo}}
                 $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''
+                updateJDBCMappingConfig($scope.pipelineConfig.stages[0], '')
+
               }
               $scope.pipelineConfig['metadata']['tapdata_schema']['schema']['database_type'] = database_type;
             }else{
               $scope.pipelineConfig['metadata']['tapdata_schema'] = {schema:{tables:tableInfo, database_type:database_type}}
               $scope.pipelineConfig['metadata']['tapdata_mapping'] = ''
+              updateJDBCMappingConfig($scope.pipelineConfig.stages[0], '')
             }
+            
+           
             $rootScope.$broadcast('pip-saveUpdates', $scope.pipelineConfig)
             setTimeout(mappingLoad.bind(this, $scope, $rootScope), 3000)
           }else{

@@ -2132,8 +2132,8 @@ angular
             $scope.pipelineConfig['metadata']['tapdata_mapping'] = result
             var updateJDBCMappingConfig = function (stage,value){
               for(var jIndex = 0; jIndex < stage.configuration.length; jIndex++){
-                if(stage.configuration[jIndex].name ===  'hikariConfigBean.mapping'){
-                  stage.configuration[jIndex].value = value
+                if(stage.configuration[jIndex].name.indexOf('.mapping')  > 0 ){
+                  stage.configuration[jIndex].value = ":"+JSON.stringify(value)
                 }
               }
             }
@@ -2197,8 +2197,8 @@ angular
           }
           var updateJDBCMappingConfig = function (stage,value){
             for(var jIndex = 0; jIndex < stage.configuration.length; jIndex++){
-              if(stage.configuration[jIndex].name ===  'hikariConfigBean.mapping'){
-                stage.configuration[jIndex].value = ":"+value
+              if(stage.configuration[jIndex].name.indexOf('.mapping')  > 0 ){
+                stage.configuration[jIndex].value = ":"+JSON.stringify(value)
               }
             }
           }
